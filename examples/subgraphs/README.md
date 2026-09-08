@@ -1,7 +1,7 @@
 # Fictional order system across two levels
 
 ```sh
-npm run demo:subgraphs
+npm run demo
 ```
 
 Open `generated/diagram.html`. Select **Order Processing**, then **Explore Inside
@@ -12,6 +12,15 @@ from its internals. Its mapping section explains each overview connection.
 
 The **Reading the two levels** Markdown document attaches to both graphs, the
 parent node, and the overview repair edge. It links across graph levels.
+Open **Documents** in the header to read it, or find it in the Order Processing
+node and Repair order edge inspectors. `npm run demo:subgraphs` is an alias for
+the same complete demo.
+
+Direct destinations in the generated HTML:
+
+- [Overview](generated/diagram.html#graph=overview).
+- [Subgraph: Inside Order Processing](generated/diagram.html#graph=order-internals).
+- [Attached Markdown: Reading the two levels](generated/diagram.html#document=reading-levels).
 
 Files:
 

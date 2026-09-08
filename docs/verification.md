@@ -139,3 +139,16 @@ checks pass for every skin. Browser-triggered downloads and direct `file://`
 opening remain unverified under the earlier environment limitations; no bypass
 was attempted. The SVG download cleanup is implemented, but its browser download
 event is not claimed as verified.
+
+## Default demo coverage
+
+`npm run demo` now builds the example containing both subgraphs and attached
+Markdown. The previous default built the original single-graph example, which
+is still available as `npm run demo:basic`.
+
+A regression test first reproduced the missing subgraph in the default output.
+It now builds the demo in an isolated temporary checkout and recovers both graph
+levels and attached Markdown from the resulting HTML. A separate fixture check
+verifies graph, node, and edge attachments plus links across graph levels.
+The full suite passes 105 tests. This correction changes the default command
+and walkthrough; the existing viewer and example content are unchanged.

@@ -10,7 +10,8 @@
   "scripts": {
     "validate": "node scripts/validate-model.mjs",
     "test": "node --test",
-    "demo": "node bin/waxwing.mjs build examples/order-processing/model.json examples/order-processing/generated --group system-structure",
+    "demo": "node bin/waxwing.mjs build examples/subgraphs/model.json examples/subgraphs/generated",
+    "demo:basic": "node bin/waxwing.mjs build examples/order-processing/model.json examples/order-processing/generated --group system-structure",
     "demo:documents": "node bin/waxwing.mjs build examples/documented-orders/model.json examples/documented-orders/generated --group system-structure",
     "demo:subgraphs": "node bin/waxwing.mjs build examples/subgraphs/model.json examples/subgraphs/generated"
   },

@@ -19,7 +19,7 @@ npm ci
 npm run demo
 ```
 
-Open [the generated HTML](examples/order-processing/generated/diagram.html)
+Open [the generated HTML](examples/subgraphs/generated/diagram.html)
 directly in a browser; it needs no server or account. Click a node, edge, group,
 or open question to inspect its claims and sources. Use **100%** for readable
 text and scroll to pan, or **Fit** for an overview. The viewer includes dark
@@ -29,9 +29,20 @@ inspect direct relationships, operation types, and recorded uncertainty;
 Standard, Engineering, and Editorial skins. See the [viewer rules](docs/viewer.md)
 for exact warning thresholds, highlight behavior, and styling boundaries.
 
-Start with the [fictional example](examples/order-processing/README.md), its
-[JSON 1](examples/order-processing/model.json), or its
-[generated JSON 2](examples/order-processing/generated/layout.json).
+The default demo includes **two graph levels and an attached Markdown document**
+in that one HTML file. Try this short walkthrough:
+
+1. Select **Order Processing**, then **Explore Inside Order Processing** to
+   open the subgraph with its API, queue, worker, and database.
+2. Select **Documents** in the header, then **Reading the two levels**. Its links
+   navigate back into either graph and to specific nodes and relationships.
+3. Return to the overview and select **Repair order**. Its inspector includes
+   the attached document and the disputed correspondence in the child graph.
+
+Start with the [complete fictional demo](examples/subgraphs/README.md), its
+[JSON 1](examples/subgraphs/model.json), or its
+[generated JSON 2](examples/subgraphs/generated/layout.json).
+The original single-graph example remains available with `npm run demo:basic`.
 
 ## Attach Markdown documents
 
