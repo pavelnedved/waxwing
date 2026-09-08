@@ -5,58 +5,26 @@ ask questions, and write files. It is a prompt package, not a built-in ingestion
 command, a crawler, or a guarantee of factual accuracy. Adapt it after trying it
 on a real system; different questions need different investigation checklists.
 
-## Start a run
+## Start a run with one file
 
-Choose the diagram by the question it should answer:
+Give the agent **[AGENT_GUIDE.md](../../AGENT_GUIDE.md)** plus its system sources,
+Waxwing checkout path, reading question, output directory, and desired output
+stage. That file contains the kickoff, exact supported source fields, complete
+examples, uncertainty rules, subgraphs/workflows, sequence behavior, document
+references, validation, pipeline commands, and error handling. No other Markdown
+file or separately supplied schema is needed to understand the authoring contract.
+The agent still needs source access to learn the actual system and a checkout to
+run validation. Without execution access, it must report validation as not run.
 
-| Question | Workflow |
-|---|---|
-| What components exist, where are their boundaries, and what depends on what? | [Architecture](workflow.md) |
-| How does one recorded path repeatedly visit components in an architecture model? | [Architecture with explicit workflow](architecture-workflows.md) |
-| What interactions occur in one scenario, or repeat/branch in scoped current behavior? | [Sequence](sequence.md) |
+The focused prompts remain optional references for readers who prefer a narrower
+view: [architecture](workflow.md), [architecture workflows](architecture-workflows.md),
+and [sequence](sequence.md). They are not additional required steps or files for
+the single-file kickoff.
 
-These are different concerns with separate JSON 1 contracts. Select one useful
-scope; do not automatically generate multiple diagram types from the same facts.
-The sequence workflow explains the evidence and ordering requirements and limits.
-
-Give your agent the chosen workflow, access to a Waxwing checkout, and
-the source locations it may investigate. Copy this kickoff message and replace
-the bracketed values:
-
-```text
-Construct Waxwing JSON 1 using the workflow at:
-  [absolute path to waxwing]/prompts/ingestion/[workflow.md, architecture-workflows.md, or sequence.md]
-
-Waxwing checkout: [absolute path]
-Diagram type: [architecture or sequence]
-Question the diagram should answer: [one concrete question]
-Source locations: [repository paths, documentation locations, supplied files]
-Environment and snapshot: [target environment and revisions, or what is unknown]
-Initial abstraction: [e.g. deployed services and their dependencies]
-Include: [scope boundaries]
-Exclude: [scope boundaries]
-Output directory: [an appropriate local directory for this system's data]
-Human clarification: [ask me targeted questions / produce a draft without asking]
-Existing JSON 1, if any: [path or none]
-
-Investigate the supplied sources and construct a partial current-implementation
-model. Follow the stages without asking me to approve every extracted fact.
-Retain unknowns and disputes explicitly. Do not change the source repositories.
-Deliver canonical model.json plus a short ingestion-report.md. Stop after JSON 1;
-I will decide when to generate a diagram.
-```
-
-Use a project-appropriate output directory. Real-system inputs, outputs, and
-human statements do not belong in Waxwing's public fictional examples.
-The workflow has no required source folder layout and does not require a
-specific model provider. Access to remote documentation depends on your agent's
-existing tools and permissions; merely supplying a URL does not supply its text.
-
-For an agent without filesystem access, provide the workflow and the contents
-of its referenced schema and contract documents, plus the relevant sources.
-It can return the two artifacts as text. Validation must be reported as not run
-until someone actually runs the validator. Missing schema/source access is not
-permission to guess their contents.
+Keep real-system inputs, outputs and human statements outside Waxwing's public
+fictional examples. The guide deliberately duplicates internal reference material
+as a user-facing interface; update it with contract changes. Its complete examples
+are exercised directly by `test/agent-guide.test.mjs`.
 
 ## What the stages produce
 

@@ -1,5 +1,8 @@
 # Construct a sequence JSON 1
 
+For the complete external handoff in one file, use
+[AGENT_GUIDE.md](../../AGENT_GUIDE.md). This focused reference is optional.
+
 Use this workflow when the question is **who interacts with whom, and in what
 order, during a current-system scenario or scoped repeating/branching behavior**.
 For component boundaries and dependencies, use the [architecture workflow](workflow.md). Do not produce

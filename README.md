@@ -10,6 +10,19 @@ module entry points and recovery of the complete source model from either
 export. The contracts are experimental drafts, not stable releases. The example
 and all its evidence are fictional.
 
+## Give your agent one file
+
+Use **[AGENT_GUIDE.md](AGENT_GUIDE.md)** as the complete external handoff for
+constructing JSON 1 or running the pipeline. It includes a copyable kickoff,
+all supported source contracts, evidence/uncertainty rules, subgraphs, workflows,
+sequence loops/alternatives, Markdown links, complete executable examples,
+CLI/API commands, and troubleshooting. No other Markdown file is required.
+
+Give the agent that file, access to your system sources, the Waxwing checkout
+path, an output directory, and the reading question. Choose whether it should
+stop at JSON 1 or build the diagrams. The specialized documents below remain
+available for focused reference and implementation history.
+
 ## Try it
 
 With Node.js 20.19.0 or newer:
@@ -151,10 +164,10 @@ cover unknown/disputed entries and compatibility with models that omit this fiel
 ## Explicit entry and exit points
 
 To construct JSON 1 from code, existing documents, and human clarification,
-start with the [ingestion prompt workflow](prompts/ingestion/README.md). It
-provides a copyable kickoff and staged instructions for an agent with source
-access. It uses the existing schema and validator; there is no built-in crawler
-or `ingest` CLI command yet.
+start with the [single-file agent guide](AGENT_GUIDE.md). It provides the
+copyable kickoff, complete authoring rules, and pipeline commands in one place.
+It uses the existing schema and validator; there is no built-in crawler or
+`ingest` CLI command yet.
 
 ```text
 Your own producer

@@ -288,3 +288,18 @@ opening via `file://` retain their earlier unverified status; no bypass was
 attempted. The workflow contract explicitly limits the first presentation to
 continuous linear scenarios, with grouping labels instead of workflow frames.
 The separate sequence behavior renderer retains loops and conditionals.
+
+## Single-file external agent guide
+
+The full suite passes **178 tests**. `AGENT_GUIDE.md` is the complete
+authoring/pipeline handoff. The README and
+focused ingestion prompts link to it as the primary external entry point.
+Its full architecture, sequence scenario, and sequence behavior JSON examples
+are extracted directly by four integration tests. They validate, lay out,
+render and recover without reading separate example/document files. Architecture
+coverage includes grouping, subgraph mappings and workflow SVG selection.
+An external-folder CLI test also exercises file-backed Markdown, prepare,
+validate, build, check-layout, selected SVG export and recovery after removing
+source inputs. The guide's JSON snippets and local file/heading links were checked.
+These tests guard executable examples against drift; they do not establish
+real-system ingestion accuracy or exhaustively verify prose.

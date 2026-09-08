@@ -1,5 +1,8 @@
 # Agent workflow: construct an evidence-backed Waxwing JSON 1
 
+For the complete external handoff in one file, use
+[AGENT_GUIDE.md](../../AGENT_GUIDE.md). This focused reference is optional.
+
 This workflow builds architecture diagrams: components, boundaries, and
 dependencies. For interactions ordered within one scenario, use the
 [sequence workflow](sequence.md) instead. Choose by the user's question; do not

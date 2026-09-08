@@ -1,5 +1,8 @@
 # Agent workflow: architecture with explicit participation
 
+For the complete external handoff in one file, use
+[AGENT_GUIDE.md](../../AGENT_GUIDE.md). This focused reference is optional.
+
 Follow the [architecture ingestion workflow](workflow.md) for source access,
 scope, evidence, canonical identities and review. Apply the additions below
 when the user wants to trace one recorded interaction path through architecture
