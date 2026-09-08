@@ -7,6 +7,13 @@ automatic layout, SVG/HTML rendering, and source recovery through
 The implementation uses Node.js, Ajv, ELK, and a standalone vanilla-JavaScript
 viewer; ingestion and model-provider decisions remain deferred.
 
+The [basic sequence implementation](docs/sequence.md) adds one separate scenario
+contract with explicit step ordering. Diagram type is selected by the concern
+being explained; architecture models are not automatically converted into
+sequence models. Shared document loading, knowledge conventions, CLI stages,
+and source recovery remain common. Branches, concurrency, and cross-type model
+packaging await concrete real-project feedback.
+
 ## First development route
 
 The agreed starting point is **JSON 1 → JSON 2 → SVG**. Ingestion is deferred

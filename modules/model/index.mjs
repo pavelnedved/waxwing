@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import Ajv2020 from 'ajv/dist/2020.js';
+import { validateSequenceModel } from '../sequence/model.mjs';
 import { graphDiagnostics } from '../graphs/index.mjs';
 import { documentDiagnostics } from '../documents/markdown.mjs';
 
@@ -25,6 +26,7 @@ function candidates(knowledge, path) {
 }
 
 export function validateModel(model) {
+  if (model?.diagramType === 'sequence') return validateSequenceModel(model);
   if (!validateShape(model)) {
     return {
       ok: false,

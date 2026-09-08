@@ -1,0 +1,216 @@
+{
+  "schemaVersion": "0.1-sequence-draft",
+  "diagramType": "sequence",
+  "id": "checkout-retry",
+  "title": "Checkout times out before payment succeeds",
+  "scope": {
+    "timeframe": "current",
+    "environment": "Fictional order system",
+    "snapshot": "Fixture v1",
+    "coverage": "partial",
+    "question": "What does Checkout know when it retries an order whose payment completed after its timeout?",
+    "includes": [
+      "One initial order request, one payment request and reply, one local timeout, and one retry."
+    ],
+    "excludes": [
+      "Handling of the retry, duplicate-charge behavior, timing durations, and alternate scenarios."
+    ],
+    "abstraction": "A single scenario across three participants; local timeout and message ordering are explicit."
+  },
+  "sources": [
+    {
+      "id": "fixture",
+      "kind": "fixture",
+      "locator": "evidence.md",
+      "description": "Invented timeout-and-retry scenario for the sequence demo."
+    }
+  ],
+  "participants": [
+    {
+      "id": "checkout",
+      "label": "Checkout",
+      "meaning": {
+        "status": "established",
+        "value": "Caller waiting for the order request to complete.",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+        }
+      }
+    },
+    {
+      "id": "orders",
+      "label": "Orders",
+      "meaning": {
+        "status": "established",
+        "value": "Service receiving order requests and requesting payment.",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+        }
+      }
+    },
+    {
+      "id": "payments",
+      "label": "Payments",
+      "meaning": {
+        "status": "established",
+        "value": "Service processing the payment request.",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+        }
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": "submit",
+      "label": "Submit order",
+      "kind": "message",
+      "from": "checkout",
+      "to": "orders",
+      "occurrence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+        }
+      }
+    },
+    {
+      "id": "charge",
+      "label": "Request payment",
+      "kind": "message",
+      "from": "orders",
+      "to": "payments",
+      "occurrence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+        }
+      }
+    },
+    {
+      "id": "timeout",
+      "label": "Order request times out locally",
+      "kind": "event",
+      "from": "checkout",
+      "to": "checkout",
+      "occurrence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+        }
+      }
+    },
+    {
+      "id": "paid",
+      "label": "Payment succeeds",
+      "kind": "reply",
+      "from": "payments",
+      "to": "orders",
+      "occurrence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+        }
+      },
+      "replyTo": "charge"
+    },
+    {
+      "id": "retry",
+      "label": "Retry the same order request",
+      "kind": "message",
+      "from": "checkout",
+      "to": "orders",
+      "occurrence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+        }
+      }
+    }
+  ],
+  "order": {
+    "status": "established",
+    "value": [
+      "submit",
+      "charge",
+      "timeout",
+      "paid",
+      "retry"
+    ],
+    "basis": {
+      "sourceRefs": [
+        "fixture"
+      ],
+      "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+    }
+  },
+  "notes": [
+    {
+      "id": "retry-outcome",
+      "subjectRefs": [
+        "retry",
+        "orders"
+      ],
+      "topic": "behavior",
+      "statement": "Does Orders deduplicate the retry?",
+      "answer": {
+        "status": "unknown",
+        "reason": "This scenario ends at receipt of the retry. No retry handler, second payment request, or final response is specified.",
+        "sourceRefs": [
+          "fixture"
+        ]
+      }
+    }
+  ],
+  "documents": [
+    {
+      "id": "reading-sequence",
+      "title": "Reading the timeout and retry",
+      "format": "markdown",
+      "file": "reading.md",
+      "attachments": [
+        {
+          "kind": "graph",
+          "ref": "checkout-retry"
+        },
+        {
+          "kind": "node",
+          "ref": "checkout"
+        },
+        {
+          "kind": "edge",
+          "ref": "retry"
+        }
+      ]
+    }
+  ]
+}

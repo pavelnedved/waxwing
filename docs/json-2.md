@@ -1,5 +1,9 @@
 # JSON 2: visual specification and complete source
 
+This page describes architecture geometry. [Sequence JSON 2](sequence.md) uses
+participant lifelines and ordered step geometry, with the same complete-source
+and recovery guarantees.
+
 **Status: experimental `0.3-draft`, containing JSON 1 `0.4-draft`.** Older JSON 2
 `0.1-draft` / JSON 1 `0.2-draft` and JSON 2 `0.2-draft` / JSON 1 `0.3-draft`
 remain supported. The schema

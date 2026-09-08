@@ -7,16 +7,28 @@ on a real system; different questions need different investigation checklists.
 
 ## Start a run
 
-Give your agent the [workflow](workflow.md), access to a Waxwing checkout, and
+Choose the diagram by the question it should answer:
+
+| Question | Workflow |
+|---|---|
+| What components exist, where are their boundaries, and what depends on what? | [Architecture](workflow.md) |
+| What interactions occur, and in what order, within one specific scenario? | [Basic sequence](sequence.md) |
+
+These are different concerns with separate JSON 1 contracts. Select one useful
+scope; do not automatically generate multiple diagram types from the same facts.
+The sequence workflow explains the evidence and ordering requirements and limits.
+
+Give your agent the chosen workflow, access to a Waxwing checkout, and
 the source locations it may investigate. Copy this kickoff message and replace
 the bracketed values:
 
 ```text
 Construct Waxwing JSON 1 using the workflow at:
-  [absolute path to waxwing]/prompts/ingestion/workflow.md
+  [absolute path to waxwing]/prompts/ingestion/[workflow.md or sequence.md]
 
 Waxwing checkout: [absolute path]
-Question the architecture should answer: [one concrete question]
+Diagram type: [architecture or sequence]
+Question the diagram should answer: [one concrete question]
 Source locations: [repository paths, documentation locations, supplied files]
 Environment and snapshot: [target environment and revisions, or what is unknown]
 Initial abstraction: [e.g. deployed services and their dependencies]

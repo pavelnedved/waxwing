@@ -1,5 +1,8 @@
 # JSON 1: first contract draft
 
+This page describes architecture JSON 1. [Sequence diagrams](sequence.md) have
+their own explicit scenario contract and reuse the same knowledge conventions.
+
 **Status: experimental `0.4-draft`, with `0.2-draft` and `0.3-draft` compatibility.** This is a concrete proposal to inspect with
 one example, not a finished schema or a commitment to an application stack.
 The [schema](../schemas/system-model.schema.json),

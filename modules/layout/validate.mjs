@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { validateSequenceLayout } from '../sequence/layout.mjs';
 import { inspectReadability } from './readability.mjs';
 import { projectGraph } from '../graphs/index.mjs';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -21,6 +22,7 @@ function cutsBox(a, b, box) {
 }
 
 export function validateLayout(document, { expectedModel } = {}) {
+  if (document?.diagramType === 'sequence') return validateSequenceLayout(document, { expectedModel });
   if (!validateShape(document)) return { ok: false, diagnostics: validateShape.errors.map((error) => ({ code: 'layout/schema', path: error.instancePath, message: error.message, details: error.params })) };
   const diagnostics = [];
   const add = (code, path, message) => diagnostics.push({ code, path, message });

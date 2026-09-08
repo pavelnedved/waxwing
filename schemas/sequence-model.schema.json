@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Waxwing sequence JSON 1 \u2014 draft 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "diagramType",
+    "id",
+    "title",
+    "scope",
+    "sources",
+    "participants",
+    "steps",
+    "order",
+    "notes",
+    "documents"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "0.1-sequence-draft"
+    },
+    "diagramType": {
+      "const": "sequence"
+    },
+    "id": {
+      "$ref": "system-model.schema.json#/$defs/id"
+    },
+    "title": {
+      "$ref": "system-model.schema.json#/$defs/text"
+    },
+    "scope": {
+      "$ref": "system-model.schema.json#/$defs/scope"
+    },
+    "sources": {
+      "$ref": "system-model.schema.json#/properties/sources"
+    },
+    "participants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "meaning"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "label": {
+            "$ref": "system-model.schema.json#/$defs/text"
+          },
+          "meaning": {
+            "$ref": "system-model.schema.json#/$defs/textKnowledge"
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "kind",
+          "from",
+          "to",
+          "occurrence"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "label": {
+            "$ref": "system-model.schema.json#/$defs/text"
+          },
+          "kind": {
+            "enum": [
+              "message",
+              "reply",
+              "event"
+            ]
+          },
+          "from": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "to": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "occurrence": {
+            "$ref": "system-model.schema.json#/$defs/booleanKnowledge"
+          },
+          "replyTo": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          }
+        }
+      }
+    },
+    "order": {
+      "$ref": "system-model.schema.json#/$defs/refsKnowledge"
+    },
+    "notes": {
+      "$ref": "system-model.schema.json#/properties/notes"
+    },
+    "documents": {
+      "$ref": "system-model.schema.json#/properties/documents"
+    }
+  }
+}

@@ -1,5 +1,10 @@
 # Agent workflow: construct an evidence-backed Waxwing JSON 1
 
+This workflow builds architecture diagrams: components, boundaries, and
+dependencies. For interactions ordered within one scenario, use the
+[sequence workflow](sequence.md) instead. Choose by the user's question; do not
+infer a sequence from dependency arrows or automatically generate both types.
+
 Your task is to investigate the supplied sources and construct an explicitly
 scoped, partial model of current implementation. The model must be useful to
 someone who has never seen the diagram. Investigate before asking, qualify before

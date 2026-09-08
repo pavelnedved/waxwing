@@ -165,6 +165,17 @@ Visual quality should help readers understand explicit knowledge. It must not
 substitute for that knowledge. The same underlying model should support human
 reading and direct inspection by another agent.
 
+## Different diagrams answer different questions
+
+An architecture view and a sequence scenario can explain different concerns
+about the same system. We define each supported diagram's meaning explicitly
+and choose it by the question being asked. Shared evidence, documents, and
+recovery do not imply that one source model can generate every kind of diagram.
+
+Whenever a visual convention carries meaning, that meaning belongs in the
+source. In a sequence diagram, vertical position communicates order: the layout
+must follow an explicit claim and must not choose an unknown or disputed order.
+
 ## The test
 
 Remove all absolute positions. Introduce a system change. Give the remaining

@@ -152,3 +152,33 @@ levels and attached Markdown from the resulting HTML. A separate fixture check
 verifies graph, node, and edge attachments plus links across graph levels.
 The full suite passes 105 tests. This correction changes the default command
 and walkthrough; the existing viewer and example content are unchanged.
+
+## Basic sequence diagrams
+
+The full suite passes 120 tests, including 15 sequence tests. Coverage includes
+explicit order independent of array storage, complete/unique step coverage,
+repeated interactions, reply targets and ordering, local events, qualified
+occurrences, unknown/disputed ordering, absent/unresolved occurrence blockers,
+source/digest equality, rejected geometric reordering/rewiring, long Unicode
+labels, document targets, all skins, source text escaping, generated script
+syntax, and a sequence module import without ELK. CLI tests build in a temporary
+directory and recover complete source/Markdown after removing input files.
+
+Browser checks on the fictional five-step demo verified:
+
+- The timeout loop stays at Checkout, the payment reply points back to Orders,
+  and the retry has a separate numbered row.
+- Inspecting the payment reply exposes its evidence and a working reference to
+  the original payment message.
+- The order inspector displays all five step references with their common
+  ordering evidence. The retry note displays its explicit unknown answer.
+- The embedded document links to the retry and other steps. Reload retains a
+  selected step; Back returns to the document and Forward restores the step.
+- The document and diagram were visually inspected at a narrow browser width.
+  Standard/light and Engineering/dark display correctly; 100% and Fit width work.
+- No browser console errors were captured.
+
+The regenerated sequence example includes JSON 2, SVG, and self-contained HTML.
+Browser-triggered downloads and direct `file://` opening remain unverified under
+the earlier environment limitations. Automated CLI export and source recovery
+are verified; no bypass of those browser limitations was attempted.

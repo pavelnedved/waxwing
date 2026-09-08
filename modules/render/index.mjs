@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { renderSequenceSVG, renderSequenceHTML } from '../sequence/render.mjs';
 import { inspectReadability } from '../layout/readability.mjs';
 import { selectHighlights, cleanViewerSVG } from './highlights.mjs';
 import { graphsOf, rootGraph } from '../graphs/index.mjs';
@@ -66,6 +67,7 @@ ${embed ? `    <metadata id="waxwing-source" data-encoding="base64">${payload}</
 }
 
 export function renderSVG(layout, options = {}) {
+  if (layout?.diagramType === 'sequence') return renderSequenceSVG(layout, options);
   assertLayout(layout);
   if (Object.keys(options).some((key) => !['graphRef', 'skin'].includes(key))) throw new Error('Unknown SVG render option.');
   const graphRef = options.graphRef ?? rootGraph(layout.model);
@@ -79,6 +81,7 @@ function checkedSkin(value = 'standard') {
 }
 
 export function renderHTML(layout, options = {}) {
+  if (layout?.diagramType === 'sequence') return renderSequenceHTML(layout, options);
   assertLayout(layout);
   if (Object.keys(options).some((key) => key !== 'skin')) throw new Error('Unknown HTML render option.');
   const skin = checkedSkin(options.skin);

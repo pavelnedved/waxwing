@@ -1,0 +1,426 @@
+{
+  "schemaVersion": "0.1-sequence-layout-draft",
+  "diagramType": "sequence",
+  "model": {
+    "schemaVersion": "0.1-sequence-draft",
+    "diagramType": "sequence",
+    "id": "checkout-retry",
+    "title": "Checkout times out before payment succeeds",
+    "scope": {
+      "timeframe": "current",
+      "environment": "Fictional order system",
+      "snapshot": "Fixture v1",
+      "coverage": "partial",
+      "question": "What does Checkout know when it retries an order whose payment completed after its timeout?",
+      "includes": [
+        "One initial order request, one payment request and reply, one local timeout, and one retry."
+      ],
+      "excludes": [
+        "Handling of the retry, duplicate-charge behavior, timing durations, and alternate scenarios."
+      ],
+      "abstraction": "A single scenario across three participants; local timeout and message ordering are explicit."
+    },
+    "sources": [
+      {
+        "id": "fixture",
+        "kind": "fixture",
+        "locator": "evidence.md",
+        "description": "Invented timeout-and-retry scenario for the sequence demo."
+      }
+    ],
+    "participants": [
+      {
+        "id": "checkout",
+        "label": "Checkout",
+        "meaning": {
+          "status": "established",
+          "value": "Caller waiting for the order request to complete.",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+          }
+        }
+      },
+      {
+        "id": "orders",
+        "label": "Orders",
+        "meaning": {
+          "status": "established",
+          "value": "Service receiving order requests and requesting payment.",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+          }
+        }
+      },
+      {
+        "id": "payments",
+        "label": "Payments",
+        "meaning": {
+          "status": "established",
+          "value": "Service processing the payment request.",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+          }
+        }
+      }
+    ],
+    "steps": [
+      {
+        "id": "submit",
+        "label": "Submit order",
+        "kind": "message",
+        "from": "checkout",
+        "to": "orders",
+        "occurrence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+          }
+        }
+      },
+      {
+        "id": "charge",
+        "label": "Request payment",
+        "kind": "message",
+        "from": "orders",
+        "to": "payments",
+        "occurrence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+          }
+        }
+      },
+      {
+        "id": "timeout",
+        "label": "Order request times out locally",
+        "kind": "event",
+        "from": "checkout",
+        "to": "checkout",
+        "occurrence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+          }
+        }
+      },
+      {
+        "id": "paid",
+        "label": "Payment succeeds",
+        "kind": "reply",
+        "from": "payments",
+        "to": "orders",
+        "occurrence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+          }
+        },
+        "replyTo": "charge"
+      },
+      {
+        "id": "retry",
+        "label": "Retry the same order request",
+        "kind": "message",
+        "from": "checkout",
+        "to": "orders",
+        "occurrence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+          }
+        }
+      }
+    ],
+    "order": {
+      "status": "established",
+      "value": [
+        "submit",
+        "charge",
+        "timeout",
+        "paid",
+        "retry"
+      ],
+      "basis": {
+        "sourceRefs": [
+          "fixture"
+        ],
+        "explanation": "Stipulated by this fictional scenario; not extracted from a real system."
+      }
+    },
+    "notes": [
+      {
+        "id": "retry-outcome",
+        "subjectRefs": [
+          "retry",
+          "orders"
+        ],
+        "topic": "behavior",
+        "statement": "Does Orders deduplicate the retry?",
+        "answer": {
+          "status": "unknown",
+          "reason": "This scenario ends at receipt of the retry. No retry handler, second payment request, or final response is specified.",
+          "sourceRefs": [
+            "fixture"
+          ]
+        }
+      }
+    ],
+    "documents": [
+      {
+        "id": "reading-sequence",
+        "title": "Reading the timeout and retry",
+        "format": "markdown",
+        "attachments": [
+          {
+            "kind": "graph",
+            "ref": "checkout-retry"
+          },
+          {
+            "kind": "node",
+            "ref": "checkout"
+          },
+          {
+            "kind": "edge",
+            "ref": "retry"
+          }
+        ],
+        "markdown": "# Reading the timeout and retry\n\nThis [sequence](#graph=checkout-retry) describes one fictional scenario. Read it\nfrom top to bottom; the distances between steps do not encode elapsed time.\n\n## What happens\n\n[Checkout](#node=checkout) sends an order request, then Orders requests payment.\nThe [timeout](#edge=timeout) happens locally at Checkout while the payment result\nhas not yet arrived at Orders. The [successful payment reply](#edge=paid) goes\nto Orders. Checkout then [retries the order request](#edge=retry).\n\nThe original request and retry are separate occurrences. Sharing endpoints does\nnot make them one dependency edge. The reply explicitly names the payment\nmessage it answers; it does not imply a response to Checkout.\n\n## What this does not establish\n\nThe model does not say that the retry causes a duplicate charge. Deduplication\nand the eventual response are unknown and recorded as such in the note attached\nto the retry and Orders. There is no second payment request in the drawing.\n\nThis document attaches to the scenario, Checkout, and the retry step. Its links\nwork in the exported HTML without the source Markdown file.\n",
+        "links": [
+          {
+            "href": "#graph=checkout-retry",
+            "target": {
+              "kind": "graph",
+              "ref": "checkout-retry"
+            }
+          },
+          {
+            "href": "#node=checkout",
+            "target": {
+              "kind": "node",
+              "ref": "checkout"
+            }
+          },
+          {
+            "href": "#edge=timeout",
+            "target": {
+              "kind": "edge",
+              "ref": "timeout"
+            }
+          },
+          {
+            "href": "#edge=paid",
+            "target": {
+              "kind": "edge",
+              "ref": "paid"
+            }
+          },
+          {
+            "href": "#edge=retry",
+            "target": {
+              "kind": "edge",
+              "ref": "retry"
+            }
+          }
+        ],
+        "assets": []
+      }
+    ]
+  },
+  "modelDigest": "84de8df79c66a9f3665768242f7cdbdb9e8d457b30b314872dd6ba02b5a08554",
+  "layout": {
+    "engine": "waxwing-sequence",
+    "version": "1"
+  },
+  "canvas": {
+    "width": 1032,
+    "height": 666
+  },
+  "participants": [
+    {
+      "ref": "checkout",
+      "box": {
+        "x": 60,
+        "y": 72,
+        "width": 232,
+        "height": 84
+      },
+      "lifeline": {
+        "x": 176,
+        "startY": 156,
+        "endY": 626
+      }
+    },
+    {
+      "ref": "orders",
+      "box": {
+        "x": 400,
+        "y": 72,
+        "width": 232,
+        "height": 84
+      },
+      "lifeline": {
+        "x": 516,
+        "startY": 156,
+        "endY": 626
+      }
+    },
+    {
+      "ref": "payments",
+      "box": {
+        "x": 740,
+        "y": 72,
+        "width": 232,
+        "height": 84
+      },
+      "lifeline": {
+        "x": 856,
+        "startY": 156,
+        "endY": 626
+      }
+    }
+  ],
+  "steps": [
+    {
+      "ref": "submit",
+      "from": "checkout",
+      "to": "orders",
+      "points": [
+        {
+          "x": 176,
+          "y": 234
+        },
+        {
+          "x": 516,
+          "y": 234
+        }
+      ],
+      "label": {
+        "x": 246,
+        "y": 196,
+        "width": 200,
+        "height": 30
+      }
+    },
+    {
+      "ref": "charge",
+      "from": "orders",
+      "to": "payments",
+      "points": [
+        {
+          "x": 516,
+          "y": 308
+        },
+        {
+          "x": 856,
+          "y": 308
+        }
+      ],
+      "label": {
+        "x": 575.2,
+        "y": 270,
+        "width": 221.6,
+        "height": 30
+      }
+    },
+    {
+      "ref": "timeout",
+      "from": "checkout",
+      "to": "checkout",
+      "points": [
+        {
+          "x": 176,
+          "y": 400
+        },
+        {
+          "x": 476.8,
+          "y": 400
+        },
+        {
+          "x": 476.8,
+          "y": 424
+        },
+        {
+          "x": 176,
+          "y": 424
+        }
+      ],
+      "label": {
+        "x": 194,
+        "y": 344,
+        "width": 264.8,
+        "height": 48
+      }
+    },
+    {
+      "ref": "paid",
+      "from": "payments",
+      "to": "orders",
+      "points": [
+        {
+          "x": 856,
+          "y": 498
+        },
+        {
+          "x": 516,
+          "y": 498
+        }
+      ],
+      "label": {
+        "x": 578.8,
+        "y": 460,
+        "width": 214.4,
+        "height": 30
+      }
+    },
+    {
+      "ref": "retry",
+      "from": "checkout",
+      "to": "orders",
+      "points": [
+        {
+          "x": 176,
+          "y": 590
+        },
+        {
+          "x": 516,
+          "y": 590
+        }
+      ],
+      "label": {
+        "x": 217.2,
+        "y": 534,
+        "width": 257.6,
+        "height": 48
+      }
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { layoutSequence } from '../sequence/layout.mjs';
 import { projectGraph } from '../graphs/index.mjs';
 import { createRequire } from 'node:module';
 import ELK from 'elkjs/lib/elk.bundled.js';
@@ -12,6 +13,7 @@ const elkVersion = JSON.parse(fs.readFileSync(createRequire(import.meta.url).res
 const box = (item, x = 0, y = 0) => ({ x: item.x + x, y: item.y + y, width: item.width, height: item.height });
 
 export async function layoutModel(input, options = {}) {
+  if (input?.diagramType === 'sequence') return layoutSequence(input, options);
   const result = validateModel(input);
   if (!result.ok) fail('JSON 1 is invalid.', result.diagnostics);
   const allowed = ['direction', 'groupingPerspectiveRef'];

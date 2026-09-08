@@ -1,0 +1,6 @@
+.sequence-svg .lifeline { stroke:var(--border); stroke-width:1.2; stroke-dasharray:4 6; }
+.sequence-svg .sequence-caption { font-size:12px; fill:var(--muted); }
+.sequence-svg .reply .edge-line { stroke-dasharray:8 4; }
+.sequence-svg .uncertain .edge-line { stroke:var(--warning); }
+.sequence-svg .uncertain .edge-label { fill:var(--warning); }
+.sequence-svg .record.selected .edge-label-bg { stroke:var(--accent); stroke-width:1; }

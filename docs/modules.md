@@ -91,6 +91,16 @@ const sameModel = recoverArtifact(svgOrHtmlText);
 missing or multiple payloads. `recoverModel` returns a defensive copy. These
 functions use validators but neither the renderer templates nor ELK.
 
+## Sequence diagrams
+
+`waxwing/sequence` exports `validateSequenceModel`, `layoutSequence`,
+`validateSequenceLayout`, `renderSequenceSVG`, and `renderSequenceHTML`.
+It does not load ELK. The general model/layout/render/artifact entry points also
+dispatch on `diagramType: "sequence"`, so existing CLI stage names work.
+The source contract and geometry differ from architecture diagrams; see the
+[sequence API and rules](sequence.md). Documents and complete source recovery
+retain their existing behavior.
+
 ## CLI boundary
 
 `bin/waxwing.mjs` dynamically loads the module required for each command. Run

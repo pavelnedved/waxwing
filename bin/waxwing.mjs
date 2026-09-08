@@ -13,6 +13,8 @@ const usage = `Waxwing — experimental modular diagram tool
   waxwing recover <layout.json|diagram.svg|diagram.html> <model.json>
   waxwing build <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
 
+Architecture and basic sequence models use the same commands. Sequence models declare diagramType: sequence.
+--group and --direction apply only to architecture diagrams; sequence order comes from JSON 1.
 The layout stage is optional. Render accepts a compatible, independently authored JSON 2.
 validate, prepare, layout, and build load explicitly registered Markdown files and local raster images.
 No command scans repositories, fetches source locators, or calls an LLM.`;
