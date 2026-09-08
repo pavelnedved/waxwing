@@ -1,0 +1,682 @@
+{
+  "schemaVersion": "0.4-draft",
+  "id": "order-system",
+  "title": "Order system across levels",
+  "scope": {
+    "timeframe": "current",
+    "environment": "Fictional production snapshot",
+    "snapshot": "Fixture v1 \u2014 2026-09-08",
+    "coverage": "partial",
+    "question": "How does the overview correspond to the service internals?",
+    "includes": [
+      "Only the explicitly listed components and operations."
+    ],
+    "excludes": [
+      "Replicas, network topology, and unrecorded behavior."
+    ],
+    "abstraction": "A partial model with two explicitly connected abstraction levels."
+  },
+  "sources": [
+    {
+      "id": "fictional-snapshot",
+      "kind": "fixture",
+      "locator": "evidence.md",
+      "description": "Invented scenario for testing known, unknown, and disputed boundary mappings."
+    }
+  ],
+  "perspectives": [],
+  "entities": [
+    {
+      "id": "checkout",
+      "label": "Checkout",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Checkout in the fictional order system.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "omits": [
+          "Deployment replicas and implementation classes."
+        ],
+        "reason": "Show responsibilities at this graph level."
+      }
+    },
+    {
+      "id": "orders",
+      "label": "Order Processing",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Order Processing in the fictional order system.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "omits": [
+          "Deployment replicas and implementation classes."
+        ],
+        "reason": "Show responsibilities at this graph level."
+      }
+    },
+    {
+      "id": "payments",
+      "label": "Payment Provider",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Payment Provider in the fictional order system.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "omits": [
+          "Deployment replicas and implementation classes."
+        ],
+        "reason": "Show responsibilities at this graph level."
+      }
+    },
+    {
+      "id": "operations",
+      "label": "Operations Console",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "actor",
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Operations Console in the fictional order system.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "omits": [
+          "Deployment replicas and implementation classes."
+        ],
+        "reason": "Show responsibilities at this graph level."
+      }
+    },
+    {
+      "id": "order-api",
+      "label": "Order API",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Order API in the fictional order system.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "omits": [
+          "Deployment replicas and implementation classes."
+        ],
+        "reason": "Show responsibilities at this graph level."
+      }
+    },
+    {
+      "id": "queue",
+      "label": "Order Queue",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "queue",
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Order Queue in the fictional order system.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "omits": [
+          "Deployment replicas and implementation classes."
+        ],
+        "reason": "Show responsibilities at this graph level."
+      }
+    },
+    {
+      "id": "worker",
+      "label": "Order Worker",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Order Worker in the fictional order system.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "omits": [
+          "Deployment replicas and implementation classes."
+        ],
+        "reason": "Show responsibilities at this graph level."
+      }
+    },
+    {
+      "id": "database",
+      "label": "Order Database",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "datastore",
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Order Database in the fictional order system.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "omits": [
+          "Deployment replicas and implementation classes."
+        ],
+        "reason": "Show responsibilities at this graph level."
+      }
+    }
+  ],
+  "groups": [],
+  "memberships": [],
+  "relationships": [
+    {
+      "id": "checkout-orders",
+      "from": "checkout",
+      "to": "orders",
+      "label": "Submit order",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      }
+    },
+    {
+      "id": "orders-payment",
+      "from": "orders",
+      "to": "payments",
+      "label": "Charge payment",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      }
+    },
+    {
+      "id": "ops-orders",
+      "from": "operations",
+      "to": "orders",
+      "label": "Repair order",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      }
+    },
+    {
+      "id": "checkout-api",
+      "from": "checkout",
+      "to": "order-api",
+      "label": "Submit order",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      }
+    },
+    {
+      "id": "api-queue",
+      "from": "order-api",
+      "to": "queue",
+      "label": "Enqueue order",
+      "kind": "publishes",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      }
+    },
+    {
+      "id": "worker-queue",
+      "from": "worker",
+      "to": "queue",
+      "label": "Consume orders",
+      "kind": "consumes",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      }
+    },
+    {
+      "id": "worker-db",
+      "from": "worker",
+      "to": "database",
+      "label": "Persist order",
+      "kind": "writes",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      }
+    },
+    {
+      "id": "ops-api",
+      "from": "operations",
+      "to": "order-api",
+      "label": "Repair via API",
+      "kind": "calls",
+      "existence": {
+        "status": "reported",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      }
+    },
+    {
+      "id": "ops-worker",
+      "from": "operations",
+      "to": "worker",
+      "label": "Repair via worker",
+      "kind": "calls",
+      "existence": {
+        "status": "reported",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-snapshot"
+          ],
+          "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+        }
+      }
+    }
+  ],
+  "notes": [],
+  "documents": [
+    {
+      "id": "reading-levels",
+      "title": "Reading the two levels",
+      "format": "markdown",
+      "file": "reading.md",
+      "attachments": [
+        {
+          "kind": "graph",
+          "ref": "overview"
+        },
+        {
+          "kind": "graph",
+          "ref": "order-internals"
+        },
+        {
+          "kind": "node",
+          "ref": "orders"
+        },
+        {
+          "kind": "edge",
+          "ref": "ops-orders",
+          "graphRef": "overview"
+        }
+      ]
+    }
+  ],
+  "rootGraphRef": "overview",
+  "graphs": [
+    {
+      "id": "overview",
+      "title": "Order system overview",
+      "scope": {
+        "timeframe": "current",
+        "environment": "Fictional production snapshot",
+        "snapshot": "Fixture v1 \u2014 2026-09-08",
+        "coverage": "partial",
+        "question": "Who interacts with Order Processing?",
+        "includes": [
+          "Only the explicitly listed components and operations."
+        ],
+        "excludes": [
+          "Replicas, network topology, and unrecorded behavior."
+        ],
+        "abstraction": "Services and external callers; Order Processing is one box."
+      },
+      "entityRefs": [
+        "checkout",
+        "orders",
+        "operations"
+      ],
+      "contextRefs": [
+        "payments"
+      ],
+      "relationshipRefs": [
+        "checkout-orders",
+        "orders-payment",
+        "ops-orders"
+      ],
+      "membershipRefs": []
+    },
+    {
+      "id": "order-internals",
+      "title": "Inside Order Processing",
+      "scope": {
+        "timeframe": "current",
+        "environment": "Fictional production snapshot",
+        "snapshot": "Fixture v1 \u2014 2026-09-08",
+        "coverage": "partial",
+        "question": "What implements Order Processing, and where do overview calls land?",
+        "includes": [
+          "Only the explicitly listed components and operations."
+        ],
+        "excludes": [
+          "Replicas, network topology, and unrecorded behavior."
+        ],
+        "abstraction": "API, queue, worker, and storage; outside callers are context."
+      },
+      "entityRefs": [
+        "order-api",
+        "queue",
+        "worker",
+        "database"
+      ],
+      "contextRefs": [
+        "checkout",
+        "payments",
+        "operations"
+      ],
+      "relationshipRefs": [
+        "checkout-api",
+        "api-queue",
+        "worker-queue",
+        "worker-db",
+        "ops-api",
+        "ops-worker"
+      ],
+      "membershipRefs": [],
+      "expands": {
+        "graphRef": "overview",
+        "nodeRef": "orders",
+        "meaning": {
+          "status": "established",
+          "value": "This partial graph expands the Order Processing service. Context nodes are outside that service.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "boundaries": [
+          {
+            "relationshipRef": "checkout-orders",
+            "detail": {
+              "status": "established",
+              "value": [
+                "checkout-api"
+              ],
+              "basis": {
+                "sourceRefs": [
+                  "fictional-snapshot"
+                ],
+                "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+              }
+            }
+          },
+          {
+            "relationshipRef": "orders-payment",
+            "detail": {
+              "status": "unknown",
+              "reason": "The overview records a payment call, but this snapshot does not identify its internal caller. No detailed payment edge is asserted.",
+              "sourceRefs": [
+                "fictional-snapshot"
+              ]
+            }
+          },
+          {
+            "relationshipRef": "ops-orders",
+            "detail": {
+              "status": "disputed",
+              "reason": "Two accounts disagree about the active repair route. Neither is selected as established.",
+              "alternatives": [
+                {
+                  "status": "reported",
+                  "value": [
+                    "ops-api"
+                  ],
+                  "basis": {
+                    "sourceRefs": [
+                      "fictional-snapshot"
+                    ],
+                    "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+                  }
+                },
+                {
+                  "status": "reported",
+                  "value": [
+                    "ops-worker"
+                  ],
+                  "basis": {
+                    "sourceRefs": [
+                      "fictional-snapshot"
+                    ],
+                    "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

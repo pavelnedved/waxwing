@@ -1,0 +1,1091 @@
+{
+  "schemaVersion": "0.3-draft",
+  "model": {
+    "schemaVersion": "0.4-draft",
+    "id": "order-system",
+    "title": "Order system across levels",
+    "scope": {
+      "timeframe": "current",
+      "environment": "Fictional production snapshot",
+      "snapshot": "Fixture v1 — 2026-09-08",
+      "coverage": "partial",
+      "question": "How does the overview correspond to the service internals?",
+      "includes": [
+        "Only the explicitly listed components and operations."
+      ],
+      "excludes": [
+        "Replicas, network topology, and unrecorded behavior."
+      ],
+      "abstraction": "A partial model with two explicitly connected abstraction levels."
+    },
+    "sources": [
+      {
+        "id": "fictional-snapshot",
+        "kind": "fixture",
+        "locator": "evidence.md",
+        "description": "Invented scenario for testing known, unknown, and disputed boundary mappings."
+      }
+    ],
+    "perspectives": [],
+    "entities": [
+      {
+        "id": "checkout",
+        "label": "Checkout",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Checkout in the fictional order system.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-snapshot"
+              ],
+              "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+            }
+          },
+          "omits": [
+            "Deployment replicas and implementation classes."
+          ],
+          "reason": "Show responsibilities at this graph level."
+        }
+      },
+      {
+        "id": "orders",
+        "label": "Order Processing",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Order Processing in the fictional order system.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-snapshot"
+              ],
+              "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+            }
+          },
+          "omits": [
+            "Deployment replicas and implementation classes."
+          ],
+          "reason": "Show responsibilities at this graph level."
+        }
+      },
+      {
+        "id": "payments",
+        "label": "Payment Provider",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Payment Provider in the fictional order system.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-snapshot"
+              ],
+              "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+            }
+          },
+          "omits": [
+            "Deployment replicas and implementation classes."
+          ],
+          "reason": "Show responsibilities at this graph level."
+        }
+      },
+      {
+        "id": "operations",
+        "label": "Operations Console",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "actor",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Operations Console in the fictional order system.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-snapshot"
+              ],
+              "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+            }
+          },
+          "omits": [
+            "Deployment replicas and implementation classes."
+          ],
+          "reason": "Show responsibilities at this graph level."
+        }
+      },
+      {
+        "id": "order-api",
+        "label": "Order API",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Order API in the fictional order system.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-snapshot"
+              ],
+              "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+            }
+          },
+          "omits": [
+            "Deployment replicas and implementation classes."
+          ],
+          "reason": "Show responsibilities at this graph level."
+        }
+      },
+      {
+        "id": "queue",
+        "label": "Order Queue",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "queue",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Order Queue in the fictional order system.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-snapshot"
+              ],
+              "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+            }
+          },
+          "omits": [
+            "Deployment replicas and implementation classes."
+          ],
+          "reason": "Show responsibilities at this graph level."
+        }
+      },
+      {
+        "id": "worker",
+        "label": "Order Worker",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Order Worker in the fictional order system.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-snapshot"
+              ],
+              "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+            }
+          },
+          "omits": [
+            "Deployment replicas and implementation classes."
+          ],
+          "reason": "Show responsibilities at this graph level."
+        }
+      },
+      {
+        "id": "database",
+        "label": "Order Database",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "datastore",
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Order Database in the fictional order system.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-snapshot"
+              ],
+              "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+            }
+          },
+          "omits": [
+            "Deployment replicas and implementation classes."
+          ],
+          "reason": "Show responsibilities at this graph level."
+        }
+      }
+    ],
+    "groups": [],
+    "memberships": [],
+    "relationships": [
+      {
+        "id": "checkout-orders",
+        "from": "checkout",
+        "to": "orders",
+        "label": "Submit order",
+        "kind": "calls",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        }
+      },
+      {
+        "id": "orders-payment",
+        "from": "orders",
+        "to": "payments",
+        "label": "Charge payment",
+        "kind": "calls",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        }
+      },
+      {
+        "id": "ops-orders",
+        "from": "operations",
+        "to": "orders",
+        "label": "Repair order",
+        "kind": "calls",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        }
+      },
+      {
+        "id": "checkout-api",
+        "from": "checkout",
+        "to": "order-api",
+        "label": "Submit order",
+        "kind": "calls",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        }
+      },
+      {
+        "id": "api-queue",
+        "from": "order-api",
+        "to": "queue",
+        "label": "Enqueue order",
+        "kind": "publishes",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        }
+      },
+      {
+        "id": "worker-queue",
+        "from": "worker",
+        "to": "queue",
+        "label": "Consume orders",
+        "kind": "consumes",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        }
+      },
+      {
+        "id": "worker-db",
+        "from": "worker",
+        "to": "database",
+        "label": "Persist order",
+        "kind": "writes",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        }
+      },
+      {
+        "id": "ops-api",
+        "from": "operations",
+        "to": "order-api",
+        "label": "Repair via API",
+        "kind": "calls",
+        "existence": {
+          "status": "reported",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        }
+      },
+      {
+        "id": "ops-worker",
+        "from": "operations",
+        "to": "worker",
+        "label": "Repair via worker",
+        "kind": "calls",
+        "existence": {
+          "status": "reported",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-snapshot"
+            ],
+            "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+          }
+        }
+      }
+    ],
+    "notes": [],
+    "documents": [
+      {
+        "id": "reading-levels",
+        "title": "Reading the two levels",
+        "format": "markdown",
+        "attachments": [
+          {
+            "kind": "graph",
+            "ref": "overview"
+          },
+          {
+            "kind": "graph",
+            "ref": "order-internals"
+          },
+          {
+            "kind": "node",
+            "ref": "orders"
+          },
+          {
+            "kind": "edge",
+            "ref": "ops-orders",
+            "graphRef": "overview"
+          }
+        ],
+        "markdown": "# Reading the two levels\n\nThe [overview](#graph=overview) compresses Order Processing into one box.\nIts [detailed graph](#graph=order-internals) shows the API, queue, worker, and database.\nThe graph is partial; it is not an inventory of everything inside the service.\n\n## Where the calls land\n\n- **Known:** [Submit order](#graph=overview&edge=checkout-orders) corresponds to the [API call](#graph=order-internals&edge=checkout-api).\n- **Unknown:** the overview records a payment call, but its internal caller has not been identified. The Payment Provider remains visible as external context with no invented detailed payment edge.\n- **Disputed:** the operations console is reported to repair orders through either the API or worker. Both candidate edges and their qualifications are retained.\n\nThe [same Checkout component](#graph=order-internals&node=checkout) appears as external context in the detailed graph. It shares its identity with the overview node; it has not become part of Order Processing.\n\n## Documents have no required level\n\nThis Markdown document explains both graphs, the Order Processing node, and the overview repair edge. A document can explain any graph, node, or edge.\n",
+        "links": [
+          {
+            "href": "#graph=overview",
+            "target": {
+              "kind": "graph",
+              "ref": "overview"
+            }
+          },
+          {
+            "href": "#graph=order-internals",
+            "target": {
+              "kind": "graph",
+              "ref": "order-internals"
+            }
+          },
+          {
+            "href": "#graph=overview&edge=checkout-orders",
+            "target": {
+              "kind": "edge",
+              "ref": "checkout-orders",
+              "graphRef": "overview"
+            }
+          },
+          {
+            "href": "#graph=order-internals&edge=checkout-api",
+            "target": {
+              "kind": "edge",
+              "ref": "checkout-api",
+              "graphRef": "order-internals"
+            }
+          },
+          {
+            "href": "#graph=order-internals&node=checkout",
+            "target": {
+              "kind": "node",
+              "ref": "checkout",
+              "graphRef": "order-internals"
+            }
+          }
+        ],
+        "assets": []
+      }
+    ],
+    "rootGraphRef": "overview",
+    "graphs": [
+      {
+        "id": "overview",
+        "title": "Order system overview",
+        "scope": {
+          "timeframe": "current",
+          "environment": "Fictional production snapshot",
+          "snapshot": "Fixture v1 — 2026-09-08",
+          "coverage": "partial",
+          "question": "Who interacts with Order Processing?",
+          "includes": [
+            "Only the explicitly listed components and operations."
+          ],
+          "excludes": [
+            "Replicas, network topology, and unrecorded behavior."
+          ],
+          "abstraction": "Services and external callers; Order Processing is one box."
+        },
+        "entityRefs": [
+          "checkout",
+          "orders",
+          "operations"
+        ],
+        "contextRefs": [
+          "payments"
+        ],
+        "relationshipRefs": [
+          "checkout-orders",
+          "orders-payment",
+          "ops-orders"
+        ],
+        "membershipRefs": []
+      },
+      {
+        "id": "order-internals",
+        "title": "Inside Order Processing",
+        "scope": {
+          "timeframe": "current",
+          "environment": "Fictional production snapshot",
+          "snapshot": "Fixture v1 — 2026-09-08",
+          "coverage": "partial",
+          "question": "What implements Order Processing, and where do overview calls land?",
+          "includes": [
+            "Only the explicitly listed components and operations."
+          ],
+          "excludes": [
+            "Replicas, network topology, and unrecorded behavior."
+          ],
+          "abstraction": "API, queue, worker, and storage; outside callers are context."
+        },
+        "entityRefs": [
+          "order-api",
+          "queue",
+          "worker",
+          "database"
+        ],
+        "contextRefs": [
+          "checkout",
+          "payments",
+          "operations"
+        ],
+        "relationshipRefs": [
+          "checkout-api",
+          "api-queue",
+          "worker-queue",
+          "worker-db",
+          "ops-api",
+          "ops-worker"
+        ],
+        "membershipRefs": [],
+        "expands": {
+          "graphRef": "overview",
+          "nodeRef": "orders",
+          "meaning": {
+            "status": "established",
+            "value": "This partial graph expands the Order Processing service. Context nodes are outside that service.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-snapshot"
+              ],
+              "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+            }
+          },
+          "boundaries": [
+            {
+              "relationshipRef": "checkout-orders",
+              "detail": {
+                "status": "established",
+                "value": [
+                  "checkout-api"
+                ],
+                "basis": {
+                  "sourceRefs": [
+                    "fictional-snapshot"
+                  ],
+                  "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+                }
+              }
+            },
+            {
+              "relationshipRef": "orders-payment",
+              "detail": {
+                "status": "unknown",
+                "reason": "The overview records a payment call, but this snapshot does not identify its internal caller. No detailed payment edge is asserted.",
+                "sourceRefs": [
+                  "fictional-snapshot"
+                ]
+              }
+            },
+            {
+              "relationshipRef": "ops-orders",
+              "detail": {
+                "status": "disputed",
+                "reason": "Two accounts disagree about the active repair route. Neither is selected as established.",
+                "alternatives": [
+                  {
+                    "status": "reported",
+                    "value": [
+                      "ops-api"
+                    ],
+                    "basis": {
+                      "sourceRefs": [
+                        "fictional-snapshot"
+                      ],
+                      "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+                    }
+                  },
+                  {
+                    "status": "reported",
+                    "value": [
+                      "ops-worker"
+                    ],
+                    "basis": {
+                      "sourceRefs": [
+                        "fictional-snapshot"
+                      ],
+                      "explanation": "Explicitly stipulated by this fictional test scenario, not extracted from a real organization."
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "modelDigest": "1b2c56a7d8d7ccea75968ab930831161f41f2437d58bdaabf49bca90c532675b",
+  "graphs": [
+    {
+      "ref": "order-internals",
+      "layout": {
+        "engine": "elk-layered@0.12.0",
+        "direction": "RIGHT",
+        "groupingPerspectiveRef": null
+      },
+      "canvas": {
+        "width": 1470.4,
+        "height": 645.3333333333334
+      },
+      "nodes": [
+        {
+          "ref": "checkout",
+          "box": {
+            "x": 36,
+            "y": 485.33333333333337,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "database",
+          "box": {
+            "x": 1202.4,
+            "y": 36,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "operations",
+          "box": {
+            "x": 36,
+            "y": 77.33333333333334,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "order-api",
+          "box": {
+            "x": 633.6,
+            "y": 277.3333333333333,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "payments",
+          "box": {
+            "x": 36,
+            "y": 281.33333333333337,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "queue",
+          "box": {
+            "x": 1202.4,
+            "y": 240,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "worker",
+          "box": {
+            "x": 633.6,
+            "y": 56.66666666666667,
+            "width": 232,
+            "height": 124
+          }
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "ref": "api-queue",
+          "from": "order-api",
+          "to": "queue",
+          "points": [
+            {
+              "x": 865.6,
+              "y": 339.3333333333333
+            },
+            {
+              "x": 1127.4,
+              "y": 339.3333333333333
+            },
+            {
+              "x": 1127.4,
+              "y": 322.66666666666663
+            },
+            {
+              "x": 1202.4,
+              "y": 322.66666666666663
+            }
+          ],
+          "label": {
+            "x": 979.2,
+            "y": 356.3333333333333,
+            "width": 109.60000000000001,
+            "height": 30
+          }
+        },
+        {
+          "ref": "checkout-api",
+          "from": "checkout",
+          "to": "order-api",
+          "points": [
+            {
+              "x": 268,
+              "y": 547.3333333333334
+            },
+            {
+              "x": 558.6,
+              "y": 547.3333333333334
+            },
+            {
+              "x": 558.6,
+              "y": 360
+            },
+            {
+              "x": 633.6,
+              "y": 360
+            }
+          ],
+          "label": {
+            "x": 399.6,
+            "y": 564.3333333333334,
+            "width": 102.4,
+            "height": 30
+          }
+        },
+        {
+          "ref": "ops-api",
+          "from": "operations",
+          "to": "order-api",
+          "points": [
+            {
+              "x": 268,
+              "y": 160
+            },
+            {
+              "x": 303,
+              "y": 160
+            },
+            {
+              "x": 303,
+              "y": 318.66666666666663
+            },
+            {
+              "x": 633.6,
+              "y": 318.66666666666663
+            }
+          ],
+          "label": {
+            "x": 378,
+            "y": 335.66666666666663,
+            "width": 145.6,
+            "height": 48
+          }
+        },
+        {
+          "ref": "ops-worker",
+          "from": "operations",
+          "to": "worker",
+          "points": [
+            {
+              "x": 268,
+              "y": 118.66666666666667
+            },
+            {
+              "x": 633.6,
+              "y": 118.66666666666667
+            }
+          ],
+          "label": {
+            "x": 378,
+            "y": 135.66666666666669,
+            "width": 145.6,
+            "height": 48
+          }
+        },
+        {
+          "ref": "worker-db",
+          "from": "worker",
+          "to": "database",
+          "points": [
+            {
+              "x": 865.6,
+              "y": 98
+            },
+            {
+              "x": 1202.4,
+              "y": 98
+            }
+          ],
+          "label": {
+            "x": 979.2,
+            "y": 115,
+            "width": 109.60000000000001,
+            "height": 30
+          }
+        },
+        {
+          "ref": "worker-queue",
+          "from": "worker",
+          "to": "queue",
+          "points": [
+            {
+              "x": 865.6,
+              "y": 139.33333333333331
+            },
+            {
+              "x": 900.6,
+              "y": 139.33333333333331
+            },
+            {
+              "x": 900.6,
+              "y": 281.3333333333333
+            },
+            {
+              "x": 1202.4,
+              "y": 281.3333333333333
+            }
+          ],
+          "label": {
+            "x": 975.6,
+            "y": 298.3333333333333,
+            "width": 116.8,
+            "height": 30
+          }
+        }
+      ]
+    },
+    {
+      "ref": "overview",
+      "layout": {
+        "engine": "elk-layered@0.12.0",
+        "direction": "RIGHT",
+        "groupingPerspectiveRef": null
+      },
+      "canvas": {
+        "width": 1427.1999999999998,
+        "height": 400
+      },
+      "nodes": [
+        {
+          "ref": "checkout",
+          "box": {
+            "x": 36,
+            "y": 240,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "operations",
+          "box": {
+            "x": 36,
+            "y": 36,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "orders",
+          "box": {
+            "x": 590.4,
+            "y": 56.66666666666667,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "payments",
+          "box": {
+            "x": 1159.1999999999998,
+            "y": 56.66666666666667,
+            "width": 232,
+            "height": 124
+          }
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "ref": "checkout-orders",
+          "from": "checkout",
+          "to": "orders",
+          "points": [
+            {
+              "x": 268,
+              "y": 302
+            },
+            {
+              "x": 515.4,
+              "y": 302
+            },
+            {
+              "x": 515.4,
+              "y": 139.33333333333331
+            },
+            {
+              "x": 590.4,
+              "y": 139.33333333333331
+            }
+          ],
+          "label": {
+            "x": 378,
+            "y": 319,
+            "width": 102.4,
+            "height": 30
+          }
+        },
+        {
+          "ref": "ops-orders",
+          "from": "operations",
+          "to": "orders",
+          "points": [
+            {
+              "x": 268,
+              "y": 98
+            },
+            {
+              "x": 590.4,
+              "y": 98
+            }
+          ],
+          "label": {
+            "x": 378,
+            "y": 51,
+            "width": 102.4,
+            "height": 30
+          }
+        },
+        {
+          "ref": "orders-payment",
+          "from": "orders",
+          "to": "payments",
+          "points": [
+            {
+              "x": 822.4,
+              "y": 118.66666666666667
+            },
+            {
+              "x": 1159.1999999999998,
+              "y": 118.66666666666667
+            }
+          ],
+          "label": {
+            "x": 932.4,
+            "y": 135.66666666666669,
+            "width": 116.8,
+            "height": 30
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "waxwing",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Composable system-model validation, automatic layout, and lossless SVG/HTML rendering.",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "validate": "node scripts/validate-model.mjs",
+    "test": "node --test",
+    "demo": "node bin/waxwing.mjs build examples/order-processing/model.json examples/order-processing/generated --group system-structure",
+    "demo:documents": "node bin/waxwing.mjs build examples/documented-orders/model.json examples/documented-orders/generated --group system-structure",
+    "demo:subgraphs": "node bin/waxwing.mjs build examples/subgraphs/model.json examples/subgraphs/generated"
+  },
+  "dependencies": {
+    "ajv": "8.17.1",
+    "elkjs": "0.12.0",
+    "markdown-it": "15.0.1"
+  },
+  "exports": {
+    "./model": "./modules/model/index.mjs",
+    "./layout": "./modules/layout/index.mjs",
+    "./render": "./modules/render/index.mjs",
+    "./artifacts": "./modules/render/artifacts.mjs",
+    "./documents": "./modules/documents/index.mjs",
+    "./graphs": "./modules/graphs/index.mjs"
+  },
+  "bin": {
+    "waxwing": "./bin/waxwing.mjs"
+  }
+}

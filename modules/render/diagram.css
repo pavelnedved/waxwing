@@ -1,0 +1,25 @@
+.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }

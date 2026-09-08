@@ -1,0 +1,444 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Waxwing JSON 2 \u2014 drafts 0.1, 0.2, and 0.3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "model",
+    "modelDigest"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "enum": [
+        "0.1-draft",
+        "0.2-draft",
+        "0.3-draft"
+      ]
+    },
+    "model": {
+      "$ref": "system-model.schema.json"
+    },
+    "modelDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine",
+        "direction",
+        "groupingPerspectiveRef"
+      ],
+      "properties": {
+        "engine": {
+          "type": "string",
+          "minLength": 1
+        },
+        "direction": {
+          "enum": [
+            "RIGHT",
+            "DOWN"
+          ]
+        },
+        "groupingPerspectiveRef": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "width": {
+          "$ref": "#/$defs/size"
+        },
+        "height": {
+          "$ref": "#/$defs/size"
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ref",
+          "box"
+        ],
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "box": {
+            "$ref": "#/$defs/box"
+          }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ref",
+          "box"
+        ],
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "box": {
+            "$ref": "#/$defs/box"
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ref",
+          "from",
+          "to",
+          "points",
+          "label"
+        ],
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "points": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "$ref": "#/$defs/point"
+            }
+          },
+          "label": {
+            "$ref": "#/$defs/box"
+          }
+        }
+      }
+    },
+    "graphs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/graphLayout"
+      }
+    }
+  },
+  "$defs": {
+    "size": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1000000
+    },
+    "coordinate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y"
+      ],
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "y": {
+          "$ref": "#/$defs/coordinate"
+        }
+      }
+    },
+    "box": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "x": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "y": {
+          "$ref": "#/$defs/coordinate"
+        },
+        "width": {
+          "$ref": "#/$defs/size"
+        },
+        "height": {
+          "$ref": "#/$defs/size"
+        }
+      }
+    },
+    "graphLayout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ref",
+        "layout",
+        "canvas",
+        "nodes",
+        "groups",
+        "edges"
+      ],
+      "properties": {
+        "ref": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "engine",
+            "direction",
+            "groupingPerspectiveRef"
+          ],
+          "properties": {
+            "engine": {
+              "type": "string",
+              "minLength": 1
+            },
+            "direction": {
+              "enum": [
+                "RIGHT",
+                "DOWN"
+              ]
+            },
+            "groupingPerspectiveRef": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "canvas": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width",
+            "height"
+          ],
+          "properties": {
+            "width": {
+              "$ref": "#/$defs/size"
+            },
+            "height": {
+              "$ref": "#/$defs/size"
+            }
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "ref",
+              "box"
+            ],
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "box": {
+                "$ref": "#/$defs/box"
+              }
+            }
+          }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "ref",
+              "box"
+            ],
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "box": {
+                "$ref": "#/$defs/box"
+              }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "ref",
+              "from",
+              "to",
+              "points",
+              "label"
+            ],
+            "properties": {
+              "ref": {
+                "type": "string"
+              },
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "points": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "$ref": "#/$defs/point"
+                }
+              },
+              "label": {
+                "$ref": "#/$defs/box"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": "0.1-draft"
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "model": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": "0.2-draft"
+              }
+            }
+          },
+          "graphs": false,
+          "layout": true,
+          "canvas": true,
+          "nodes": true,
+          "groups": true,
+          "edges": true
+        },
+        "required": [
+          "layout",
+          "canvas",
+          "nodes",
+          "groups",
+          "edges"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": "0.2-draft"
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "model": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": "0.3-draft"
+              }
+            }
+          },
+          "graphs": false,
+          "layout": true,
+          "canvas": true,
+          "nodes": true,
+          "groups": true,
+          "edges": true
+        },
+        "required": [
+          "layout",
+          "canvas",
+          "nodes",
+          "groups",
+          "edges"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": "0.3-draft"
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "model": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": "0.4-draft"
+              }
+            }
+          },
+          "layout": false,
+          "canvas": false,
+          "nodes": false,
+          "groups": false,
+          "edges": false,
+          "graphs": true
+        },
+        "required": [
+          "graphs"
+        ]
+      }
+    }
+  ]
+}

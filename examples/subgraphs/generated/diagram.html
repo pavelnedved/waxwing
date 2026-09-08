@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Order system across levels · Waxwing</title><style>:root { color-scheme:light; --bg:#f7f8fa; --surface:#fff; --ink:#17283a; --muted:#657588; --border:#dce3ea; --accent:#087d78; --soft:#edf3f3; --warning:#9c630d; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+body.dark { color-scheme:dark; --bg:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --border:#34495e; --accent:#5dd6c4; --soft:#1b3541; --warning:#f1c778; }
+button,a { -webkit-tap-highlight-color:transparent; }
+button { color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 13px; cursor:pointer; font:inherit; font-size:12px; }
+button:hover { border-color:var(--accent); }
+button:focus-visible,a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.masthead { height:72px; padding:0 38px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:16px; background:var(--surface); }
+.brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink); font-size:12px; font-weight:750; letter-spacing:2px; }
+.brand-mark { background:var(--accent); color:var(--surface); width:29px; height:29px; text-align:center; border-radius:8px; font-size:22px; font-family:Georgia,serif; font-style:italic; line-height:26px; }
+.brand-note { border-left:1px solid var(--border); padding-left:16px; margin-left:6px; color:var(--muted); font-weight:500; font-size:10px; letter-spacing:1.4px; }
+.header-actions { display:flex; gap:8px; }
+main { max-width:1800px; margin:0 auto; padding:32px 38px 20px; }
+.eyebrow { display:flex; gap:9px; align-items:center; font-size:10px; font-weight:650; letter-spacing:1.6px; color:var(--muted); }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.sep { opacity:.5; padding:0 4px; }
+.title-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+h1 { font-size:clamp(21px,2.2vw,34px); font-weight:620; letter-spacing:-1px; margin:12px 0 8px; line-height:1.25; }
+.purpose { margin:0; color:var(--muted); max-width:900px; }
+.scope-line { display:flex; flex-wrap:wrap; gap:22px; margin:17px 0 24px; color:var(--muted); font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.map-panel { border:1px solid var(--border); background:var(--surface); border-radius:12px; overflow:hidden; }
+.map-toolbar { min-height:50px; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+.map-toolbar>div { display:flex; align-items:center; gap:14px; }
+.toolbar-label { font-size:10px; font-weight:700; letter-spacing:1.5px; color:var(--accent); }
+#perspective-label { color:var(--muted); font-size:12px; }
+.zoom-controls { gap:5px!important; }
+.zoom-controls button { padding:3px 10px; min-width:30px; }
+#zoom-label { color:var(--muted); font-size:11px; min-width:34px; }
+#map-viewport { width:100%; height:clamp(330px,43vw,520px); overflow:auto; background:var(--bg); display:block; position:relative; }
+#map-viewport svg { display:block; flex-shrink:0; max-width:none; }
+.map-caption { padding:12px 18px; display:flex; justify-content:space-between; gap:16px; color:var(--muted); font-size:11px; border-top:1px solid var(--border); }
+.knowledge-section { margin-top:25px; }
+.section-heading { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+h2 { font-size:16px; letter-spacing:-.2px; margin:0; font-weight:620; }
+#knowledge-count { color:var(--muted); font-size:12px; }
+#knowledge-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 26px; }
+.knowledge-row { display:flex; align-items:center; gap:13px; text-align:left; background:none; border:0; border-top:1px solid var(--border); border-radius:0; padding:13px 0; width:100%; font-size:12px; }
+.knowledge-row:hover .question { color:var(--accent); }
+.status-pill { display:inline-block; flex-shrink:0; font:10px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; border:1px solid var(--border); padding:2px 7px; border-radius:5px; color:var(--warning); text-transform:uppercase; letter-spacing:.4px; }
+.status-pill.disputed { color:#bd5262; }
+.question { flex:1; }
+.row-arrow { color:var(--muted); }
+footer { border-top:1px solid var(--border); margin-top:25px; padding-top:16px; display:flex; justify-content:space-between; color:var(--muted); font-size:10px; }
+#inspector { position:fixed; z-index:10; top:0; bottom:0; right:0; width:min(480px,100vw); background:var(--surface); box-shadow:-16px 0 55px #071c3625; border-left:1px solid var(--border); overflow-y:auto; }
+#inspector[hidden] { display:none; }
+.inspector-header { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; background:var(--surface); padding:18px 24px; border-bottom:1px solid var(--border); font-size:10px; letter-spacing:1.8px; color:var(--muted); }
+.inspector-header button { font-size:20px; line-height:20px; padding:4px 9px; }
+#inspector-content { padding:23px; }
+#inspector-content h2 { font-size:22px; margin-bottom:5px; overflow-wrap:anywhere; }
+.record-id { font:11px ui-monospace,monospace; color:var(--muted); margin-bottom:22px; }
+.detail-field { margin:16px 0; }
+.detail-key { display:block; color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+.detail-value { white-space:pre-wrap; overflow-wrap:anywhere; }
+.detail-section { border-top:1px solid var(--border); padding-top:14px; margin-top:22px; }
+.detail-section h3 { font-size:14px; margin:0 0 12px; }
+.claim { padding:12px; border:1px solid var(--border); border-radius:8px; margin:8px 0; background:var(--bg); }
+.claim .detail-value { margin-top:8px; }
+.claim-basis { color:var(--muted); font-size:12px; margin-top:10px; }
+.source-ref { display:inline-block; margin:6px 4px 0 0; padding:4px 7px; font-size:10px; }
+.sub-record { margin:10px 0; padding:12px 0; border-bottom:1px solid var(--border); }
+.sub-record h4 { font-size:13px; margin:0 0 7px; }
+details { margin-top:22px; }
+summary { cursor:pointer; font-size:12px; color:var(--muted); }
+pre { font:11px/1.6 ui-monospace,monospace; white-space:pre-wrap; overflow-wrap:anywhere; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:7px; }
+@media(max-width:700px) { .masthead { height:auto; min-height:68px; padding:14px 18px; flex-wrap:wrap; }.brand-note { display:none; }main { padding:24px 18px; }.header-actions { flex-wrap:wrap; }.title-row { align-items:flex-start; }#knowledge-list { grid-template-columns:1fr; }.map-caption { flex-direction:column; gap:4px; }footer { flex-direction:column; gap:5px; }.scope-line { gap:12px; } }
+@media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; } }
+
+[hidden] { display:none!important; }
+.header-link { display:inline-flex; align-items:center; gap:8px; color:var(--ink); border:1px solid var(--border); border-radius:7px; padding:8px 13px; font-size:12px; text-decoration:none; }
+.header-link span { color:var(--accent); }
+.attached-documents { border:1px solid var(--border); border-radius:9px; padding:14px; background:var(--bg); margin:18px 0; }
+.attached-documents h3 { font-size:12px; margin:0 0 8px; color:var(--muted); }
+.document-link { display:block; color:var(--accent); font-size:13px; padding:5px 0; text-decoration:none; }
+#document-reader { max-width:1360px; padding-bottom:80px; }
+.document-breadcrumb { display:flex; gap:13px; align-items:center; margin:4px 0 32px; color:var(--muted); font-size:12px; }
+.document-breadcrumb a { color:var(--accent); text-decoration:none; }
+.document-workspace { display:grid; grid-template-columns:220px minmax(0,1fr); gap:48px; align-items:start; }
+#document-nav { position:sticky; top:24px; max-height:85vh; overflow:auto; padding-right:20px; border-right:1px solid var(--border); }
+.document-nav-link { display:block; margin:8px 0; padding:10px 12px; color:var(--muted); text-decoration:none; border-radius:7px; font-size:13px; overflow-wrap:anywhere; }
+.document-nav-link[aria-current=page] { color:var(--accent); background:var(--soft); font-weight:600; }
+#document-content { min-width:0; max-width:850px; }
+#document-content h1 { margin-top:12px; overflow-wrap:anywhere; }
+.document-attachments { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 28px; }
+.document-attachments a { text-decoration:none; border:1px solid var(--border); border-radius:6px; color:var(--accent); padding:5px 9px; font-size:11px; overflow-wrap:anywhere; }
+.document-card { display:block; margin-top:18px; border:1px solid var(--border); border-radius:10px; padding:20px; text-decoration:none; color:var(--ink); background:var(--surface); font-weight:600; }
+.document-card:hover { border-color:var(--accent); }
+.document-card span { display:block; margin-top:7px; color:var(--muted); font-size:12px; font-weight:400; }
+.markdown-body { line-height:1.8; font-size:15px; overflow-wrap:anywhere; }
+.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4 { line-height:1.35; margin:1.5em 0 .6em; scroll-margin-top:24px; }
+.markdown-body h2 { font-size:22px; border-top:1px solid var(--border); padding-top:22px; }
+.markdown-body h3 { font-size:18px; }
+.markdown-body a { color:var(--accent); text-underline-offset:3px; }
+.markdown-body p { margin:12px 0; }
+.markdown-body blockquote { border-left:3px solid var(--accent); margin:20px 0; padding:8px 20px; background:var(--soft); color:var(--muted); }
+.markdown-body table { display:block; max-width:100%; overflow:auto; border-collapse:collapse; font-size:13px; margin:20px 0; }
+.markdown-body th,.markdown-body td { border:1px solid var(--border); padding:10px 14px; text-align:left; }
+.markdown-body th { background:var(--soft); }
+.markdown-body code { font-size:.85em; background:var(--soft); padding:2px 5px; border-radius:4px; }
+.markdown-body pre { overflow:auto; white-space:pre; padding:18px; font-size:12px; }
+.markdown-body pre code { background:none; padding:0; font-size:inherit; }
+.markdown-body img { max-width:100%; height:auto; }
+.document-source { border-top:1px solid var(--border); padding-top:20px; margin-top:36px; }
+.document-source pre { max-height:420px; overflow:auto; }
+@media(max-width:800px) { .document-workspace { grid-template-columns:1fr; gap:24px; }#document-nav { position:static; max-height:none; padding:0 0 14px; border:0; border-bottom:1px solid var(--border); }.document-nav-link { display:inline-block; margin:4px 4px 0 0; }#document-content { max-width:100%; } }
+
+#graph-breadcrumb { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:18px; font-size:12px; }
+#graph-breadcrumb .document-link { display:inline; padding:0; }
+#graph-abstraction { font-size:12px; margin-top:8px; }
+#graph-connections { margin-top:22px; }
+#graph-connections:empty { display:none; }
+.graph-child { display:flex; gap:12px; align-items:center; margin:8px 0; }
+.boundary-row { border-top:1px solid var(--border); padding:14px 0; }
+.boundary-row>.claim { margin:8px 0; }
+</style></head>
+<body>
+  <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions"><a class="header-link" href="#documents">Documents <span>1</span></a><button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
+  <main id="diagram-main">
+    <nav id="graph-breadcrumb" aria-label="Graph hierarchy"></nav>
+    <div class="eyebrow"><span class="live-dot"></span> CURRENT IMPLEMENTATION <span class="sep">/</span> PARTIAL MODEL</div>
+    <div class="title-row"><h1 id="graph-title">Order system overview</h1><button id="model-details">Model details ↗</button></div>
+    <p class="purpose" id="graph-question">Who interacts with Order Processing?</p>
+    <p class="purpose" id="graph-abstraction">Services and external callers; Order Processing is one box.</p>
+    <div class="scope-line" id="graph-scope"></div>
+    <section class="map-panel" aria-label="Architecture diagram">
+      <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
+      <div id="map-viewport" tabindex="0" aria-label="Diagram canvas. Use zoom controls; scroll to pan."><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-graph-ref="overview" data-theme="light" viewBox="0 0 1427.2 400" width="1427.2" height="400" role="group" aria-labelledby="ww-title ww-description">
+    <title id="ww-title">Order system overview</title><desc id="ww-description">Services and external callers; Order Processing is one box. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+    <metadata id="waxwing-source" data-encoding="base64">eyJncmFwaHMiOlt7ImNhbnZhcyI6eyJoZWlnaHQiOjY0NS4zMzMzMzMzMzMzMzM0LCJ3aWR0aCI6MTQ3MC40fSwiZWRnZXMiOlt7ImZyb20iOiJvcmRlci1hcGkiLCJsYWJlbCI6eyJoZWlnaHQiOjMwLCJ3aWR0aCI6MTA5LjYwMDAwMDAwMDAwMDAxLCJ4Ijo5NzkuMiwieSI6MzU2LjMzMzMzMzMzMzMzMzN9LCJwb2ludHMiOlt7IngiOjg2NS42LCJ5IjozMzkuMzMzMzMzMzMzMzMzM30seyJ4IjoxMTI3LjQsInkiOjMzOS4zMzMzMzMzMzMzMzMzfSx7IngiOjExMjcuNCwieSI6MzIyLjY2NjY2NjY2NjY2NjYzfSx7IngiOjEyMDIuNCwieSI6MzIyLjY2NjY2NjY2NjY2NjYzfV0sInJlZiI6ImFwaS1xdWV1ZSIsInRvIjoicXVldWUifSx7ImZyb20iOiJjaGVja291dCIsImxhYmVsIjp7ImhlaWdodCI6MzAsIndpZHRoIjoxMDIuNCwieCI6Mzk5LjYsInkiOjU2NC4zMzMzMzMzMzMzMzM0fSwicG9pbnRzIjpbeyJ4IjoyNjgsInkiOjU0Ny4zMzMzMzMzMzMzMzM0fSx7IngiOjU1OC42LCJ5Ijo1NDcuMzMzMzMzMzMzMzMzNH0seyJ4Ijo1NTguNiwieSI6MzYwfSx7IngiOjYzMy42LCJ5IjozNjB9XSwicmVmIjoiY2hlY2tvdXQtYXBpIiwidG8iOiJvcmRlci1hcGkifSx7ImZyb20iOiJvcGVyYXRpb25zIiwibGFiZWwiOnsiaGVpZ2h0Ijo0OCwid2lkdGgiOjE0NS42LCJ4IjozNzgsInkiOjMzNS42NjY2NjY2NjY2NjY2M30sInBvaW50cyI6W3sieCI6MjY4LCJ5IjoxNjB9LHsieCI6MzAzLCJ5IjoxNjB9LHsieCI6MzAzLCJ5IjozMTguNjY2NjY2NjY2NjY2NjN9LHsieCI6NjMzLjYsInkiOjMxOC42NjY2NjY2NjY2NjY2M31dLCJyZWYiOiJvcHMtYXBpIiwidG8iOiJvcmRlci1hcGkifSx7ImZyb20iOiJvcGVyYXRpb25zIiwibGFiZWwiOnsiaGVpZ2h0Ijo0OCwid2lkdGgiOjE0NS42LCJ4IjozNzgsInkiOjEzNS42NjY2NjY2NjY2NjY2OX0sInBvaW50cyI6W3sieCI6MjY4LCJ5IjoxMTguNjY2NjY2NjY2NjY2Njd9LHsieCI6NjMzLjYsInkiOjExOC42NjY2NjY2NjY2NjY2N31dLCJyZWYiOiJvcHMtd29ya2VyIiwidG8iOiJ3b3JrZXIifSx7ImZyb20iOiJ3b3JrZXIiLCJsYWJlbCI6eyJoZWlnaHQiOjMwLCJ3aWR0aCI6MTA5LjYwMDAwMDAwMDAwMDAxLCJ4Ijo5NzkuMiwieSI6MTE1fSwicG9pbnRzIjpbeyJ4Ijo4NjUuNiwieSI6OTh9LHsieCI6MTIwMi40LCJ5Ijo5OH1dLCJyZWYiOiJ3b3JrZXItZGIiLCJ0byI6ImRhdGFiYXNlIn0seyJmcm9tIjoid29ya2VyIiwibGFiZWwiOnsiaGVpZ2h0IjozMCwid2lkdGgiOjExNi44LCJ4Ijo5NzUuNiwieSI6Mjk4LjMzMzMzMzMzMzMzMzN9LCJwb2ludHMiOlt7IngiOjg2NS42LCJ5IjoxMzkuMzMzMzMzMzMzMzMzMzF9LHsieCI6OTAwLjYsInkiOjEzOS4zMzMzMzMzMzMzMzMzMX0seyJ4Ijo5MDAuNiwieSI6MjgxLjMzMzMzMzMzMzMzMzN9LHsieCI6MTIwMi40LCJ5IjoyODEuMzMzMzMzMzMzMzMzM31dLCJyZWYiOiJ3b3JrZXItcXVldWUiLCJ0byI6InF1ZXVlIn1dLCJncm91cHMiOltdLCJsYXlvdXQiOnsiZGlyZWN0aW9uIjoiUklHSFQiLCJlbmdpbmUiOiJlbGstbGF5ZXJlZEAwLjEyLjAiLCJncm91cGluZ1BlcnNwZWN0aXZlUmVmIjpudWxsfSwibm9kZXMiOlt7ImJveCI6eyJoZWlnaHQiOjEyNCwid2lkdGgiOjIzMiwieCI6MzYsInkiOjQ4NS4zMzMzMzMzMzMzMzMzN30sInJlZiI6ImNoZWNrb3V0In0seyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjEyMDIuNCwieSI6MzZ9LCJyZWYiOiJkYXRhYmFzZSJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4IjozNiwieSI6NzcuMzMzMzMzMzMzMzMzMzR9LCJyZWYiOiJvcGVyYXRpb25zIn0seyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjYzMy42LCJ5IjoyNzcuMzMzMzMzMzMzMzMzM30sInJlZiI6Im9yZGVyLWFwaSJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4IjozNiwieSI6MjgxLjMzMzMzMzMzMzMzMzM3fSwicmVmIjoicGF5bWVudHMifSx7ImJveCI6eyJoZWlnaHQiOjEyNCwid2lkdGgiOjIzMiwieCI6MTIwMi40LCJ5IjoyNDB9LCJyZWYiOiJxdWV1ZSJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4Ijo2MzMuNiwieSI6NTYuNjY2NjY2NjY2NjY2Njd9LCJyZWYiOiJ3b3JrZXIifV0sInJlZiI6Im9yZGVyLWludGVybmFscyJ9LHsiY2FudmFzIjp7ImhlaWdodCI6NDAwLCJ3aWR0aCI6MTQyNy4xOTk5OTk5OTk5OTk4fSwiZWRnZXMiOlt7ImZyb20iOiJjaGVja291dCIsImxhYmVsIjp7ImhlaWdodCI6MzAsIndpZHRoIjoxMDIuNCwieCI6Mzc4LCJ5IjozMTl9LCJwb2ludHMiOlt7IngiOjI2OCwieSI6MzAyfSx7IngiOjUxNS40LCJ5IjozMDJ9LHsieCI6NTE1LjQsInkiOjEzOS4zMzMzMzMzMzMzMzMzMX0seyJ4Ijo1OTAuNCwieSI6MTM5LjMzMzMzMzMzMzMzMzMxfV0sInJlZiI6ImNoZWNrb3V0LW9yZGVycyIsInRvIjoib3JkZXJzIn0seyJmcm9tIjoib3BlcmF0aW9ucyIsImxhYmVsIjp7ImhlaWdodCI6MzAsIndpZHRoIjoxMDIuNCwieCI6Mzc4LCJ5Ijo1MX0sInBvaW50cyI6W3sieCI6MjY4LCJ5Ijo5OH0seyJ4Ijo1OTAuNCwieSI6OTh9XSwicmVmIjoib3BzLW9yZGVycyIsInRvIjoib3JkZXJzIn0seyJmcm9tIjoib3JkZXJzIiwibGFiZWwiOnsiaGVpZ2h0IjozMCwid2lkdGgiOjExNi44LCJ4Ijo5MzIuNCwieSI6MTM1LjY2NjY2NjY2NjY2NjY5fSwicG9pbnRzIjpbeyJ4Ijo4MjIuNCwieSI6MTE4LjY2NjY2NjY2NjY2NjY3fSx7IngiOjExNTkuMTk5OTk5OTk5OTk5OCwieSI6MTE4LjY2NjY2NjY2NjY2NjY3fV0sInJlZiI6Im9yZGVycy1wYXltZW50IiwidG8iOiJwYXltZW50cyJ9XSwiZ3JvdXBzIjpbXSwibGF5b3V0Ijp7ImRpcmVjdGlvbiI6IlJJR0hUIiwiZW5naW5lIjoiZWxrLWxheWVyZWRAMC4xMi4wIiwiZ3JvdXBpbmdQZXJzcGVjdGl2ZVJlZiI6bnVsbH0sIm5vZGVzIjpbeyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjM2LCJ5IjoyNDB9LCJyZWYiOiJjaGVja291dCJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4IjozNiwieSI6MzZ9LCJyZWYiOiJvcGVyYXRpb25zIn0seyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjU5MC40LCJ5Ijo1Ni42NjY2NjY2NjY2NjY2N30sInJlZiI6Im9yZGVycyJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4IjoxMTU5LjE5OTk5OTk5OTk5OTgsInkiOjU2LjY2NjY2NjY2NjY2NjY3fSwicmVmIjoicGF5bWVudHMifV0sInJlZiI6Im92ZXJ2aWV3In1dLCJtb2RlbCI6eyJkb2N1bWVudHMiOlt7ImFzc2V0cyI6W10sImF0dGFjaG1lbnRzIjpbeyJraW5kIjoiZ3JhcGgiLCJyZWYiOiJvdmVydmlldyJ9LHsia2luZCI6ImdyYXBoIiwicmVmIjoib3JkZXItaW50ZXJuYWxzIn0seyJraW5kIjoibm9kZSIsInJlZiI6Im9yZGVycyJ9LHsiZ3JhcGhSZWYiOiJvdmVydmlldyIsImtpbmQiOiJlZGdlIiwicmVmIjoib3BzLW9yZGVycyJ9XSwiZm9ybWF0IjoibWFya2Rvd24iLCJpZCI6InJlYWRpbmctbGV2ZWxzIiwibGlua3MiOlt7ImhyZWYiOiIjZ3JhcGg9b3ZlcnZpZXciLCJ0YXJnZXQiOnsia2luZCI6ImdyYXBoIiwicmVmIjoib3ZlcnZpZXcifX0seyJocmVmIjoiI2dyYXBoPW9yZGVyLWludGVybmFscyIsInRhcmdldCI6eyJraW5kIjoiZ3JhcGgiLCJyZWYiOiJvcmRlci1pbnRlcm5hbHMifX0seyJocmVmIjoiI2dyYXBoPW92ZXJ2aWV3JmVkZ2U9Y2hlY2tvdXQtb3JkZXJzIiwidGFyZ2V0Ijp7ImdyYXBoUmVmIjoib3ZlcnZpZXciLCJraW5kIjoiZWRnZSIsInJlZiI6ImNoZWNrb3V0LW9yZGVycyJ9fSx7ImhyZWYiOiIjZ3JhcGg9b3JkZXItaW50ZXJuYWxzJmVkZ2U9Y2hlY2tvdXQtYXBpIiwidGFyZ2V0Ijp7ImdyYXBoUmVmIjoib3JkZXItaW50ZXJuYWxzIiwia2luZCI6ImVkZ2UiLCJyZWYiOiJjaGVja291dC1hcGkifX0seyJocmVmIjoiI2dyYXBoPW9yZGVyLWludGVybmFscyZub2RlPWNoZWNrb3V0IiwidGFyZ2V0Ijp7ImdyYXBoUmVmIjoib3JkZXItaW50ZXJuYWxzIiwia2luZCI6Im5vZGUiLCJyZWYiOiJjaGVja291dCJ9fV0sIm1hcmtkb3duIjoiIyBSZWFkaW5nIHRoZSB0d28gbGV2ZWxzXG5cblRoZSBbb3ZlcnZpZXddKCNncmFwaD1vdmVydmlldykgY29tcHJlc3NlcyBPcmRlciBQcm9jZXNzaW5nIGludG8gb25lIGJveC5cbkl0cyBbZGV0YWlsZWQgZ3JhcGhdKCNncmFwaD1vcmRlci1pbnRlcm5hbHMpIHNob3dzIHRoZSBBUEksIHF1ZXVlLCB3b3JrZXIsIGFuZCBkYXRhYmFzZS5cblRoZSBncmFwaCBpcyBwYXJ0aWFsOyBpdCBpcyBub3QgYW4gaW52ZW50b3J5IG9mIGV2ZXJ5dGhpbmcgaW5zaWRlIHRoZSBzZXJ2aWNlLlxuXG4jIyBXaGVyZSB0aGUgY2FsbHMgbGFuZFxuXG4tICoqS25vd246KiogW1N1Ym1pdCBvcmRlcl0oI2dyYXBoPW92ZXJ2aWV3JmVkZ2U9Y2hlY2tvdXQtb3JkZXJzKSBjb3JyZXNwb25kcyB0byB0aGUgW0FQSSBjYWxsXSgjZ3JhcGg9b3JkZXItaW50ZXJuYWxzJmVkZ2U9Y2hlY2tvdXQtYXBpKS5cbi0gKipVbmtub3duOioqIHRoZSBvdmVydmlldyByZWNvcmRzIGEgcGF5bWVudCBjYWxsLCBidXQgaXRzIGludGVybmFsIGNhbGxlciBoYXMgbm90IGJlZW4gaWRlbnRpZmllZC4gVGhlIFBheW1lbnQgUHJvdmlkZXIgcmVtYWlucyB2aXNpYmxlIGFzIGV4dGVybmFsIGNvbnRleHQgd2l0aCBubyBpbnZlbnRlZCBkZXRhaWxlZCBwYXltZW50IGVkZ2UuXG4tICoqRGlzcHV0ZWQ6KiogdGhlIG9wZXJhdGlvbnMgY29uc29sZSBpcyByZXBvcnRlZCB0byByZXBhaXIgb3JkZXJzIHRocm91Z2ggZWl0aGVyIHRoZSBBUEkgb3Igd29ya2VyLiBCb3RoIGNhbmRpZGF0ZSBlZGdlcyBhbmQgdGhlaXIgcXVhbGlmaWNhdGlvbnMgYXJlIHJldGFpbmVkLlxuXG5UaGUgW3NhbWUgQ2hlY2tvdXQgY29tcG9uZW50XSgjZ3JhcGg9b3JkZXItaW50ZXJuYWxzJm5vZGU9Y2hlY2tvdXQpIGFwcGVhcnMgYXMgZXh0ZXJuYWwgY29udGV4dCBpbiB0aGUgZGV0YWlsZWQgZ3JhcGguIEl0IHNoYXJlcyBpdHMgaWRlbnRpdHkgd2l0aCB0aGUgb3ZlcnZpZXcgbm9kZTsgaXQgaGFzIG5vdCBiZWNvbWUgcGFydCBvZiBPcmRlciBQcm9jZXNzaW5nLlxuXG4jIyBEb2N1bWVudHMgaGF2ZSBubyByZXF1aXJlZCBsZXZlbFxuXG5UaGlzIE1hcmtkb3duIGRvY3VtZW50IGV4cGxhaW5zIGJvdGggZ3JhcGhzLCB0aGUgT3JkZXIgUHJvY2Vzc2luZyBub2RlLCBhbmQgdGhlIG92ZXJ2aWV3IHJlcGFpciBlZGdlLiBBIGRvY3VtZW50IGNhbiBleHBsYWluIGFueSBncmFwaCwgbm9kZSwgb3IgZWRnZS5cbiIsInRpdGxlIjoiUmVhZGluZyB0aGUgdHdvIGxldmVscyJ9XSwiZW50aXRpZXMiOlt7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkRlcGxveW1lbnQgcmVwbGljYXMgYW5kIGltcGxlbWVudGF0aW9uIGNsYXNzZXMuIl0sInJlYXNvbiI6IlNob3cgcmVzcG9uc2liaWxpdGllcyBhdCB0aGlzIGdyYXBoIGxldmVsLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJDaGVja291dCBpbiB0aGUgZmljdGlvbmFsIG9yZGVyIHN5c3RlbS4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoic2VydmljZSJ9LCJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJpZCI6ImNoZWNrb3V0IiwibGFiZWwiOiJDaGVja291dCJ9LHsiYWJzdHJhY3Rpb24iOnsib21pdHMiOlsiRGVwbG95bWVudCByZXBsaWNhcyBhbmQgaW1wbGVtZW50YXRpb24gY2xhc3Nlcy4iXSwicmVhc29uIjoiU2hvdyByZXNwb25zaWJpbGl0aWVzIGF0IHRoaXMgZ3JhcGggbGV2ZWwuIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6Ik9yZGVyIFByb2Nlc3NpbmcgaW4gdGhlIGZpY3Rpb25hbCBvcmRlciBzeXN0ZW0uIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6InNlcnZpY2UifSwiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJvcmRlcnMiLCJsYWJlbCI6Ik9yZGVyIFByb2Nlc3NpbmcifSx7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkRlcGxveW1lbnQgcmVwbGljYXMgYW5kIGltcGxlbWVudGF0aW9uIGNsYXNzZXMuIl0sInJlYXNvbiI6IlNob3cgcmVzcG9uc2liaWxpdGllcyBhdCB0aGlzIGdyYXBoIGxldmVsLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJQYXltZW50IFByb3ZpZGVyIGluIHRoZSBmaWN0aW9uYWwgb3JkZXIgc3lzdGVtLiJ9fSwiY2F0ZWdvcnkiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImlkIjoicGF5bWVudHMiLCJsYWJlbCI6IlBheW1lbnQgUHJvdmlkZXIifSx7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkRlcGxveW1lbnQgcmVwbGljYXMgYW5kIGltcGxlbWVudGF0aW9uIGNsYXNzZXMuIl0sInJlYXNvbiI6IlNob3cgcmVzcG9uc2liaWxpdGllcyBhdCB0aGlzIGdyYXBoIGxldmVsLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJPcGVyYXRpb25zIENvbnNvbGUgaW4gdGhlIGZpY3Rpb25hbCBvcmRlciBzeXN0ZW0uIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6ImFjdG9yIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImlkIjoib3BlcmF0aW9ucyIsImxhYmVsIjoiT3BlcmF0aW9ucyBDb25zb2xlIn0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJEZXBsb3ltZW50IHJlcGxpY2FzIGFuZCBpbXBsZW1lbnRhdGlvbiBjbGFzc2VzLiJdLCJyZWFzb24iOiJTaG93IHJlc3BvbnNpYmlsaXRpZXMgYXQgdGhpcyBncmFwaCBsZXZlbC4iLCJyZXByZXNlbnRzIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiT3JkZXIgQVBJIGluIHRoZSBmaWN0aW9uYWwgb3JkZXIgc3lzdGVtLiJ9fSwiY2F0ZWdvcnkiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImlkIjoib3JkZXItYXBpIiwibGFiZWwiOiJPcmRlciBBUEkifSx7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkRlcGxveW1lbnQgcmVwbGljYXMgYW5kIGltcGxlbWVudGF0aW9uIGNsYXNzZXMuIl0sInJlYXNvbiI6IlNob3cgcmVzcG9uc2liaWxpdGllcyBhdCB0aGlzIGdyYXBoIGxldmVsLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJPcmRlciBRdWV1ZSBpbiB0aGUgZmljdGlvbmFsIG9yZGVyIHN5c3RlbS4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoicXVldWUifSwiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJxdWV1ZSIsImxhYmVsIjoiT3JkZXIgUXVldWUifSx7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkRlcGxveW1lbnQgcmVwbGljYXMgYW5kIGltcGxlbWVudGF0aW9uIGNsYXNzZXMuIl0sInJlYXNvbiI6IlNob3cgcmVzcG9uc2liaWxpdGllcyBhdCB0aGlzIGdyYXBoIGxldmVsLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJPcmRlciBXb3JrZXIgaW4gdGhlIGZpY3Rpb25hbCBvcmRlciBzeXN0ZW0uIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6InNlcnZpY2UifSwiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJ3b3JrZXIiLCJsYWJlbCI6Ik9yZGVyIFdvcmtlciJ9LHsiYWJzdHJhY3Rpb24iOnsib21pdHMiOlsiRGVwbG95bWVudCByZXBsaWNhcyBhbmQgaW1wbGVtZW50YXRpb24gY2xhc3Nlcy4iXSwicmVhc29uIjoiU2hvdyByZXNwb25zaWJpbGl0aWVzIGF0IHRoaXMgZ3JhcGggbGV2ZWwuIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6Ik9yZGVyIERhdGFiYXNlIGluIHRoZSBmaWN0aW9uYWwgb3JkZXIgc3lzdGVtLiJ9fSwiY2F0ZWdvcnkiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJkYXRhc3RvcmUifSwiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJkYXRhYmFzZSIsImxhYmVsIjoiT3JkZXIgRGF0YWJhc2UifV0sImdyYXBocyI6W3siY29udGV4dFJlZnMiOlsicGF5bWVudHMiXSwiZW50aXR5UmVmcyI6WyJjaGVja291dCIsIm9yZGVycyIsIm9wZXJhdGlvbnMiXSwiaWQiOiJvdmVydmlldyIsIm1lbWJlcnNoaXBSZWZzIjpbXSwicmVsYXRpb25zaGlwUmVmcyI6WyJjaGVja291dC1vcmRlcnMiLCJvcmRlcnMtcGF5bWVudCIsIm9wcy1vcmRlcnMiXSwic2NvcGUiOnsiYWJzdHJhY3Rpb24iOiJTZXJ2aWNlcyBhbmQgZXh0ZXJuYWwgY2FsbGVyczsgT3JkZXIgUHJvY2Vzc2luZyBpcyBvbmUgYm94LiIsImNvdmVyYWdlIjoicGFydGlhbCIsImVudmlyb25tZW50IjoiRmljdGlvbmFsIHByb2R1Y3Rpb24gc25hcHNob3QiLCJleGNsdWRlcyI6WyJSZXBsaWNhcywgbmV0d29yayB0b3BvbG9neSwgYW5kIHVucmVjb3JkZWQgYmVoYXZpb3IuIl0sImluY2x1ZGVzIjpbIk9ubHkgdGhlIGV4cGxpY2l0bHkgbGlzdGVkIGNvbXBvbmVudHMgYW5kIG9wZXJhdGlvbnMuIl0sInF1ZXN0aW9uIjoiV2hvIGludGVyYWN0cyB3aXRoIE9yZGVyIFByb2Nlc3Npbmc/Iiwic25hcHNob3QiOiJGaXh0dXJlIHYxIOKAlCAyMDI2LTA5LTA4IiwidGltZWZyYW1lIjoiY3VycmVudCJ9LCJ0aXRsZSI6Ik9yZGVyIHN5c3RlbSBvdmVydmlldyJ9LHsiY29udGV4dFJlZnMiOlsiY2hlY2tvdXQiLCJwYXltZW50cyIsIm9wZXJhdGlvbnMiXSwiZW50aXR5UmVmcyI6WyJvcmRlci1hcGkiLCJxdWV1ZSIsIndvcmtlciIsImRhdGFiYXNlIl0sImV4cGFuZHMiOnsiYm91bmRhcmllcyI6W3siZGV0YWlsIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjpbImNoZWNrb3V0LWFwaSJdfSwicmVsYXRpb25zaGlwUmVmIjoiY2hlY2tvdXQtb3JkZXJzIn0seyJkZXRhaWwiOnsicmVhc29uIjoiVGhlIG92ZXJ2aWV3IHJlY29yZHMgYSBwYXltZW50IGNhbGwsIGJ1dCB0aGlzIHNuYXBzaG90IGRvZXMgbm90IGlkZW50aWZ5IGl0cyBpbnRlcm5hbCBjYWxsZXIuIE5vIGRldGFpbGVkIHBheW1lbnQgZWRnZSBpcyBhc3NlcnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdLCJzdGF0dXMiOiJ1bmtub3duIn0sInJlbGF0aW9uc2hpcFJlZiI6Im9yZGVycy1wYXltZW50In0seyJkZXRhaWwiOnsiYWx0ZXJuYXRpdmVzIjpbeyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoicmVwb3J0ZWQiLCJ2YWx1ZSI6WyJvcHMtYXBpIl19LHsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6InJlcG9ydGVkIiwidmFsdWUiOlsib3BzLXdvcmtlciJdfV0sInJlYXNvbiI6IlR3byBhY2NvdW50cyBkaXNhZ3JlZSBhYm91dCB0aGUgYWN0aXZlIHJlcGFpciByb3V0ZS4gTmVpdGhlciBpcyBzZWxlY3RlZCBhcyBlc3RhYmxpc2hlZC4iLCJzdGF0dXMiOiJkaXNwdXRlZCJ9LCJyZWxhdGlvbnNoaXBSZWYiOiJvcHMtb3JkZXJzIn1dLCJncmFwaFJlZiI6Im92ZXJ2aWV3IiwibWVhbmluZyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6IlRoaXMgcGFydGlhbCBncmFwaCBleHBhbmRzIHRoZSBPcmRlciBQcm9jZXNzaW5nIHNlcnZpY2UuIENvbnRleHQgbm9kZXMgYXJlIG91dHNpZGUgdGhhdCBzZXJ2aWNlLiJ9LCJub2RlUmVmIjoib3JkZXJzIn0sImlkIjoib3JkZXItaW50ZXJuYWxzIiwibWVtYmVyc2hpcFJlZnMiOltdLCJyZWxhdGlvbnNoaXBSZWZzIjpbImNoZWNrb3V0LWFwaSIsImFwaS1xdWV1ZSIsIndvcmtlci1xdWV1ZSIsIndvcmtlci1kYiIsIm9wcy1hcGkiLCJvcHMtd29ya2VyIl0sInNjb3BlIjp7ImFic3RyYWN0aW9uIjoiQVBJLCBxdWV1ZSwgd29ya2VyLCBhbmQgc3RvcmFnZTsgb3V0c2lkZSBjYWxsZXJzIGFyZSBjb250ZXh0LiIsImNvdmVyYWdlIjoicGFydGlhbCIsImVudmlyb25tZW50IjoiRmljdGlvbmFsIHByb2R1Y3Rpb24gc25hcHNob3QiLCJleGNsdWRlcyI6WyJSZXBsaWNhcywgbmV0d29yayB0b3BvbG9neSwgYW5kIHVucmVjb3JkZWQgYmVoYXZpb3IuIl0sImluY2x1ZGVzIjpbIk9ubHkgdGhlIGV4cGxpY2l0bHkgbGlzdGVkIGNvbXBvbmVudHMgYW5kIG9wZXJhdGlvbnMuIl0sInF1ZXN0aW9uIjoiV2hhdCBpbXBsZW1lbnRzIE9yZGVyIFByb2Nlc3NpbmcsIGFuZCB3aGVyZSBkbyBvdmVydmlldyBjYWxscyBsYW5kPyIsInNuYXBzaG90IjoiRml4dHVyZSB2MSDigJQgMjAyNi0wOS0wOCIsInRpbWVmcmFtZSI6ImN1cnJlbnQifSwidGl0bGUiOiJJbnNpZGUgT3JkZXIgUHJvY2Vzc2luZyJ9XSwiZ3JvdXBzIjpbXSwiaWQiOiJvcmRlci1zeXN0ZW0iLCJtZW1iZXJzaGlwcyI6W10sIm5vdGVzIjpbXSwicGVyc3BlY3RpdmVzIjpbXSwicmVsYXRpb25zaGlwcyI6W3siZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiZnJvbSI6ImNoZWNrb3V0IiwiaWQiOiJjaGVja291dC1vcmRlcnMiLCJraW5kIjoiY2FsbHMiLCJsYWJlbCI6IlN1Ym1pdCBvcmRlciIsInRvIjoib3JkZXJzIn0seyJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoib3JkZXJzIiwiaWQiOiJvcmRlcnMtcGF5bWVudCIsImtpbmQiOiJjYWxscyIsImxhYmVsIjoiQ2hhcmdlIHBheW1lbnQiLCJ0byI6InBheW1lbnRzIn0seyJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoib3BlcmF0aW9ucyIsImlkIjoib3BzLW9yZGVycyIsImtpbmQiOiJjYWxscyIsImxhYmVsIjoiUmVwYWlyIG9yZGVyIiwidG8iOiJvcmRlcnMifSx7ImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJjaGVja291dCIsImlkIjoiY2hlY2tvdXQtYXBpIiwia2luZCI6ImNhbGxzIiwibGFiZWwiOiJTdWJtaXQgb3JkZXIiLCJ0byI6Im9yZGVyLWFwaSJ9LHsiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiZnJvbSI6Im9yZGVyLWFwaSIsImlkIjoiYXBpLXF1ZXVlIiwia2luZCI6InB1Ymxpc2hlcyIsImxhYmVsIjoiRW5xdWV1ZSBvcmRlciIsInRvIjoicXVldWUifSx7ImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJ3b3JrZXIiLCJpZCI6Indvcmtlci1xdWV1ZSIsImtpbmQiOiJjb25zdW1lcyIsImxhYmVsIjoiQ29uc3VtZSBvcmRlcnMiLCJ0byI6InF1ZXVlIn0seyJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IHN0aXB1bGF0ZWQgYnkgdGhpcyBmaWN0aW9uYWwgdGVzdCBzY2VuYXJpbywgbm90IGV4dHJhY3RlZCBmcm9tIGEgcmVhbCBvcmdhbml6YXRpb24uIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtc25hcHNob3QiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoid29ya2VyIiwiaWQiOiJ3b3JrZXItZGIiLCJraW5kIjoid3JpdGVzIiwibGFiZWwiOiJQZXJzaXN0IG9yZGVyIiwidG8iOiJkYXRhYmFzZSJ9LHsiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBzdGlwdWxhdGVkIGJ5IHRoaXMgZmljdGlvbmFsIHRlc3Qgc2NlbmFyaW8sIG5vdCBleHRyYWN0ZWQgZnJvbSBhIHJlYWwgb3JnYW5pemF0aW9uLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXNuYXBzaG90Il19LCJzdGF0dXMiOiJyZXBvcnRlZCIsInZhbHVlIjp0cnVlfSwiZnJvbSI6Im9wZXJhdGlvbnMiLCJpZCI6Im9wcy1hcGkiLCJraW5kIjoiY2FsbHMiLCJsYWJlbCI6IlJlcGFpciB2aWEgQVBJIiwidG8iOiJvcmRlci1hcGkifSx7ImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgc3RpcHVsYXRlZCBieSB0aGlzIGZpY3Rpb25hbCB0ZXN0IHNjZW5hcmlvLCBub3QgZXh0cmFjdGVkIGZyb20gYSByZWFsIG9yZ2FuaXphdGlvbi4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1zbmFwc2hvdCJdfSwic3RhdHVzIjoicmVwb3J0ZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJvcGVyYXRpb25zIiwiaWQiOiJvcHMtd29ya2VyIiwia2luZCI6ImNhbGxzIiwibGFiZWwiOiJSZXBhaXIgdmlhIHdvcmtlciIsInRvIjoid29ya2VyIn1dLCJyb290R3JhcGhSZWYiOiJvdmVydmlldyIsInNjaGVtYVZlcnNpb24iOiIwLjQtZHJhZnQiLCJzY29wZSI6eyJhYnN0cmFjdGlvbiI6IkEgcGFydGlhbCBtb2RlbCB3aXRoIHR3byBleHBsaWNpdGx5IGNvbm5lY3RlZCBhYnN0cmFjdGlvbiBsZXZlbHMuIiwiY292ZXJhZ2UiOiJwYXJ0aWFsIiwiZW52aXJvbm1lbnQiOiJGaWN0aW9uYWwgcHJvZHVjdGlvbiBzbmFwc2hvdCIsImV4Y2x1ZGVzIjpbIlJlcGxpY2FzLCBuZXR3b3JrIHRvcG9sb2d5LCBhbmQgdW5yZWNvcmRlZCBiZWhhdmlvci4iXSwiaW5jbHVkZXMiOlsiT25seSB0aGUgZXhwbGljaXRseSBsaXN0ZWQgY29tcG9uZW50cyBhbmQgb3BlcmF0aW9ucy4iXSwicXVlc3Rpb24iOiJIb3cgZG9lcyB0aGUgb3ZlcnZpZXcgY29ycmVzcG9uZCB0byB0aGUgc2VydmljZSBpbnRlcm5hbHM/Iiwic25hcHNob3QiOiJGaXh0dXJlIHYxIOKAlCAyMDI2LTA5LTA4IiwidGltZWZyYW1lIjoiY3VycmVudCJ9LCJzb3VyY2VzIjpbeyJkZXNjcmlwdGlvbiI6IkludmVudGVkIHNjZW5hcmlvIGZvciB0ZXN0aW5nIGtub3duLCB1bmtub3duLCBhbmQgZGlzcHV0ZWQgYm91bmRhcnkgbWFwcGluZ3MuIiwiaWQiOiJmaWN0aW9uYWwtc25hcHNob3QiLCJraW5kIjoiZml4dHVyZSIsImxvY2F0b3IiOiJldmlkZW5jZS5tZCJ9XSwidGl0bGUiOiJPcmRlciBzeXN0ZW0gYWNyb3NzIGxldmVscyJ9LCJtb2RlbERpZ2VzdCI6IjFiMmM1NmE3ZDhkN2NjZWE3NTk2OGFiOTMwODMxMTYxZjQxZjI0MzdkNThiZGFhYmY0OWJjYTkwYzUzMjY3NWIiLCJzY2hlbWFWZXJzaW9uIjoiMC4zLWRyYWZ0In0=</metadata>
+    <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
+    <g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><g class=""><path class="edge-hit" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333"/><path class="edge-line" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><g class=""><path class="edge-hit" d="M268,98 L590.4,98"/><path class="edge-line" d="M268,98 L590.4,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><g class=""><path class="edge-hit" d="M822.4,118.667 L1159.2,118.667"/><path class="edge-line" d="M822.4,118.667 L1159.2,118.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
+      <rect class="node-box" x="36" y="240" width="232" height="124" rx="12"/>
+      <rect class="accent" x="54" y="259" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="265">service</text>
+      <text class="node-title" x="54" y="292">Checkout</text>
+      <text class="node-status" x="54" y="315">established · present</text>
+      <text class="node-link" x="54" y="346">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="operations" tabindex="0" role="button" aria-label="Inspect Operations Console"><g class="category-actor">
+      <rect class="node-box" x="36" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="54" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="61">actor</text>
+      <text class="node-title" x="54" y="88">Operations Console</text>
+      <text class="node-status" x="54" y="111">established · present</text>
+      <text class="node-link" x="54" y="142">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="orders" tabindex="0" role="button" aria-label="Inspect Order Processing"><g class="category-service">
+      <rect class="node-box" x="590.4" y="56.667" width="232" height="124" rx="12"/>
+      <rect class="accent" x="608.4" y="75.667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="622.4" y="81.667">service</text>
+      <text class="node-title" x="608.4" y="108.667">Order Processing</text>
+      <text class="node-status" x="608.4" y="131.667">established · present</text>
+      <text class="node-link" x="608.4" y="162.667">Detailed graph available ↗</text>
+    </g></g><g class="record" data-ref="payments" tabindex="0" role="button" aria-label="Inspect Payment Provider"><g class="category-service">
+      <rect class="node-box" x="1159.2" y="56.667" width="232" height="124" rx="12"/>
+      <rect class="accent" x="1177.2" y="75.667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="1191.2" y="81.667">Context · service</text>
+      <text class="node-title" x="1177.2" y="108.667">Payment Provider</text>
+      <text class="node-status" x="1177.2" y="131.667">established · present</text>
+      <text class="node-link" x="1177.2" y="162.667">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><rect class="edge-label-bg" x="378" y="319" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="337">Submit order</text></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><rect class="edge-label-bg" x="378" y="51" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="69">Repair order</text></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><rect class="edge-label-bg" x="932.4" y="135.667" width="116.8" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="990.8" y="153.667">Charge payment</text></g>
+  </svg></div>
+      <div class="map-caption"><span>Arrows describe operations: actor → resource.</span><span>Position does not imply execution order. Select any element to inspect it.</span></div>
+    </section>
+    <section id="graph-connections" aria-label="Connections between graph levels"></section>
+    <section class="knowledge-section" aria-labelledby="knowledge-heading"><div class="section-heading"><h2 id="knowledge-heading">What remains open</h2><span id="knowledge-count"></span></div><div id="knowledge-list"></div></section>
+    <footer><span>Full source travels with this artifact. Qualifications remain intact.</span><span>Waxwing · experimental MVP</span></footer>
+  </main>
+  <main id="document-reader" hidden aria-label="Documents">
+    <div class="document-breadcrumb"><a href="#">← Graph</a><span>/</span><a href="#documents">Documents</a></div>
+    <div class="document-workspace"><nav id="document-nav" aria-label="Included documents"></nav><section id="document-content" aria-live="polite"></section></div>
+  </main>
+  <template id="ww-document-reading-levels"><article class="markdown-body"><h1 id="ww-doc-reading-levels--reading-the-two-levels">Reading the two levels</h1>
+<p>The <a href="#graph=overview">overview</a> compresses Order Processing into one box.
+Its <a href="#graph=order-internals">detailed graph</a> shows the API, queue, worker, and database.
+The graph is partial; it is not an inventory of everything inside the service.</p>
+<h2 id="ww-doc-reading-levels--where-the-calls-land">Where the calls land</h2>
+<ul>
+<li><strong>Known:</strong> <a href="#graph=overview&amp;edge=checkout-orders">Submit order</a> corresponds to the <a href="#graph=order-internals&amp;edge=checkout-api">API call</a>.</li>
+<li><strong>Unknown:</strong> the overview records a payment call, but its internal caller has not been identified. The Payment Provider remains visible as external context with no invented detailed payment edge.</li>
+<li><strong>Disputed:</strong> the operations console is reported to repair orders through either the API or worker. Both candidate edges and their qualifications are retained.</li>
+</ul>
+<p>The <a href="#graph=order-internals&amp;node=checkout">same Checkout component</a> appears as external context in the detailed graph. It shares its identity with the overview node; it has not become part of Order Processing.</p>
+<h2 id="ww-doc-reading-levels--documents-have-no-required-level">Documents have no required level</h2>
+<p>This Markdown document explains both graphs, the Order Processing node, and the overview repair edge. A document can explain any graph, node, or edge.</p>
+</article></template>
+  <template id="ww-graph-overview"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-graph-ref="overview" data-theme="light" viewBox="0 0 1427.2 400" width="1427.2" height="400" role="group" aria-labelledby="ww-title ww-description">
+    <title id="ww-title">Order system overview</title><desc id="ww-description">Services and external callers; Order Processing is one box. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+
+    <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
+    <g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><g class=""><path class="edge-hit" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333"/><path class="edge-line" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><g class=""><path class="edge-hit" d="M268,98 L590.4,98"/><path class="edge-line" d="M268,98 L590.4,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><g class=""><path class="edge-hit" d="M822.4,118.667 L1159.2,118.667"/><path class="edge-line" d="M822.4,118.667 L1159.2,118.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
+      <rect class="node-box" x="36" y="240" width="232" height="124" rx="12"/>
+      <rect class="accent" x="54" y="259" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="265">service</text>
+      <text class="node-title" x="54" y="292">Checkout</text>
+      <text class="node-status" x="54" y="315">established · present</text>
+      <text class="node-link" x="54" y="346">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="operations" tabindex="0" role="button" aria-label="Inspect Operations Console"><g class="category-actor">
+      <rect class="node-box" x="36" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="54" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="61">actor</text>
+      <text class="node-title" x="54" y="88">Operations Console</text>
+      <text class="node-status" x="54" y="111">established · present</text>
+      <text class="node-link" x="54" y="142">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="orders" tabindex="0" role="button" aria-label="Inspect Order Processing"><g class="category-service">
+      <rect class="node-box" x="590.4" y="56.667" width="232" height="124" rx="12"/>
+      <rect class="accent" x="608.4" y="75.667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="622.4" y="81.667">service</text>
+      <text class="node-title" x="608.4" y="108.667">Order Processing</text>
+      <text class="node-status" x="608.4" y="131.667">established · present</text>
+      <text class="node-link" x="608.4" y="162.667">Detailed graph available ↗</text>
+    </g></g><g class="record" data-ref="payments" tabindex="0" role="button" aria-label="Inspect Payment Provider"><g class="category-service">
+      <rect class="node-box" x="1159.2" y="56.667" width="232" height="124" rx="12"/>
+      <rect class="accent" x="1177.2" y="75.667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="1191.2" y="81.667">Context · service</text>
+      <text class="node-title" x="1177.2" y="108.667">Payment Provider</text>
+      <text class="node-status" x="1177.2" y="131.667">established · present</text>
+      <text class="node-link" x="1177.2" y="162.667">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><rect class="edge-label-bg" x="378" y="319" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="337">Submit order</text></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><rect class="edge-label-bg" x="378" y="51" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="69">Repair order</text></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><rect class="edge-label-bg" x="932.4" y="135.667" width="116.8" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="990.8" y="153.667">Charge payment</text></g>
+  </svg></template><template id="ww-graph-order-internals"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-graph-ref="order-internals" data-theme="light" viewBox="0 0 1470.4 645.333" width="1470.4" height="645.333" role="group" aria-labelledby="ww-title ww-description">
+    <title id="ww-title">Inside Order Processing</title><desc id="ww-description">API, queue, worker, and storage; outside callers are context. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+
+    <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
+    <g class="record" data-ref="api-queue" tabindex="0" role="button" aria-label="Inspect Enqueue order"><g class=""><path class="edge-hit" d="M865.6,339.333 L1127.4,339.333 L1127.4,322.667 L1202.4,322.667"/><path class="edge-line" d="M865.6,339.333 L1127.4,339.333 L1127.4,322.667 L1202.4,322.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout-api" tabindex="0" role="button" aria-label="Inspect Submit order"><g class=""><path class="edge-hit" d="M268,547.333 L558.6,547.333 L558.6,360 L633.6,360"/><path class="edge-line" d="M268,547.333 L558.6,547.333 L558.6,360 L633.6,360" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="ops-api" tabindex="0" role="button" aria-label="Inspect Repair via API"><g class="qualified"><path class="edge-hit" d="M268,160 L303,160 L303,318.667 L633.6,318.667"/><path class="edge-line" d="M268,160 L303,160 L303,318.667 L633.6,318.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="ops-worker" tabindex="0" role="button" aria-label="Inspect Repair via worker"><g class="qualified"><path class="edge-hit" d="M268,118.667 L633.6,118.667"/><path class="edge-line" d="M268,118.667 L633.6,118.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="worker-db" tabindex="0" role="button" aria-label="Inspect Persist order"><g class=""><path class="edge-hit" d="M865.6,98 L1202.4,98"/><path class="edge-line" d="M865.6,98 L1202.4,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="worker-queue" tabindex="0" role="button" aria-label="Inspect Consume orders"><g class=""><path class="edge-hit" d="M865.6,139.333 L900.6,139.333 L900.6,281.333 L1202.4,281.333"/><path class="edge-line" d="M865.6,139.333 L900.6,139.333 L900.6,281.333 L1202.4,281.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
+      <rect class="node-box" x="36" y="485.333" width="232" height="124" rx="12"/>
+      <rect class="accent" x="54" y="504.333" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="510.333">Context · service</text>
+      <text class="node-title" x="54" y="537.333">Checkout</text>
+      <text class="node-status" x="54" y="560.333">established · present</text>
+      <text class="node-link" x="54" y="591.333">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="database" tabindex="0" role="button" aria-label="Inspect Order Database"><g class="category-datastore">
+      <rect class="node-box" x="1202.4" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="1220.4" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="1234.4" y="61">datastore</text>
+      <text class="node-title" x="1220.4" y="88">Order Database</text>
+      <text class="node-status" x="1220.4" y="111">established · present</text>
+      <text class="node-link" x="1220.4" y="142">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="operations" tabindex="0" role="button" aria-label="Inspect Operations Console"><g class="category-actor">
+      <rect class="node-box" x="36" y="77.333" width="232" height="124" rx="12"/>
+      <rect class="accent" x="54" y="96.333" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="102.333">Context · actor</text>
+      <text class="node-title" x="54" y="129.333">Operations Console</text>
+      <text class="node-status" x="54" y="152.333">established · present</text>
+      <text class="node-link" x="54" y="183.333">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="order-api" tabindex="0" role="button" aria-label="Inspect Order API"><g class="category-service">
+      <rect class="node-box" x="633.6" y="277.333" width="232" height="124" rx="12"/>
+      <rect class="accent" x="651.6" y="296.333" width="6" height="6" rx="2"/>
+      <text class="node-category" x="665.6" y="302.333">service</text>
+      <text class="node-title" x="651.6" y="329.333">Order API</text>
+      <text class="node-status" x="651.6" y="352.333">established · present</text>
+      <text class="node-link" x="651.6" y="383.333">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="payments" tabindex="0" role="button" aria-label="Inspect Payment Provider"><g class="category-service">
+      <rect class="node-box" x="36" y="281.333" width="232" height="124" rx="12"/>
+      <rect class="accent" x="54" y="300.333" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="306.333">Context · service</text>
+      <text class="node-title" x="54" y="333.333">Payment Provider</text>
+      <text class="node-status" x="54" y="356.333">established · present</text>
+      <text class="node-link" x="54" y="387.333">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="queue" tabindex="0" role="button" aria-label="Inspect Order Queue"><g class="category-queue">
+      <rect class="node-box" x="1202.4" y="240" width="232" height="124" rx="12"/>
+      <rect class="accent" x="1220.4" y="259" width="6" height="6" rx="2"/>
+      <text class="node-category" x="1234.4" y="265">queue</text>
+      <text class="node-title" x="1220.4" y="292">Order Queue</text>
+      <text class="node-status" x="1220.4" y="315">established · present</text>
+      <text class="node-link" x="1220.4" y="346">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="worker" tabindex="0" role="button" aria-label="Inspect Order Worker"><g class="category-service">
+      <rect class="node-box" x="633.6" y="56.667" width="232" height="124" rx="12"/>
+      <rect class="accent" x="651.6" y="75.667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="665.6" y="81.667">service</text>
+      <text class="node-title" x="651.6" y="108.667">Order Worker</text>
+      <text class="node-status" x="651.6" y="131.667">established · present</text>
+      <text class="node-link" x="651.6" y="162.667">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="api-queue" tabindex="0" role="button" aria-label="Inspect Enqueue order"><rect class="edge-label-bg" x="979.2" y="356.333" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1034" y="374.333">Enqueue order</text></g><g class="record" data-ref="checkout-api" tabindex="0" role="button" aria-label="Inspect Submit order"><rect class="edge-label-bg" x="399.6" y="564.333" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="450.8" y="582.333">Submit order</text></g><g class="record" data-ref="ops-api" tabindex="0" role="button" aria-label="Inspect Repair via API"><rect class="edge-label-bg" x="378" y="335.667" width="145.6" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="450.8" y="353.667">Repair via API</text><text class="edge-label edge-note" text-anchor="middle" x="450.8" y="371.667">reported · present</text></g><g class="record" data-ref="ops-worker" tabindex="0" role="button" aria-label="Inspect Repair via worker"><rect class="edge-label-bg" x="378" y="135.667" width="145.6" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="450.8" y="153.667">Repair via worker</text><text class="edge-label edge-note" text-anchor="middle" x="450.8" y="171.667">reported · present</text></g><g class="record" data-ref="worker-db" tabindex="0" role="button" aria-label="Inspect Persist order"><rect class="edge-label-bg" x="979.2" y="115" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1034" y="133">Persist order</text></g><g class="record" data-ref="worker-queue" tabindex="0" role="button" aria-label="Inspect Consume orders"><rect class="edge-label-bg" x="975.6" y="298.333" width="116.8" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1034" y="316.333">Consume orders</text></g>
+  </svg></template>
+  <aside id="inspector" hidden aria-label="Model inspector"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside>
+  <script>(() => {
+  'use strict';
+  const payload = document.getElementById('waxwing-source').textContent;
+  const layout = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(payload), (char) => char.charCodeAt(0))));
+  const model = layout.model;
+  const documents = model.documents ?? [];
+  const graphs = model.graphs ?? [{ id: model.id, title: model.title, scope: model.scope,
+    entityRefs: model.entities.map((item) => item.id), contextRefs: [],
+    relationshipRefs: model.relationships.map((item) => item.id), membershipRefs: model.memberships.map((item) => item.id) }];
+  const root = model.rootGraphRef ?? model.id;
+  let activeGraph = graphs.find((item) => item.id === root);
+  let drawing = layout.graphs?.find((item) => item.ref === root) ?? layout;
+  const graphNodes = (graph) => [...graph.entityRefs, ...graph.contextRefs];
+  const locations = (kind, ref) => graphs.filter((graph) => (kind === 'node' ? graphNodes(graph) : graph.relationshipRefs).includes(ref));
+  const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'graphs'];
+  const index = new Map(collections.flatMap((collection) => (model[collection] ?? []).map((record) => [record.id, { record, collection }])));
+  let svg = document.querySelector('.ww-svg');
+  const sourceMetadata = document.getElementById('waxwing-source').cloneNode(true);
+  const viewport = document.getElementById('map-viewport');
+  const inspector = document.getElementById('inspector');
+  const content = document.getElementById('inspector-content');
+  let previousFocus;
+  let zoom = 1;
+  let fitted = true;
+  const name = (ref) => {
+    const record = index.get(ref)?.record;
+    if (record?.memberRef) return `${index.get(record.memberRef)?.record.label ?? record.memberRef} · ${index.get(record.perspectiveRef)?.record.label ?? record.perspectiveRef}`;
+    return record?.label || record?.title || record?.statement || ref;
+  };
+  const humanize = (key) => key.replace(/([a-z])([A-Z])/g, '$1 $2').replaceAll('_', ' ');
+
+  function el(tag, text, className) {
+    const item = document.createElement(tag);
+    if (text !== undefined) item.textContent = text;
+    if (className) item.className = className;
+    return item;
+  }
+
+  function field(key, value) {
+    const container = el('div', undefined, 'detail-field');
+    container.append(el('span', humanize(key), 'detail-key'));
+    if (value && typeof value === 'object' && value.status) container.append(claim(value));
+    else if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'object') {
+          const nested = el('div', undefined, 'sub-record');
+          if (item.label || item.id) nested.append(el('h4', item.label || item.id));
+          nested.append(objectFields(item));
+          container.append(nested);
+        }
+        else container.append(el('div', key.endsWith('Refs') ? name(item) : String(item), 'detail-value'));
+      }
+      if (!value.length) container.append(el('div', 'None recorded', 'detail-value'));
+    } else if (value && typeof value === 'object') container.append(objectFields(value));
+    else if ((key.endsWith('Ref') || ['from', 'to'].includes(key)) && index.has(value)) {
+      const button = el('button', name(value), 'source-ref');
+      button.addEventListener('click', () => show(value));
+      container.append(button);
+    } else container.append(el('div', String(value), 'detail-value'));
+    return container;
+  }
+
+  function sourceButtons(refs) {
+    const container = el('div');
+    for (const ref of refs ?? []) {
+      const button = el('button', ref, 'source-ref');
+      button.addEventListener('click', () => show(ref));
+      container.append(button);
+    }
+    return container;
+  }
+
+  function claim(value) {
+    const container = el('div', undefined, 'claim');
+    container.append(el('span', value.status, `status-pill ${value.status}`));
+    if (Object.hasOwn(value, 'value')) container.append(el('div', Array.isArray(value.value) ? value.value.map(name).join(' + ') : typeof value.value === 'string' && index.has(value.value) ? name(value.value) : String(value.value), 'detail-value'));
+    if (value.reason) container.append(el('div', value.reason, 'detail-value'));
+    if (value.basis) {
+      container.append(el('div', value.basis.explanation, 'claim-basis'));
+      container.append(sourceButtons(value.basis.sourceRefs));
+    }
+    if (value.sourceRefs) container.append(sourceButtons(value.sourceRefs));
+    for (const alternative of value.alternatives ?? []) container.append(claim(alternative));
+    return container;
+  }
+
+  function objectFields(record) {
+    const container = el('div');
+    for (const [key, value] of Object.entries(record)) {
+      if (['id', 'label'].includes(key)) continue;
+      container.append(field(key, value));
+    }
+    return container;
+  }
+
+  function displayRecord(ref) {
+    if (inspector.hidden || !inspector.contains(document.activeElement)) previousFocus = document.activeElement;
+    content.replaceChildren();
+    const record = ref === '__model' ? model : index.get(ref)?.record;
+    if (!record) return;
+    content.append(el('h2', ref === '__model' ? 'Model & scope' : name(ref)));
+    content.append(el('div', ref === '__model' ? `${model.schemaVersion} · ${model.id}` : ref, 'record-id'));
+    const attached = documents.filter((doc) => doc.attachments.some((target) => ref === '__model' ? target.kind === 'graph' && target.ref === activeGraph.id : target.ref === ref && ['node', 'edge'].includes(target.kind) && (!target.graphRef || target.graphRef === activeGraph.id)));
+    if (attached.length) {
+      const section = el('section', undefined, 'attached-documents');
+      section.append(el('h3', 'Documents'));
+      for (const doc of attached) {
+        const link = el('a', `${doc.title} ↗`, 'document-link');
+        link.href = `#document=${encodeURIComponent(doc.id)}`; section.append(link);
+      }
+      content.append(section);
+    }
+    for (const child of graphs.filter((graph) => graph.expands?.graphRef === activeGraph.id && graph.expands.nodeRef === ref)) {
+      const section = el('section', undefined, 'attached-documents');
+      const link = el('a', `Explore ${child.title} →`, 'document-link'); link.href = `#graph=${child.id}`;
+      section.append(link, claim(child.expands.meaning)); content.append(section);
+    }
+    for (const graph of graphs.filter((item) => item.expands?.graphRef === activeGraph.id)) {
+      const boundary = graph.expands.boundaries.find((item) => item.relationshipRef === ref);
+      if (!boundary) continue;
+      const section = el('section', undefined, 'attached-documents');
+      section.append(el('h3', 'Detailed correspondence'), graphLink(graph), claim(boundary.detail)); content.append(section);
+    }
+    if (ref === '__model') {
+      content.append(field('graph', activeGraph));
+      content.append(field('modelScope', model.scope));
+      content.append(field('perspectives', model.perspectives));
+      content.append(field('sources', model.sources));
+      const catalog = el('section', undefined, 'detail-section');
+      catalog.append(el('h3', 'All model records'));
+      for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes', 'documents']) {
+        const row = el('div', undefined, 'detail-field');
+        row.append(el('span', collection, 'detail-key'));
+        for (const item of model[collection] ?? []) {
+          const button = el('button', name(item.id), 'source-ref');
+          button.addEventListener('click', () => show(item.id));
+          row.append(button);
+        }
+        catalog.append(row);
+      }
+      content.append(catalog);
+    } else {
+      content.append(objectFields(record));
+      const memberships = model.memberships.filter((item) => activeGraph.membershipRefs.includes(item.id) && (item.memberRef === ref || item.group.value === ref || item.group.alternatives?.some((alternative) => alternative.value === ref)));
+      const notes = model.notes.filter((item) => item.subjectRefs.includes(ref));
+      for (const [heading, records] of [['Membership and perspective', memberships], ['Related knowledge', notes]]) {
+        if (!records.length) continue;
+        const section = el('section', undefined, 'detail-section');
+        section.append(el('h3', heading));
+        for (const item of records) {
+          const part = el('div', undefined, 'sub-record');
+          part.append(el('h4', item.statement || name(item.perspectiveRef)));
+          part.append(objectFields(item));
+          section.append(part);
+        }
+        content.append(section);
+      }
+    }
+    const raw = el('details');
+    raw.append(el('summary', 'Exact JSON record'), el('pre', JSON.stringify(record, null, 2)));
+    content.append(raw);
+    inspector.hidden = false;
+    inspector.scrollTop = 0;
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.toggle('selected', element.dataset.ref === ref));
+    document.getElementById('close-inspector').focus();
+  }
+
+  function hideInspector() {
+    inspector.hidden = true;
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.remove('selected'));
+    if (previousFocus?.isConnected) previousFocus.focus();
+  }
+  function targetHash(target) {
+    const params = new URLSearchParams();
+    if (target.kind === 'document') params.set('document', target.ref);
+    else {
+      if (target.kind === 'graph') params.set('graph', target.ref);
+      else {
+        const candidates = locations(target.kind, target.ref);
+        if (!candidates.length && !target.graphRef) return `#graph=${activeGraph.id}&record=${encodeURIComponent(target.ref)}`;
+        const graphRef = target.graphRef ?? (candidates.some((graph) => graph.id === activeGraph.id) ? activeGraph.id : candidates.length === 1 ? candidates[0].id : undefined);
+        if (graphRef) params.set('graph', graphRef);
+      }
+      if (target.kind !== 'graph') params.set(target.kind, target.ref);
+    }
+    return `#${params}`;
+  }
+  function navigate(hash) {
+    if (location.hash === hash || (!location.hash && hash === '#')) applyRoute();
+    else location.hash = hash;
+  }
+  function show(ref) {
+    const collection = index.get(ref)?.collection;
+    const kind = { documents: 'document', entities: 'node', relationships: 'edge', graphs: 'graph' }[collection];
+    navigate(kind ? targetHash({ kind, ref }) : `#graph=${activeGraph.id}&record=${encodeURIComponent(ref)}`);
+  }
+  function close() { navigate(`#graph=${activeGraph.id}`); }
+  const reader = document.getElementById('document-reader');
+  const documentContent = document.getElementById('document-content');
+  const diagramMain = document.getElementById('diagram-main');
+  const documentNav = document.getElementById('document-nav');
+  documentNav.append(el('div', 'DOCUMENTS', 'detail-key'));
+  for (const doc of documents) {
+    const link = el('a', doc.title, 'document-nav-link');
+    link.href = targetHash({ kind: 'document', ref: doc.id });
+    link.dataset.document = doc.id; documentNav.append(link);
+  }
+  function documentScreen(doc, heading) {
+    document.title = `${doc?.title ?? 'Documents'} · ${model.title} · Waxwing`;
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren();
+    documentNav.querySelectorAll('a').forEach((link) => {
+      if (link.dataset.document === doc?.id) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    if (!doc) {
+      documentContent.append(el('div', 'REFERENCE LIBRARY', 'eyebrow'), el('h1', 'Documents'));
+      documentContent.append(el('p', 'Detailed explanations attached to this graph and its components.', 'purpose'));
+      for (const item of documents) {
+        const link = el('a', item.title, 'document-card'); link.href = targetHash({ kind: 'document', ref: item.id });
+        const subjects = item.attachments.map((target) => target.kind === 'graph' ? graphs.find((graph) => graph.id === target.ref)?.title : name(target.ref));
+        link.append(el('span', subjects.join(' · ') || 'Included document')); documentContent.append(link);
+      }
+      if (!documents.length) documentContent.append(el('p', 'No documents included.'));
+    } else {
+      documentContent.append(el('div', 'DOCUMENT', 'eyebrow'), el('h1', doc.title));
+      const attachments = el('div', undefined, 'document-attachments');
+      for (const target of doc.attachments) {
+        const link = el('a', `${target.kind} · ${target.kind === 'graph' ? graphs.find((graph) => graph.id === target.ref)?.title : name(target.ref)}`);
+        link.href = targetHash(target); attachments.append(link);
+      }
+      documentContent.append(attachments);
+      documentContent.append(document.getElementById(`ww-document-${doc.id}`).content.cloneNode(true));
+      const raw = el('details', undefined, 'document-source');
+      raw.append(el('summary', 'Original Markdown'), el('pre', doc.markdown));
+      const button = el('button', 'Download .md');
+      button.addEventListener('click', () => download(doc.markdown, `${doc.id}.md`, 'text/markdown;charset=utf-8'));
+      raw.append(button); documentContent.append(raw);
+      if (heading !== undefined) {
+        const destination = document.getElementById(`ww-doc-${doc.id}--${heading}`);
+        if (!destination) { unavailable('The requested document heading does not exist.'); return; }
+        destination.scrollIntoView({ block: 'start' });
+      }
+    }
+    if (heading === undefined) window.scrollTo(0, 0);
+  }
+  function unavailable(message) {
+    document.title = 'Link unavailable · Waxwing';
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren(el('h1', 'Link unavailable'), el('p', message));
+    const link = el('a', 'Return to graph'); link.href = '#'; documentContent.append(link);
+  }
+  function applyRoute() {
+    const hash = location.hash.slice(1);
+    if (hash === 'documents') { documentScreen(); return; }
+    const params = new URLSearchParams(hash), keys = [...params.keys()];
+    if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'heading', 'graph', 'node', 'edge', 'record'].includes(key))) { unavailable('This link uses an unsupported or ambiguous target.'); return; }
+    if (params.has('document')) {
+      if (keys.some((key) => !['document', 'heading'].includes(key))) { unavailable('This link names conflicting destinations.'); return; }
+      const doc = documents.find((item) => item.id === params.get('document'));
+      if (!doc) { unavailable('The requested document is not included in this export.'); return; }
+      documentScreen(doc, params.has('heading') ? params.get('heading') : undefined); return;
+    }
+    if (params.has('heading') || ['node', 'edge', 'record'].filter((key) => params.has(key)).length > 1 || (params.has('graph') && !graphs.some((graph) => graph.id === params.get('graph')))) { unavailable('The requested graph or record is not available.'); return; }
+    const requestedKind = ['node', 'edge'].find((kind) => params.has(kind));
+    let graphRef = params.get('graph') ?? root;
+    if (requestedKind) {
+      const candidates = locations(requestedKind, params.get(requestedKind));
+      if (!params.has('graph')) {
+        if (candidates.length === 1) graphRef = candidates[0].id;
+        else if (candidates.length > 1) { graphChoice(requestedKind, params.get(requestedKind), candidates); return; }
+      }
+      if (!candidates.some((graph) => graph.id === graphRef)) { unavailable('This record is not shown in the requested graph.'); return; }
+    }
+    const wasReading = !reader.hidden;
+    reader.hidden = true; diagramMain.hidden = false;
+    if (wasReading) { window.scrollTo(0, 0); if (fitted) fit(); }
+    switchGraph(graphRef);
+    document.title = `${activeGraph.title} · Waxwing`;
+    const key = ['node', 'edge', 'record'].find((key) => params.has(key));
+    if (!key) { hideInspector(); return; }
+    const ref = params.get(key), entry = index.get(ref);
+    if ((key === 'node' && entry?.collection !== 'entities') || (key === 'edge' && entry?.collection !== 'relationships') || (key === 'record' && ref !== '__model' && (!entry || entry.collection === 'documents'))) { unavailable('The requested record does not exist or has a different type.'); return; }
+    displayRecord(ref);
+  }
+  window.addEventListener('hashchange', applyRoute);
+  document.getElementById('close-inspector').addEventListener('click', close);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !inspector.hidden) close(); });
+  document.getElementById('model-details').addEventListener('click', () => show('__model'));
+  document.querySelector('.brand').addEventListener('click', (event) => { event.preventDefault(); navigate(`#graph=${root}`); fit(); });
+  viewport.addEventListener('click', (event) => { const record = event.target.closest('[data-ref]'); if (record) show(record.dataset.ref); });
+  viewport.addEventListener('keydown', (event) => {
+    if (!['Enter', ' '].includes(event.key)) return;
+    const record = event.target.closest('[data-ref]');
+    if (record) { event.preventDefault(); show(record.dataset.ref); }
+  });
+
+  function graphChoice(kind, ref, candidates) {
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren(el('h1', `Choose a graph for ${name(ref)}`));
+    for (const graph of candidates) {
+      const link = el('a', graph.title, 'document-card'); link.href = targetHash({ kind, ref, graphRef: graph.id }); documentContent.append(link);
+    }
+  }
+  function graphLink(graph, text = graph.title) {
+    const link = el('a', text, 'document-link'); link.href = `#graph=${graph.id}`; return link;
+  }
+  function switchGraph(ref) {
+    if (activeGraph.id !== ref) {
+      activeGraph = graphs.find((graph) => graph.id === ref);
+      drawing = layout.graphs.find((item) => item.ref === ref);
+      viewport.replaceChildren(document.getElementById(`ww-graph-${ref}`).content.cloneNode(true));
+      svg = viewport.querySelector('svg'); svg.prepend(sourceMetadata.cloneNode(true));
+      svg.dataset.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+      fitted = true; fit(); window.scrollTo(0, 0);
+    }
+    document.getElementById('graph-title').textContent = activeGraph.title;
+    document.getElementById('graph-question').textContent = activeGraph.scope.question;
+    document.getElementById('graph-abstraction').textContent = activeGraph.scope.abstraction;
+    const scope = document.getElementById('graph-scope');
+    scope.replaceChildren(...[activeGraph.scope.environment, activeGraph.scope.snapshot,
+      `${activeGraph.entityRefs.length} components · ${activeGraph.contextRefs.length} external context · ${activeGraph.relationshipRefs.length} relationships`].map((text) => el('span', text)));
+    const breadcrumb = document.getElementById('graph-breadcrumb'); breadcrumb.replaceChildren();
+    const ancestors = []; let ancestor = activeGraph;
+    while (ancestor) { ancestors.unshift(ancestor); ancestor = graphs.find((item) => item.id === ancestor.expands?.graphRef); }
+    for (const graph of ancestors) {
+      if (breadcrumb.childNodes.length) breadcrumb.append(el('span', ' / '));
+      const link = graphLink(graph); if (graph.id === ref) link.setAttribute('aria-current', 'page'); breadcrumb.append(link);
+    }
+    const connections = document.getElementById('graph-connections'); connections.replaceChildren();
+    for (const child of graphs.filter((graph) => graph.expands?.graphRef === ref)) {
+      const row = el('div', undefined, 'graph-child');
+      row.append(graphLink(child, `${name(child.expands.nodeRef)} → ${child.title}`), el('span', child.expands.meaning.status, `status-pill ${child.expands.meaning.status}`)); connections.append(row);
+    }
+    if (activeGraph.expands) {
+      const expansion = activeGraph.expands;
+      connections.append(el('h2', `How this graph expands ${name(expansion.nodeRef)}`), claim(expansion.meaning));
+      connections.append(el('p', 'Boundary mappings are recorded claims. Unknown mappings do not generate connections.'));
+      for (const boundary of expansion.boundaries) {
+        const row = el('div', undefined, 'boundary-row');
+        const link = el('a', name(boundary.relationshipRef), 'document-link');
+        link.href = targetHash({ kind: 'edge', ref: boundary.relationshipRef, graphRef: expansion.graphRef });
+        row.append(link, claim(boundary.detail));
+        const claims = boundary.detail.status === 'unknown' ? [] : boundary.detail.status === 'disputed' ? boundary.detail.alternatives : [boundary.detail];
+        for (const candidate of claims) for (const edge of candidate.value) {
+          const detail = el('a', `Inspect ${name(edge)} ↗`, 'source-ref'); detail.href = targetHash({ kind: 'edge', ref: edge, graphRef: ref }); row.append(detail);
+        }
+        connections.append(row);
+      }
+    }
+    const documentBack = document.querySelector('.document-breadcrumb a');
+    documentBack.href = `#graph=${ref}`; documentBack.textContent = `← ${activeGraph.title}`;
+    document.getElementById('perspective-label').textContent = drawing.layout.groupingPerspectiveRef ? `Grouping: ${name(drawing.layout.groupingPerspectiveRef)}` : 'No grouping perspective selected';
+    refreshKnowledge();
+  }
+  function refreshKnowledge() {
+    const open = [];
+    function collect(value, owner, path) {
+      if (!value || typeof value !== 'object') return;
+      if (['unknown', 'disputed'].includes(value.status)) open.push({ owner, path, ...value });
+      for (const [key, child] of Object.entries(value)) collect(child, owner, path ? `${path}.${key}` : key);
+    }
+    const visible = new Set([...graphNodes(activeGraph), ...activeGraph.relationshipRefs, ...activeGraph.membershipRefs, ...drawing.groups.map((group) => group.ref)]);
+    for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes']) {
+      for (const record of model[collection]) if (visible.has(record.id) || record.subjectRefs?.some((ref) => visible.has(ref))) collect(record, record, '');
+    }
+    if (activeGraph.expands) collect(activeGraph.expands, activeGraph, 'expands');
+    const list = document.getElementById('knowledge-list'); list.replaceChildren();
+    for (const item of open.sort((a, b) => (a.status === 'disputed' ? 0 : 1) - (b.status === 'disputed' ? 0 : 1))) {
+      const button = el('button', undefined, 'knowledge-row');
+      const description = (item.owner.id === activeGraph.id && item.path.startsWith('expands.boundaries.') ? `${name(activeGraph.expands.boundaries[Number(item.path.split('.')[2])].relationshipRef)} · correspondence between levels` : undefined) || item.owner.statement || (item.owner.memberRef ? `${name(item.owner.memberRef)} · ${name(item.owner.perspectiveRef)}` : `${name(item.owner.id)} · ${humanize(item.path)}`);
+      button.append(el('span', item.status, `status-pill ${item.status}`), el('span', description, 'question'), el('span', '↗', 'row-arrow'));
+      button.addEventListener('click', () => item.owner.id === activeGraph.id ? navigate(`#graph=${activeGraph.id}&record=${activeGraph.id}`) : show(item.owner.id)); list.append(button);
+    }
+    if (!open.length) list.append(el('p', 'No explicit unknowns or disputes recorded. Partial scope still applies.'));
+    document.getElementById('knowledge-count').textContent = `${open.filter((item) => item.status === 'unknown').length} unknown · ${open.filter((item) => item.status === 'disputed').length} disputed`;
+  }
+
+  function applyZoom() {
+    svg.style.width = `${drawing.canvas.width * zoom}px`;
+    svg.style.height = `${drawing.canvas.height * zoom}px`;
+    svg.style.marginLeft = `${Math.max(0, (viewport.clientWidth - drawing.canvas.width * zoom) / 2)}px`;
+    svg.style.marginTop = `${Math.max(0, (viewport.clientHeight - drawing.canvas.height * zoom) / 2)}px`;
+    document.getElementById('zoom-label').textContent = `${Math.round(zoom * 100)}%`;
+  }
+  function fit() { fitted = true; zoom = Math.min(viewport.clientWidth / drawing.canvas.width, viewport.clientHeight / drawing.canvas.height, 1.3); applyZoom(); viewport.scrollTo(0, 0); }
+  function changeZoom(factor) { fitted = false; zoom = Math.max(.15, Math.min(3, zoom * factor)); applyZoom(); }
+  document.getElementById('zoom-fit').addEventListener('click', fit);
+  document.getElementById('zoom-read').addEventListener('click', () => { fitted = false; zoom = 1; applyZoom(); });
+  document.getElementById('zoom-in').addEventListener('click', () => changeZoom(1.25));
+  document.getElementById('zoom-out').addEventListener('click', () => changeZoom(.8));
+  new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); }).observe(viewport);
+  fit();
+
+  document.getElementById('theme').addEventListener('click', () => {
+    const dark = document.body.classList.toggle('dark');
+    svg.dataset.theme = dark ? 'dark' : 'light';
+    document.getElementById('theme').textContent = dark ? 'Light theme' : 'Dark theme';
+  });
+  function download(contents, filename, type) {
+    const url = URL.createObjectURL(new Blob([contents], { type }));
+    const link = el('a'); link.href = url; link.download = filename;
+    link.hidden = true;
+    document.body.append(link);
+    link.click();
+    setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 1000);
+  }
+  document.getElementById('source-download').addEventListener('click', () => download(JSON.stringify(model, null, 2) + '\n', `${model.id}.model.json`, 'application/json'));
+  document.getElementById('layout-download').addEventListener('click', () => download(JSON.stringify(layout, null, 2) + '\n', `${model.id}.layout.json`, 'application/json'));
+  document.getElementById('svg-download').addEventListener('click', () => {
+    const clean = svg.cloneNode(true);
+    clean.removeAttribute('style');
+    clean.querySelectorAll('.selected').forEach((element) => element.classList.remove('selected'));
+    download('<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clean), `${activeGraph.id}.svg`, 'image/svg+xml');
+  });
+  applyRoute();
+})();
+</script>
+</body></html>

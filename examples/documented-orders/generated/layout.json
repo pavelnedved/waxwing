@@ -1,0 +1,974 @@
+{
+  "schemaVersion": "0.2-draft",
+  "model": {
+    "schemaVersion": "0.3-draft",
+    "id": "order-processing",
+    "title": "Order Processing: Current Submission Paths",
+    "scope": {
+      "timeframe": "current",
+      "environment": "fictional production",
+      "snapshot": "fixture-1",
+      "coverage": "partial",
+      "question": "How can orders reach Fulfillment, and what do we actually know about the two routes?",
+      "includes": [
+        "Five runtime entities and their current connections",
+        "System membership and the worker ownership dispute",
+        "Missing route conditions and reported queue rationale"
+      ],
+      "excludes": [
+        "Proposed or intended future topology",
+        "Authentication and customer interfaces",
+        "Replica counts, database schemas, and deployment networks"
+      ],
+      "abstraction": "Deployed services and infrastructure resources; service internals are collapsed. Membership claims refer to these represented units."
+    },
+    "sources": [
+      {
+        "id": "runtime-inventory",
+        "kind": "fixture",
+        "locator": "../order-processing/evidence.md#runtime-inventory",
+        "description": "Stipulated deployed entities, categories, and internal responsibilities."
+      },
+      {
+        "id": "runtime-connections",
+        "kind": "fixture",
+        "locator": "../order-processing/evidence.md#runtime-connections",
+        "description": "Stipulated current connections and missing behavioral knowledge."
+      },
+      {
+        "id": "system-boundary",
+        "kind": "fixture",
+        "locator": "../order-processing/evidence.md#system-boundary",
+        "description": "Stipulated system catalog boundaries; no security or ownership implication."
+      },
+      {
+        "id": "commerce-report",
+        "kind": "fixture",
+        "locator": "../order-processing/evidence.md#commerce-ownership-report",
+        "description": "Fictional Commerce ownership claim."
+      },
+      {
+        "id": "operations-report",
+        "kind": "fixture",
+        "locator": "../order-processing/evidence.md#operations-ownership-report",
+        "description": "Fictional Operations ownership claim."
+      },
+      {
+        "id": "queue-rationale-report",
+        "kind": "fixture",
+        "locator": "../order-processing/evidence.md#queue-rationale-report",
+        "description": "Fictional maintainer explanation; not an operational guarantee."
+      }
+    ],
+    "entities": [
+      {
+        "id": "checkout-api",
+        "label": "Checkout API",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "Listed as deployed in fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "The fixture inventory supplies this category."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Request handling, order persistence, and submission adapters.",
+            "basis": {
+              "sourceRefs": [
+                "runtime-inventory"
+              ],
+              "explanation": "These responsibilities are stipulated in the fictional inventory."
+            }
+          },
+          "omits": [
+            "Internal functions and endpoints"
+          ],
+          "reason": "Explain service interactions without expanding internal implementation."
+        }
+      },
+      {
+        "id": "orders-db",
+        "label": "Orders DB",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "Listed as deployed in fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "datastore",
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "The fixture inventory supplies this category."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Storage of order records.",
+            "basis": {
+              "sourceRefs": [
+                "runtime-inventory"
+              ],
+              "explanation": "These responsibilities are stipulated in the fictional inventory."
+            }
+          },
+          "omits": [
+            "Tables, schema, and transaction details"
+          ],
+          "reason": "Explain service interactions without expanding internal implementation."
+        }
+      },
+      {
+        "id": "order-queue",
+        "label": "Order Queue",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "Listed as deployed in fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "queue",
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "The fixture inventory supplies this category."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Transport of order submissions.",
+            "basis": {
+              "sourceRefs": [
+                "runtime-inventory"
+              ],
+              "explanation": "These responsibilities are stipulated in the fictional inventory."
+            }
+          },
+          "omits": [
+            "Broker internals and configuration"
+          ],
+          "reason": "Explain service interactions without expanding internal implementation."
+        }
+      },
+      {
+        "id": "order-worker",
+        "label": "Order Worker",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "Listed as deployed in fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "The fixture inventory supplies this category."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Queue consumer and fulfillment adapter.",
+            "basis": {
+              "sourceRefs": [
+                "runtime-inventory"
+              ],
+              "explanation": "These responsibilities are stipulated in the fictional inventory."
+            }
+          },
+          "omits": [
+            "Internal functions and replica count"
+          ],
+          "reason": "Explain service interactions without expanding internal implementation."
+        }
+      },
+      {
+        "id": "fulfillment",
+        "label": "Fulfillment",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "Listed as deployed in fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "runtime-inventory"
+            ],
+            "explanation": "The fixture inventory supplies this category."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Order acceptance and dispatch operations.",
+            "basis": {
+              "sourceRefs": [
+                "runtime-inventory"
+              ],
+              "explanation": "These responsibilities are stipulated in the fictional inventory."
+            }
+          },
+          "omits": [
+            "Internal fulfillment workflow"
+          ],
+          "reason": "Explain service interactions without expanding internal implementation."
+        }
+      }
+    ],
+    "groups": [
+      {
+        "id": "order-system",
+        "label": "Order Processing",
+        "meaning": {
+          "status": "established",
+          "value": "The current Order Processing system boundary in the fixture service catalog.",
+          "basis": {
+            "sourceRefs": [
+              "system-boundary"
+            ],
+            "explanation": "A system grouping; it makes no security or ownership claim."
+          }
+        },
+        "perspectiveRef": "system-structure"
+      },
+      {
+        "id": "fulfillment-system",
+        "label": "Fulfillment Platform",
+        "meaning": {
+          "status": "established",
+          "value": "The separate system containing Fulfillment.",
+          "basis": {
+            "sourceRefs": [
+              "system-boundary"
+            ],
+            "explanation": "External relative to Order Processing, without asserting a network crossing."
+          }
+        },
+        "perspectiveRef": "system-structure"
+      },
+      {
+        "id": "commerce",
+        "label": "Commerce",
+        "meaning": {
+          "status": "reported",
+          "value": "An organizational owner named by the Commerce representative.",
+          "basis": {
+            "sourceRefs": [
+              "commerce-report"
+            ],
+            "explanation": "Defines the candidate owner identity, not accepted worker membership."
+          }
+        },
+        "perspectiveRef": "runtime-ownership"
+      },
+      {
+        "id": "operations",
+        "label": "Operations",
+        "meaning": {
+          "status": "reported",
+          "value": "An organizational owner named by the Operations representative.",
+          "basis": {
+            "sourceRefs": [
+              "operations-report"
+            ],
+            "explanation": "Defines the candidate owner identity, not accepted worker membership."
+          }
+        },
+        "perspectiveRef": "runtime-ownership"
+      }
+    ],
+    "memberships": [
+      {
+        "id": "api-system",
+        "memberRef": "checkout-api",
+        "group": {
+          "status": "established",
+          "value": "order-system",
+          "basis": {
+            "sourceRefs": [
+              "system-boundary"
+            ],
+            "explanation": "The fixture catalog explicitly assigns this system membership."
+          }
+        },
+        "perspectiveRef": "system-structure"
+      },
+      {
+        "id": "db-system",
+        "memberRef": "orders-db",
+        "group": {
+          "status": "established",
+          "value": "order-system",
+          "basis": {
+            "sourceRefs": [
+              "system-boundary"
+            ],
+            "explanation": "The fixture catalog explicitly assigns this system membership."
+          }
+        },
+        "perspectiveRef": "system-structure"
+      },
+      {
+        "id": "queue-system",
+        "memberRef": "order-queue",
+        "group": {
+          "status": "established",
+          "value": "order-system",
+          "basis": {
+            "sourceRefs": [
+              "system-boundary"
+            ],
+            "explanation": "The fixture catalog explicitly assigns this system membership."
+          }
+        },
+        "perspectiveRef": "system-structure"
+      },
+      {
+        "id": "worker-system",
+        "memberRef": "order-worker",
+        "group": {
+          "status": "established",
+          "value": "order-system",
+          "basis": {
+            "sourceRefs": [
+              "system-boundary"
+            ],
+            "explanation": "The fixture catalog explicitly assigns this system membership."
+          }
+        },
+        "perspectiveRef": "system-structure"
+      },
+      {
+        "id": "fulfillment-membership",
+        "memberRef": "fulfillment",
+        "group": {
+          "status": "established",
+          "value": "fulfillment-system",
+          "basis": {
+            "sourceRefs": [
+              "system-boundary"
+            ],
+            "explanation": "The fixture catalog explicitly assigns this system membership."
+          }
+        },
+        "perspectiveRef": "system-structure"
+      },
+      {
+        "id": "worker-owner",
+        "memberRef": "order-worker",
+        "group": {
+          "status": "disputed",
+          "reason": "The two reports disagree about exclusive production-deployment approval authority for the same worker service and snapshot. No resolving record is established.",
+          "alternatives": [
+            {
+              "status": "reported",
+              "value": "commerce",
+              "basis": {
+                "sourceRefs": [
+                  "commerce-report"
+                ],
+                "explanation": "Commerce reports current ownership."
+              }
+            },
+            {
+              "status": "reported",
+              "value": "operations",
+              "basis": {
+                "sourceRefs": [
+                  "operations-report"
+                ],
+                "explanation": "Operations reports current ownership."
+              }
+            }
+          ]
+        },
+        "perspectiveRef": "runtime-ownership"
+      }
+    ],
+    "relationships": [
+      {
+        "id": "persist-order",
+        "from": "checkout-api",
+        "to": "orders-db",
+        "kind": "writes",
+        "label": "Writes orders",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-connections"
+            ],
+            "explanation": "Explicitly listed in the current fictional implementation."
+          }
+        }
+      },
+      {
+        "id": "enqueue-order",
+        "from": "checkout-api",
+        "to": "order-queue",
+        "kind": "publishes",
+        "label": "Publishes order submissions",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-connections"
+            ],
+            "explanation": "Explicitly listed in the current fictional implementation."
+          }
+        },
+        "condition": {
+          "status": "unknown",
+          "reason": "The condition selecting queued submission is unavailable.",
+          "sourceRefs": [
+            "runtime-connections"
+          ]
+        }
+      },
+      {
+        "id": "consume-order",
+        "from": "order-worker",
+        "to": "order-queue",
+        "kind": "consumes",
+        "label": "Consumes order submissions",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-connections"
+            ],
+            "explanation": "Explicitly listed in the current fictional implementation."
+          }
+        }
+      },
+      {
+        "id": "worker-submit",
+        "from": "order-worker",
+        "to": "fulfillment",
+        "kind": "calls",
+        "label": "Submits orders to Fulfillment",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-connections"
+            ],
+            "explanation": "Explicitly listed in the current fictional implementation."
+          }
+        }
+      },
+      {
+        "id": "direct-submit",
+        "from": "checkout-api",
+        "to": "fulfillment",
+        "kind": "calls",
+        "label": "Submits orders directly",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "runtime-connections"
+            ],
+            "explanation": "Explicitly listed in the current fictional implementation."
+          }
+        },
+        "condition": {
+          "status": "unknown",
+          "reason": "The condition selecting direct submission is unavailable.",
+          "sourceRefs": [
+            "runtime-connections"
+          ]
+        }
+      }
+    ],
+    "notes": [
+      {
+        "id": "dual-submission",
+        "subjectRefs": [
+          "direct-submit",
+          "enqueue-order",
+          "worker-submit"
+        ],
+        "topic": "behavior",
+        "statement": "Can one order take both direct and queued submission routes?",
+        "answer": {
+          "status": "unknown",
+          "reason": "The fixture does not establish exclusivity or duplicate submission behavior.",
+          "sourceRefs": [
+            "runtime-connections"
+          ]
+        }
+      },
+      {
+        "id": "queue-rationale",
+        "subjectRefs": [
+          "order-queue"
+        ],
+        "topic": "rationale",
+        "statement": "Why was the existing queue introduced?",
+        "answer": {
+          "status": "reported",
+          "value": "To absorb Fulfillment outages.",
+          "basis": {
+            "sourceRefs": [
+              "queue-rationale-report"
+            ],
+            "explanation": "A maintainer explanation; operational effectiveness has not been established."
+          }
+        }
+      },
+      {
+        "id": "delivery-guarantees",
+        "subjectRefs": [
+          "order-queue",
+          "consume-order"
+        ],
+        "topic": "behavior",
+        "statement": "What delivery and retry guarantees apply to queued orders?",
+        "answer": {
+          "status": "unknown",
+          "reason": "No delivery guarantees, retry behavior, or idempotency evidence was supplied.",
+          "sourceRefs": [
+            "runtime-connections"
+          ]
+        }
+      },
+      {
+        "id": "path-framing",
+        "subjectRefs": [
+          "direct-submit",
+          "enqueue-order",
+          "worker-submit"
+        ],
+        "topic": "interpretation",
+        "statement": "How should the two submission routes be described?",
+        "answer": {
+          "status": "established",
+          "value": "Two currently implemented routes; neither is established as the primary, fallback, or exclusive route.",
+          "basis": {
+            "sourceRefs": [
+              "runtime-connections"
+            ],
+            "explanation": "Do not turn an unknown selection rule into an invented fallback or migration story."
+          }
+        }
+      }
+    ],
+    "perspectives": [
+      {
+        "id": "system-structure",
+        "label": "System structure",
+        "meaning": "Catalog membership in one current system; no ownership, deployment, or network isolation is implied.",
+        "scope": "The five represented runtime entities in fictional production.",
+        "period": "fixture-1"
+      },
+      {
+        "id": "runtime-ownership",
+        "label": "Runtime ownership",
+        "meaning": "Exclusive authority to approve production deployments of the represented unit, as reported by the two representatives.",
+        "scope": "The whole Order Worker service in fictional production, not an internal component.",
+        "period": "fixture-1"
+      }
+    ],
+    "documents": [
+      {
+        "id": "system-guide",
+        "title": "Reading the system",
+        "format": "markdown",
+        "attachments": [
+          {
+            "kind": "graph",
+            "ref": "order-processing"
+          }
+        ],
+        "markdown": "# Reading this system\n\nThis is a **fictional, partial model** of the current Order Processing system.\nIt explains what is established about order submission and what remains open.\n\n## Two implemented routes\n\nCheckout API can submit to Fulfillment directly, or publish an order submission\nthat Order Worker consumes before calling Fulfillment. The model does **not**\nestablish which route is primary, which is a fallback, or whether they are exclusive.\n\nRead the [worker guide](../services/worker/README.md) and the\n[submission details](../interfaces/submission.md#route-selection).\n\n| Question | Recorded state |\n|---|---|\n| Does the worker consume from Order Queue? | Established |\n| What selects each submission route? | Unknown |\n| Who approves production deployments of the worker? | Disputed |\n\n## How to read the arrows\n\nArrows describe operations from actor to resource. For consumption, the\n[worker](#node=order-worker) points to the queue it consumes from.\nPosition does not establish execution order.\n\n> These documents explain the fixture. Their attachment does not make every\n> sentence a separately validated architectural claim.\n\n[Return to the graph](#graph=order-processing).\n",
+        "links": [
+          {
+            "href": "../services/worker/README.md",
+            "target": {
+              "kind": "document",
+              "ref": "worker-guide"
+            }
+          },
+          {
+            "href": "../interfaces/submission.md#route-selection",
+            "target": {
+              "kind": "document",
+              "ref": "submission-details",
+              "heading": "route-selection"
+            }
+          },
+          {
+            "href": "#node=order-worker",
+            "target": {
+              "kind": "node",
+              "ref": "order-worker"
+            }
+          },
+          {
+            "href": "#graph=order-processing",
+            "target": {
+              "kind": "graph",
+              "ref": "order-processing"
+            }
+          }
+        ],
+        "assets": []
+      },
+      {
+        "id": "worker-guide",
+        "title": "Order Worker guide",
+        "format": "markdown",
+        "attachments": [
+          {
+            "kind": "node",
+            "ref": "order-worker"
+          }
+        ],
+        "markdown": "# Order Worker\n\nThe worker consumes order submissions from Order Queue and calls Fulfillment.\nIts internal functions and replica count are outside this diagram's scope.\n\n## Responsibilities\n\n1. Consume a queued order submission.\n2. Submit the order to Fulfillment.\n\nThis list describes the fixture's responsibilities. It does not specify retries,\nidempotency, timing guarantees, or concurrency between orders.\n\nRead [submission details](../../interfaces/submission.md) or inspect the\n[worker-to-Fulfillment relationship](#edge=worker-submit).\n\n## Ownership remains disputed\n\nCommerce and Operations report different owners for the same exclusive deployment\napproval responsibility, environment, and snapshot. Neither report has been\nselected as established ownership.\n\n## Example vocabulary\n\n```json\n{\n  \"from\": \"order-worker\",\n  \"kind\": \"consumes\",\n  \"to\": \"order-queue\"\n}\n```\n\nThis is a relationship excerpt, not a complete model or a wire protocol contract.\n\nSee the [system guide](../../guides/system.md#two-implemented-routes).\n",
+        "links": [
+          {
+            "href": "../../interfaces/submission.md",
+            "target": {
+              "kind": "document",
+              "ref": "submission-details"
+            }
+          },
+          {
+            "href": "#edge=worker-submit",
+            "target": {
+              "kind": "edge",
+              "ref": "worker-submit"
+            }
+          },
+          {
+            "href": "../../guides/system.md#two-implemented-routes",
+            "target": {
+              "kind": "document",
+              "ref": "system-guide",
+              "heading": "two-implemented-routes"
+            }
+          }
+        ],
+        "assets": []
+      },
+      {
+        "id": "submission-details",
+        "title": "Submission details",
+        "format": "markdown",
+        "attachments": [
+          {
+            "kind": "edge",
+            "ref": "worker-submit"
+          },
+          {
+            "kind": "edge",
+            "ref": "direct-submit"
+          }
+        ],
+        "markdown": "# Submission details\n\nBoth [Checkout API](#node=checkout-api) and [Order Worker](#node=order-worker)\nhave implemented calls to Fulfillment in this fictional snapshot.\n\n## Route selection\n\nThe selection conditions for the direct and queued routes are **unknown**.\nWhether one order can take both routes is also unknown. No primary/fallback\ndescription is established.\n\n## Interface details\n\nThe fixture does not supply the request schema, endpoint path, authentication\nmechanism, response codes, or retry contract. This document deliberately leaves\nthose unspecified rather than inventing a plausible API.\n\nAn actual interface contract could be written in an ordinary document like this;\nthe tool does not treat contracts as a special type.\n\n[Read the worker guide](../services/worker/README.md#responsibilities).\n",
+        "links": [
+          {
+            "href": "#node=checkout-api",
+            "target": {
+              "kind": "node",
+              "ref": "checkout-api"
+            }
+          },
+          {
+            "href": "#node=order-worker",
+            "target": {
+              "kind": "node",
+              "ref": "order-worker"
+            }
+          },
+          {
+            "href": "../services/worker/README.md#responsibilities",
+            "target": {
+              "kind": "document",
+              "ref": "worker-guide",
+              "heading": "responsibilities"
+            }
+          }
+        ],
+        "assets": []
+      }
+    ]
+  },
+  "modelDigest": "2a1f5089dbf33df04d085a7ed807c8bd890c286eabedbb4fb4dee0d76ddbdaf0",
+  "layout": {
+    "engine": "elk-layered@0.12.0",
+    "direction": "RIGHT",
+    "groupingPerspectiveRef": "system-structure"
+  },
+  "canvas": {
+    "width": 1488,
+    "height": 507
+  },
+  "nodes": [
+    {
+      "ref": "checkout-api",
+      "box": {
+        "x": 66,
+        "y": 164.66666666666666,
+        "width": 232,
+        "height": 124
+      }
+    },
+    {
+      "ref": "fulfillment",
+      "box": {
+        "x": 1190,
+        "y": 317,
+        "width": 232,
+        "height": 124
+      }
+    },
+    {
+      "ref": "order-queue",
+      "box": {
+        "x": 486.4,
+        "y": 255,
+        "width": 232,
+        "height": 124
+      }
+    },
+    {
+      "ref": "order-worker",
+      "box": {
+        "x": 66,
+        "y": 317,
+        "width": 232,
+        "height": 124
+      }
+    },
+    {
+      "ref": "orders-db",
+      "box": {
+        "x": 486.4,
+        "y": 111,
+        "width": 232,
+        "height": 124
+      }
+    }
+  ],
+  "groups": [
+    {
+      "ref": "fulfillment-system",
+      "box": {
+        "x": 1160,
+        "y": 252.99999999999997,
+        "width": 292,
+        "height": 218
+      }
+    },
+    {
+      "ref": "order-system",
+      "box": {
+        "x": 36,
+        "y": 36,
+        "width": 712.4,
+        "height": 435
+      }
+    }
+  ],
+  "edges": [
+    {
+      "ref": "consume-order",
+      "from": "order-worker",
+      "to": "order-queue",
+      "points": [
+        {
+          "x": 298,
+          "y": 358.3333333333333
+        },
+        {
+          "x": 308,
+          "y": 358.3333333333333
+        },
+        {
+          "x": 308,
+          "y": 337.66666666666663
+        },
+        {
+          "x": 486.4,
+          "y": 337.66666666666663
+        }
+      ],
+      "label": {
+        "x": 338.8,
+        "y": 340.66666666666663,
+        "width": 116.8,
+        "height": 48
+      }
+    },
+    {
+      "ref": "direct-submit",
+      "from": "checkout-api",
+      "to": "fulfillment",
+      "points": [
+        {
+          "x": 298,
+          "y": 195.66666666666666
+        },
+        {
+          "x": 308,
+          "y": 195.66666666666666
+        },
+        {
+          "x": 308,
+          "y": 100
+        },
+        {
+          "x": 788.4,
+          "y": 100
+        },
+        {
+          "x": 788.4,
+          "y": 358.3333333333333
+        },
+        {
+          "x": 1190,
+          "y": 358.3333333333333
+        }
+      ],
+      "label": {
+        "x": 863.4,
+        "y": 293.3333333333333,
+        "width": 181.6,
+        "height": 48
+      }
+    },
+    {
+      "ref": "enqueue-order",
+      "from": "checkout-api",
+      "to": "order-queue",
+      "points": [
+        {
+          "x": 298,
+          "y": 257.66666666666663
+        },
+        {
+          "x": 476.4,
+          "y": 257.66666666666663
+        },
+        {
+          "x": 476.4,
+          "y": 296.3333333333333
+        },
+        {
+          "x": 486.4,
+          "y": 296.3333333333333
+        }
+      ],
+      "label": {
+        "x": 328,
+        "y": 260.66666666666663,
+        "width": 138.4,
+        "height": 66
+      }
+    },
+    {
+      "ref": "persist-order",
+      "from": "checkout-api",
+      "to": "orders-db",
+      "points": [
+        {
+          "x": 298,
+          "y": 226.66666666666666
+        },
+        {
+          "x": 318,
+          "y": 226.66666666666666
+        },
+        {
+          "x": 318,
+          "y": 173
+        },
+        {
+          "x": 486.4,
+          "y": 173
+        }
+      ],
+      "label": {
+        "x": 342.4,
+        "y": 176,
+        "width": 109.60000000000001,
+        "height": 30
+      }
+    },
+    {
+      "ref": "worker-submit",
+      "from": "order-worker",
+      "to": "fulfillment",
+      "points": [
+        {
+          "x": 298,
+          "y": 399.66666666666663
+        },
+        {
+          "x": 1190,
+          "y": 399.66666666666663
+        }
+      ],
+      "label": {
+        "x": 885,
+        "y": 416.66666666666663,
+        "width": 138.4,
+        "height": 48
+      }
+    }
+  ]
+}

@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Image Processing Pipeline · Waxwing</title><style>:root { color-scheme:light; --bg:#f7f8fa; --surface:#fff; --ink:#17283a; --muted:#657588; --border:#dce3ea; --accent:#087d78; --soft:#edf3f3; --warning:#9c630d; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+body.dark { color-scheme:dark; --bg:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --border:#34495e; --accent:#5dd6c4; --soft:#1b3541; --warning:#f1c778; }
+button,a { -webkit-tap-highlight-color:transparent; }
+button { color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 13px; cursor:pointer; font:inherit; font-size:12px; }
+button:hover { border-color:var(--accent); }
+button:focus-visible,a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.masthead { height:72px; padding:0 38px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:16px; background:var(--surface); }
+.brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink); font-size:12px; font-weight:750; letter-spacing:2px; }
+.brand-mark { background:var(--accent); color:var(--surface); width:29px; height:29px; text-align:center; border-radius:8px; font-size:22px; font-family:Georgia,serif; font-style:italic; line-height:26px; }
+.brand-note { border-left:1px solid var(--border); padding-left:16px; margin-left:6px; color:var(--muted); font-weight:500; font-size:10px; letter-spacing:1.4px; }
+.header-actions { display:flex; gap:8px; }
+main { max-width:1800px; margin:0 auto; padding:32px 38px 20px; }
+.eyebrow { display:flex; gap:9px; align-items:center; font-size:10px; font-weight:650; letter-spacing:1.6px; color:var(--muted); }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.sep { opacity:.5; padding:0 4px; }
+.title-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+h1 { font-size:clamp(21px,2.2vw,34px); font-weight:620; letter-spacing:-1px; margin:12px 0 8px; line-height:1.25; }
+.purpose { margin:0; color:var(--muted); max-width:900px; }
+.scope-line { display:flex; flex-wrap:wrap; gap:22px; margin:17px 0 24px; color:var(--muted); font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.map-panel { border:1px solid var(--border); background:var(--surface); border-radius:12px; overflow:hidden; }
+.map-toolbar { min-height:50px; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+.map-toolbar>div { display:flex; align-items:center; gap:14px; }
+.toolbar-label { font-size:10px; font-weight:700; letter-spacing:1.5px; color:var(--accent); }
+#perspective-label { color:var(--muted); font-size:12px; }
+.zoom-controls { gap:5px!important; }
+.zoom-controls button { padding:3px 10px; min-width:30px; }
+#zoom-label { color:var(--muted); font-size:11px; min-width:34px; }
+#map-viewport { width:100%; height:clamp(330px,43vw,520px); overflow:auto; background:var(--bg); display:block; position:relative; }
+#map-viewport svg { display:block; flex-shrink:0; max-width:none; }
+.map-caption { padding:12px 18px; display:flex; justify-content:space-between; gap:16px; color:var(--muted); font-size:11px; border-top:1px solid var(--border); }
+.knowledge-section { margin-top:25px; }
+.section-heading { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+h2 { font-size:16px; letter-spacing:-.2px; margin:0; font-weight:620; }
+#knowledge-count { color:var(--muted); font-size:12px; }
+#knowledge-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 26px; }
+.knowledge-row { display:flex; align-items:center; gap:13px; text-align:left; background:none; border:0; border-top:1px solid var(--border); border-radius:0; padding:13px 0; width:100%; font-size:12px; }
+.knowledge-row:hover .question { color:var(--accent); }
+.status-pill { display:inline-block; flex-shrink:0; font:10px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; border:1px solid var(--border); padding:2px 7px; border-radius:5px; color:var(--warning); text-transform:uppercase; letter-spacing:.4px; }
+.status-pill.disputed { color:#bd5262; }
+.question { flex:1; }
+.row-arrow { color:var(--muted); }
+footer { border-top:1px solid var(--border); margin-top:25px; padding-top:16px; display:flex; justify-content:space-between; color:var(--muted); font-size:10px; }
+#inspector { position:fixed; z-index:10; top:0; bottom:0; right:0; width:min(480px,100vw); background:var(--surface); box-shadow:-16px 0 55px #071c3625; border-left:1px solid var(--border); overflow-y:auto; }
+#inspector[hidden] { display:none; }
+.inspector-header { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; background:var(--surface); padding:18px 24px; border-bottom:1px solid var(--border); font-size:10px; letter-spacing:1.8px; color:var(--muted); }
+.inspector-header button { font-size:20px; line-height:20px; padding:4px 9px; }
+#inspector-content { padding:23px; }
+#inspector-content h2 { font-size:22px; margin-bottom:5px; overflow-wrap:anywhere; }
+.record-id { font:11px ui-monospace,monospace; color:var(--muted); margin-bottom:22px; }
+.detail-field { margin:16px 0; }
+.detail-key { display:block; color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+.detail-value { white-space:pre-wrap; overflow-wrap:anywhere; }
+.detail-section { border-top:1px solid var(--border); padding-top:14px; margin-top:22px; }
+.detail-section h3 { font-size:14px; margin:0 0 12px; }
+.claim { padding:12px; border:1px solid var(--border); border-radius:8px; margin:8px 0; background:var(--bg); }
+.claim .detail-value { margin-top:8px; }
+.claim-basis { color:var(--muted); font-size:12px; margin-top:10px; }
+.source-ref { display:inline-block; margin:6px 4px 0 0; padding:4px 7px; font-size:10px; }
+.sub-record { margin:10px 0; padding:12px 0; border-bottom:1px solid var(--border); }
+.sub-record h4 { font-size:13px; margin:0 0 7px; }
+details { margin-top:22px; }
+summary { cursor:pointer; font-size:12px; color:var(--muted); }
+pre { font:11px/1.6 ui-monospace,monospace; white-space:pre-wrap; overflow-wrap:anywhere; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:7px; }
+@media(max-width:700px) { .masthead { height:auto; min-height:68px; padding:14px 18px; flex-wrap:wrap; }.brand-note { display:none; }main { padding:24px 18px; }.header-actions { flex-wrap:wrap; }.title-row { align-items:flex-start; }#knowledge-list { grid-template-columns:1fr; }.map-caption { flex-direction:column; gap:4px; }footer { flex-direction:column; gap:5px; }.scope-line { gap:12px; } }
+@media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; } }
+</style></head>
+<body>
+  <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions"><button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
+  <main>
+    <div class="eyebrow"><span class="live-dot"></span> CURRENT IMPLEMENTATION <span class="sep">/</span> PARTIAL MODEL</div>
+    <div class="title-row"><h1>Image Processing Pipeline</h1><button id="model-details">Model details ↗</button></div>
+    <p class="purpose">Follow one successfully processed image from upload to its index record.</p>
+    <div class="scope-line"><span>fictional production</span><span>pipeline-fixture-1</span><span>6 components · 5 relationships</span></div>
+    <section class="map-panel" aria-label="Architecture diagram">
+      <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
+      <div id="map-viewport" tabindex="0" aria-label="Diagram canvas. Use zoom controls; scroll to pan."><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-theme="light" viewBox="0 0 3392.8 196" width="3392.8" height="196" role="group" aria-labelledby="ww-title ww-description">
+    <title id="ww-title">Image Processing Pipeline</title><desc id="ww-description">Deployed services, queues, and one datastore; each component represents all of its instances. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+    <metadata id="waxwing-source" data-encoding="base64">eyJjYW52YXMiOnsiaGVpZ2h0IjoxOTYsIndpZHRoIjozMzkyLjh9LCJlZGdlcyI6W3siZnJvbSI6ImluZGV4LXdvcmtlciIsImxhYmVsIjp7ImhlaWdodCI6MzAsIndpZHRoIjoxNjcuMjAwMDAwMDAwMDAwMDIsIngiOjIyMzUuNjAwMDAwMDAwMDAwNCwieSI6MTE1fSwicG9pbnRzIjpbeyJ4IjoyNTEyLjgsInkiOjk4fSx7IngiOjIxMjUuNjAwMDAwMDAwMDAwNCwieSI6OTh9XSwicmVmIjoiY29uc3VtZS1yZXNpemVkIiwidG8iOiJyZXNpemVkLXF1ZXVlIn0seyJmcm9tIjoicmVzaXplLXdvcmtlciIsImxhYmVsIjp7ImhlaWdodCI6MzAsIndpZHRoIjoxNjAsIngiOjk5Ny4yLCJ5IjoxMTV9LCJwb2ludHMiOlt7IngiOjEyNjcuMiwieSI6OTh9LHsieCI6ODg3LjIsInkiOjk4fV0sInJlZiI6ImNvbnN1bWUtdXBsb2FkIiwidG8iOiJ1cGxvYWQtcXVldWUifSx7ImZyb20iOiJyZXNpemUtd29ya2VyIiwibGFiZWwiOnsiaGVpZ2h0IjozMCwid2lkdGgiOjE3NC40LCJ4IjoxNjA5LjIsInkiOjExNX0sInBvaW50cyI6W3sieCI6MTQ5OS4yLCJ5Ijo5OH0seyJ4IjoxODkzLjYwMDAwMDAwMDAwMDEsInkiOjk4fV0sInJlZiI6InB1Ymxpc2gtcmVzaXplZCIsInRvIjoicmVzaXplZC1xdWV1ZSJ9LHsiZnJvbSI6InVwbG9hZC1hcGkiLCJsYWJlbCI6eyJoZWlnaHQiOjMwLCJ3aWR0aCI6MTY3LjIwMDAwMDAwMDAwMDAyLCJ4IjozNzgsInkiOjExNX0sInBvaW50cyI6W3sieCI6MjY4LCJ5Ijo5OH0seyJ4Ijo2NTUuMiwieSI6OTh9XSwicmVmIjoicHVibGlzaC11cGxvYWQiLCJ0byI6InVwbG9hZC1xdWV1ZSJ9LHsiZnJvbSI6ImluZGV4LXdvcmtlciIsImxhYmVsIjp7ImhlaWdodCI6MzAsIndpZHRoIjoxNjAsIngiOjI4NTQuOCwieSI6MTE1fSwicG9pbnRzIjpbeyJ4IjoyNzQ0LjgsInkiOjk4fSx7IngiOjMxMjQuOCwieSI6OTh9XSwicmVmIjoid3JpdGUtaW5kZXgiLCJ0byI6ImluZGV4LWRiIn1dLCJncm91cHMiOltdLCJsYXlvdXQiOnsiZGlyZWN0aW9uIjoiUklHSFQiLCJlbmdpbmUiOiJlbGstbGF5ZXJlZEAwLjEyLjArZXhwZXJpbWVudC1jb25zdW1lci1wbGFjZW1lbnQtdjEiLCJncm91cGluZ1BlcnNwZWN0aXZlUmVmIjpudWxsfSwibW9kZWwiOnsiZW50aXRpZXMiOlt7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkludGVybmFsIGltcGxlbWVudGF0aW9uIGFuZCByZXBsaWNhIGNvdW50Il0sInJlYXNvbiI6IktlZXAgdGhlIHN1Y2Nlc3NmdWwgcHJvY2Vzc2luZyBwYXRoIGF0IGNvbXBvbmVudCBsZXZlbC4iLCJyZXByZXNlbnRzIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhpcyByZXNwb25zaWJpbGl0eSBpcyBzdGlwdWxhdGVkIGluIHRoZSBmaXh0dXJlIHNwZWNpZmljYXRpb24uIiwic291cmNlUmVmcyI6WyJmaXh0dXJlLXNwZWMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJBY2NlcHRzIGFuIGltYWdlIGFuZCBwdWJsaXNoZXMgaXRzIHVwbG9hZCBqb2IuIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGV4cGxpY2l0bHkgY2xhc3NpZmllcyBVcGxvYWQgQVBJIGFzIHNlcnZpY2UuIiwic291cmNlUmVmcyI6WyJmaXh0dXJlLXNwZWMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlVwbG9hZCBBUEkgaXMgZGVwbG95ZWQgaW4gcGlwZWxpbmUtZml4dHVyZS0xLiIsInNvdXJjZVJlZnMiOlsiZml4dHVyZS1zcGVjIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJ1cGxvYWQtYXBpIiwibGFiZWwiOiJVcGxvYWQgQVBJIn0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJJbnRlcm5hbCBpbXBsZW1lbnRhdGlvbiBhbmQgcmVwbGljYSBjb3VudCJdLCJyZWFzb24iOiJLZWVwIHRoZSBzdWNjZXNzZnVsIHByb2Nlc3NpbmcgcGF0aCBhdCBjb21wb25lbnQgbGV2ZWwuIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoaXMgcmVzcG9uc2liaWxpdHkgaXMgc3RpcHVsYXRlZCBpbiB0aGUgZml4dHVyZSBzcGVjaWZpY2F0aW9uLiIsInNvdXJjZVJlZnMiOlsiZml4dHVyZS1zcGVjIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiQ2FycmllcyB1cGxvYWQgam9icyB0byB0aGUgcmVzaXplIHdvcmtlci4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgZXhwbGljaXRseSBjbGFzc2lmaWVzIFVwbG9hZCBRdWV1ZSBhcyBxdWV1ZS4iLCJzb3VyY2VSZWZzIjpbImZpeHR1cmUtc3BlYyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6InF1ZXVlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlVwbG9hZCBRdWV1ZSBpcyBkZXBsb3llZCBpbiBwaXBlbGluZS1maXh0dXJlLTEuIiwic291cmNlUmVmcyI6WyJmaXh0dXJlLXNwZWMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJpZCI6InVwbG9hZC1xdWV1ZSIsImxhYmVsIjoiVXBsb2FkIFF1ZXVlIn0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJJbnRlcm5hbCBpbXBsZW1lbnRhdGlvbiBhbmQgcmVwbGljYSBjb3VudCJdLCJyZWFzb24iOiJLZWVwIHRoZSBzdWNjZXNzZnVsIHByb2Nlc3NpbmcgcGF0aCBhdCBjb21wb25lbnQgbGV2ZWwuIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoaXMgcmVzcG9uc2liaWxpdHkgaXMgc3RpcHVsYXRlZCBpbiB0aGUgZml4dHVyZSBzcGVjaWZpY2F0aW9uLiIsInNvdXJjZVJlZnMiOlsiZml4dHVyZS1zcGVjIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiQ29uc3VtZXMgYW4gdXBsb2FkIGpvYiwgcmVzaXplcyBpdHMgaW1hZ2UsIGFuZCBwdWJsaXNoZXMgYSByZXNpemVkLWltYWdlIGpvYi4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgZXhwbGljaXRseSBjbGFzc2lmaWVzIFJlc2l6ZSBXb3JrZXIgYXMgc2VydmljZS4iLCJzb3VyY2VSZWZzIjpbImZpeHR1cmUtc3BlYyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6InNlcnZpY2UifSwiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiUmVzaXplIFdvcmtlciBpcyBkZXBsb3llZCBpbiBwaXBlbGluZS1maXh0dXJlLTEuIiwic291cmNlUmVmcyI6WyJmaXh0dXJlLXNwZWMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJpZCI6InJlc2l6ZS13b3JrZXIiLCJsYWJlbCI6IlJlc2l6ZSBXb3JrZXIifSx7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkludGVybmFsIGltcGxlbWVudGF0aW9uIGFuZCByZXBsaWNhIGNvdW50Il0sInJlYXNvbiI6IktlZXAgdGhlIHN1Y2Nlc3NmdWwgcHJvY2Vzc2luZyBwYXRoIGF0IGNvbXBvbmVudCBsZXZlbC4iLCJyZXByZXNlbnRzIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhpcyByZXNwb25zaWJpbGl0eSBpcyBzdGlwdWxhdGVkIGluIHRoZSBmaXh0dXJlIHNwZWNpZmljYXRpb24uIiwic291cmNlUmVmcyI6WyJmaXh0dXJlLXNwZWMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJDYXJyaWVzIHJlc2l6ZWQtaW1hZ2Ugam9icyB0byB0aGUgaW5kZXggd29ya2VyLiJ9fSwiY2F0ZWdvcnkiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGUgZml4dHVyZSBleHBsaWNpdGx5IGNsYXNzaWZpZXMgUmVzaXplZCBRdWV1ZSBhcyBxdWV1ZS4iLCJzb3VyY2VSZWZzIjpbImZpeHR1cmUtc3BlYyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6InF1ZXVlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlJlc2l6ZWQgUXVldWUgaXMgZGVwbG95ZWQgaW4gcGlwZWxpbmUtZml4dHVyZS0xLiIsInNvdXJjZVJlZnMiOlsiZml4dHVyZS1zcGVjIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJyZXNpemVkLXF1ZXVlIiwibGFiZWwiOiJSZXNpemVkIFF1ZXVlIn0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJJbnRlcm5hbCBpbXBsZW1lbnRhdGlvbiBhbmQgcmVwbGljYSBjb3VudCJdLCJyZWFzb24iOiJLZWVwIHRoZSBzdWNjZXNzZnVsIHByb2Nlc3NpbmcgcGF0aCBhdCBjb21wb25lbnQgbGV2ZWwuIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoaXMgcmVzcG9uc2liaWxpdHkgaXMgc3RpcHVsYXRlZCBpbiB0aGUgZml4dHVyZSBzcGVjaWZpY2F0aW9uLiIsInNvdXJjZVJlZnMiOlsiZml4dHVyZS1zcGVjIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiQ29uc3VtZXMgYSByZXNpemVkLWltYWdlIGpvYiBhbmQgd3JpdGVzIHRoZSByZXN1bHRpbmcgaW5kZXggcmVjb3JkLiJ9fSwiY2F0ZWdvcnkiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGUgZml4dHVyZSBleHBsaWNpdGx5IGNsYXNzaWZpZXMgSW5kZXggV29ya2VyIGFzIHNlcnZpY2UuIiwic291cmNlUmVmcyI6WyJmaXh0dXJlLXNwZWMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkluZGV4IFdvcmtlciBpcyBkZXBsb3llZCBpbiBwaXBlbGluZS1maXh0dXJlLTEuIiwic291cmNlUmVmcyI6WyJmaXh0dXJlLXNwZWMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJpZCI6ImluZGV4LXdvcmtlciIsImxhYmVsIjoiSW5kZXggV29ya2VyIn0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJJbnRlcm5hbCBpbXBsZW1lbnRhdGlvbiBhbmQgcmVwbGljYSBjb3VudCJdLCJyZWFzb24iOiJLZWVwIHRoZSBzdWNjZXNzZnVsIHByb2Nlc3NpbmcgcGF0aCBhdCBjb21wb25lbnQgbGV2ZWwuIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoaXMgcmVzcG9uc2liaWxpdHkgaXMgc3RpcHVsYXRlZCBpbiB0aGUgZml4dHVyZSBzcGVjaWZpY2F0aW9uLiIsInNvdXJjZVJlZnMiOlsiZml4dHVyZS1zcGVjIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiU3RvcmVzIHRoZSBjb21wbGV0ZWQgaW1hZ2UgaW5kZXggcmVjb3Jkcy4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgZXhwbGljaXRseSBjbGFzc2lmaWVzIEluZGV4IERCIGFzIGRhdGFzdG9yZS4iLCJzb3VyY2VSZWZzIjpbImZpeHR1cmUtc3BlYyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6ImRhdGFzdG9yZSJ9LCJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJJbmRleCBEQiBpcyBkZXBsb3llZCBpbiBwaXBlbGluZS1maXh0dXJlLTEuIiwic291cmNlUmVmcyI6WyJmaXh0dXJlLXNwZWMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJpZCI6ImluZGV4LWRiIiwibGFiZWwiOiJJbmRleCBEQiJ9XSwiZ3JvdXBzIjpbXSwiaWQiOiJpbWFnZS1waXBlbGluZSIsIm1lbWJlcnNoaXBzIjpbXSwibm90ZXMiOlt7ImFuc3dlciI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIHN0aXB1bGF0ZXMgdGhpcyBwZXItaW1hZ2UgY2F1c2FsIHNlcXVlbmNlIGV4cGxpY2l0bHkuIEl0IGlzIG5vdCBpbmZlcnJlZCBmcm9tIGRlcGVuZGVuY3kgYXJyb3dzLiBGYWlsdXJlIGFuZCByZXRyeSBiZWhhdmlvciBpcyBvdXRzaWRlIHRoaXMgcGFydGlhbCBtb2RlbC4iLCJzb3VyY2VSZWZzIjpbImZpeHR1cmUtc3BlYyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6IlVwbG9hZCBBUEkgcHVibGlzaGVzIHRoZSBpbWFnZSBqb2IgdG8gVXBsb2FkIFF1ZXVlLiBSZXNpemUgV29ya2VyIGNvbnN1bWVzIHRoYXQgam9iLCByZXNpemVzIGl0cyBpbWFnZSwgdGhlbiBwdWJsaXNoZXMgaXRzIHJlc3VsdCB0byBSZXNpemVkIFF1ZXVlLiBJbmRleCBXb3JrZXIgY29uc3VtZXMgdGhhdCByZXN1bHQgYW5kIHdyaXRlcyB0aGUgaW1hZ2UgaW5kZXggcmVjb3JkIHRvIEluZGV4IERCLiJ9LCJpZCI6InN1Y2Nlc3NmdWwtcHJvY2Vzc2luZyIsInN0YXRlbWVudCI6IldoYXQgc2VxdWVuY2UgZG9lcyBvbmUgc3VjY2Vzc2Z1bGx5IHByb2Nlc3NlZCBpbWFnZSBmb2xsb3c/Iiwic3ViamVjdFJlZnMiOlsidXBsb2FkLWFwaSIsInVwbG9hZC1xdWV1ZSIsInJlc2l6ZS13b3JrZXIiLCJyZXNpemVkLXF1ZXVlIiwiaW5kZXgtd29ya2VyIiwiaW5kZXgtZGIiLCJwdWJsaXNoLXVwbG9hZCIsImNvbnN1bWUtdXBsb2FkIiwicHVibGlzaC1yZXNpemVkIiwiY29uc3VtZS1yZXNpemVkIiwid3JpdGUtaW5kZXgiXSwidG9waWMiOiJiZWhhdmlvciJ9XSwicGVyc3BlY3RpdmVzIjpbXSwicmVsYXRpb25zaGlwcyI6W3siZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgZXhwbGljaXRseSBlc3RhYmxpc2hlcyB0aGF0IHVwbG9hZC1hcGkgcHVibGlzaGVzIHVwbG9hZC1xdWV1ZS4iLCJzb3VyY2VSZWZzIjpbImZpeHR1cmUtc3BlYyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJ1cGxvYWQtYXBpIiwiaWQiOiJwdWJsaXNoLXVwbG9hZCIsImtpbmQiOiJwdWJsaXNoZXMiLCJsYWJlbCI6IlB1Ymxpc2hlcyB1cGxvYWQgam9icyIsInRvIjoidXBsb2FkLXF1ZXVlIn0seyJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGUgZml4dHVyZSBleHBsaWNpdGx5IGVzdGFibGlzaGVzIHRoYXQgcmVzaXplLXdvcmtlciBjb25zdW1lcyB1cGxvYWQtcXVldWUuIiwic291cmNlUmVmcyI6WyJmaXh0dXJlLXNwZWMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoicmVzaXplLXdvcmtlciIsImlkIjoiY29uc3VtZS11cGxvYWQiLCJraW5kIjoiY29uc3VtZXMiLCJsYWJlbCI6IkNvbnN1bWVzIHVwbG9hZCBqb2JzIiwidG8iOiJ1cGxvYWQtcXVldWUifSx7ImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGV4cGxpY2l0bHkgZXN0YWJsaXNoZXMgdGhhdCByZXNpemUtd29ya2VyIHB1Ymxpc2hlcyByZXNpemVkLXF1ZXVlLiIsInNvdXJjZVJlZnMiOlsiZml4dHVyZS1zcGVjIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiZnJvbSI6InJlc2l6ZS13b3JrZXIiLCJpZCI6InB1Ymxpc2gtcmVzaXplZCIsImtpbmQiOiJwdWJsaXNoZXMiLCJsYWJlbCI6IlB1Ymxpc2hlcyByZXNpemVkIGpvYnMiLCJ0byI6InJlc2l6ZWQtcXVldWUifSx7ImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGV4cGxpY2l0bHkgZXN0YWJsaXNoZXMgdGhhdCBpbmRleC13b3JrZXIgY29uc3VtZXMgcmVzaXplZC1xdWV1ZS4iLCJzb3VyY2VSZWZzIjpbImZpeHR1cmUtc3BlYyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJpbmRleC13b3JrZXIiLCJpZCI6ImNvbnN1bWUtcmVzaXplZCIsImtpbmQiOiJjb25zdW1lcyIsImxhYmVsIjoiQ29uc3VtZXMgcmVzaXplZCBqb2JzIiwidG8iOiJyZXNpemVkLXF1ZXVlIn0seyJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGUgZml4dHVyZSBleHBsaWNpdGx5IGVzdGFibGlzaGVzIHRoYXQgaW5kZXgtd29ya2VyIHdyaXRlcyBpbmRleC1kYi4iLCJzb3VyY2VSZWZzIjpbImZpeHR1cmUtc3BlYyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJpbmRleC13b3JrZXIiLCJpZCI6IndyaXRlLWluZGV4Iiwia2luZCI6IndyaXRlcyIsImxhYmVsIjoiV3JpdGVzIGluZGV4IHJlY29yZHMiLCJ0byI6ImluZGV4LWRiIn1dLCJzY2hlbWFWZXJzaW9uIjoiMC4yLWRyYWZ0Iiwic2NvcGUiOnsiYWJzdHJhY3Rpb24iOiJEZXBsb3llZCBzZXJ2aWNlcywgcXVldWVzLCBhbmQgb25lIGRhdGFzdG9yZTsgZWFjaCBjb21wb25lbnQgcmVwcmVzZW50cyBhbGwgb2YgaXRzIGluc3RhbmNlcy4iLCJjb3ZlcmFnZSI6InBhcnRpYWwiLCJlbnZpcm9ubWVudCI6ImZpY3Rpb25hbCBwcm9kdWN0aW9uIiwiZXhjbHVkZXMiOlsiUmV0cmllcyBhbmQgZmFpbHVyZSBwYXRocyIsIldvcmtlciByZXBsaWNhcyBhbmQgYnJva2VyIGludGVybmFscyIsIk93bmVyc2hpcCBhbmQgZGVwbG95bWVudCBib3VuZGFyaWVzIl0sImluY2x1ZGVzIjpbIlRoZSBzaXggZGVwbG95ZWQgY29tcG9uZW50cyBvbiB0aGUgc3VjY2Vzc2Z1bCBwcm9jZXNzaW5nIHBhdGgiLCJUaGVpciBmaXZlIG9wZXJhdGlvbiByZWxhdGlvbnNoaXBzIl0sInF1ZXN0aW9uIjoiRm9sbG93IG9uZSBzdWNjZXNzZnVsbHkgcHJvY2Vzc2VkIGltYWdlIGZyb20gdXBsb2FkIHRvIGl0cyBpbmRleCByZWNvcmQuIiwic25hcHNob3QiOiJwaXBlbGluZS1maXh0dXJlLTEiLCJ0aW1lZnJhbWUiOiJjdXJyZW50In0sInNvdXJjZXMiOlt7ImRlc2NyaXB0aW9uIjoiU3RpcHVsYXRlZCBjdXJyZW50IGJlaGF2aW9yIGluIHRoaXMgZnVsbHkgc3ludGhldGljIGV4cGVyaW1lbnQuIiwiaWQiOiJmaXh0dXJlLXNwZWMiLCJraW5kIjoiZml4dHVyZSIsImxvY2F0b3IiOiIuLi9ldmlkZW5jZS5tZCJ9XSwidGl0bGUiOiJJbWFnZSBQcm9jZXNzaW5nIFBpcGVsaW5lIn0sIm1vZGVsRGlnZXN0IjoiYWZhN2NkYzkyYTU2MzliZGE5YmU3MjRlMzc0NDU3Y2M4ZTZmM2JmZTQ0NTY4MzgwZDNmMTk0ZjM0MzZlYzA1ZSIsIm5vZGVzIjpbeyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjMxMjQuOCwieSI6MzZ9LCJyZWYiOiJpbmRleC1kYiJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4IjoyNTEyLjgsInkiOjM2fSwicmVmIjoiaW5kZXgtd29ya2VyIn0seyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjEyNjcuMiwieSI6MzZ9LCJyZWYiOiJyZXNpemUtd29ya2VyIn0seyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjE4OTMuNjAwMDAwMDAwMDAwMSwieSI6MzZ9LCJyZWYiOiJyZXNpemVkLXF1ZXVlIn0seyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjM2LCJ5IjozNn0sInJlZiI6InVwbG9hZC1hcGkifSx7ImJveCI6eyJoZWlnaHQiOjEyNCwid2lkdGgiOjIzMiwieCI6NjU1LjIsInkiOjM2fSwicmVmIjoidXBsb2FkLXF1ZXVlIn1dLCJzY2hlbWFWZXJzaW9uIjoiMC4xLWRyYWZ0In0=</metadata>
+    <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
+    <g class="record" data-ref="consume-resized" tabindex="0" role="button" aria-label="Inspect Consumes resized jobs"><g class=""><path class="edge-hit" d="M2512.8,98 L2125.6,98"/><path class="edge-line" d="M2512.8,98 L2125.6,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="consume-upload" tabindex="0" role="button" aria-label="Inspect Consumes upload jobs"><g class=""><path class="edge-hit" d="M1267.2,98 L887.2,98"/><path class="edge-line" d="M1267.2,98 L887.2,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="publish-resized" tabindex="0" role="button" aria-label="Inspect Publishes resized jobs"><g class=""><path class="edge-hit" d="M1499.2,98 L1893.6,98"/><path class="edge-line" d="M1499.2,98 L1893.6,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="publish-upload" tabindex="0" role="button" aria-label="Inspect Publishes upload jobs"><g class=""><path class="edge-hit" d="M268,98 L655.2,98"/><path class="edge-line" d="M268,98 L655.2,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="write-index" tabindex="0" role="button" aria-label="Inspect Writes index records"><g class=""><path class="edge-hit" d="M2744.8,98 L3124.8,98"/><path class="edge-line" d="M2744.8,98 L3124.8,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="index-db" tabindex="0" role="button" aria-label="Inspect Index DB"><g class="category-datastore">
+      <rect class="node-box" x="3124.8" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="3142.8" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="3156.8" y="61">datastore</text>
+      <text class="node-title" x="3142.8" y="88">Index DB</text>
+      <text class="node-status" x="3142.8" y="111">established · present</text>
+      <text class="node-link" x="3142.8" y="142">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="index-worker" tabindex="0" role="button" aria-label="Inspect Index Worker"><g class="category-service">
+      <rect class="node-box" x="2512.8" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="2530.8" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="2544.8" y="61">service</text>
+      <text class="node-title" x="2530.8" y="88">Index Worker</text>
+      <text class="node-status" x="2530.8" y="111">established · present</text>
+      <text class="node-link" x="2530.8" y="142">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="resize-worker" tabindex="0" role="button" aria-label="Inspect Resize Worker"><g class="category-service">
+      <rect class="node-box" x="1267.2" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="1285.2" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="1299.2" y="61">service</text>
+      <text class="node-title" x="1285.2" y="88">Resize Worker</text>
+      <text class="node-status" x="1285.2" y="111">established · present</text>
+      <text class="node-link" x="1285.2" y="142">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="resized-queue" tabindex="0" role="button" aria-label="Inspect Resized Queue"><g class="category-queue">
+      <rect class="node-box" x="1893.6" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="1911.6" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="1925.6" y="61">queue</text>
+      <text class="node-title" x="1911.6" y="88">Resized Queue</text>
+      <text class="node-status" x="1911.6" y="111">established · present</text>
+      <text class="node-link" x="1911.6" y="142">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="upload-api" tabindex="0" role="button" aria-label="Inspect Upload API"><g class="category-service">
+      <rect class="node-box" x="36" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="54" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="61">service</text>
+      <text class="node-title" x="54" y="88">Upload API</text>
+      <text class="node-status" x="54" y="111">established · present</text>
+      <text class="node-link" x="54" y="142">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="upload-queue" tabindex="0" role="button" aria-label="Inspect Upload Queue"><g class="category-queue">
+      <rect class="node-box" x="655.2" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="673.2" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="687.2" y="61">queue</text>
+      <text class="node-title" x="673.2" y="88">Upload Queue</text>
+      <text class="node-status" x="673.2" y="111">established · present</text>
+      <text class="node-link" x="673.2" y="142">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="consume-resized" tabindex="0" role="button" aria-label="Inspect Consumes resized jobs"><rect class="edge-label-bg" x="2235.6" y="115" width="167.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="2319.2" y="133">Consumes resized jobs</text></g><g class="record" data-ref="consume-upload" tabindex="0" role="button" aria-label="Inspect Consumes upload jobs"><rect class="edge-label-bg" x="997.2" y="115" width="160" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1077.2" y="133">Consumes upload jobs</text></g><g class="record" data-ref="publish-resized" tabindex="0" role="button" aria-label="Inspect Publishes resized jobs"><rect class="edge-label-bg" x="1609.2" y="115" width="174.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1696.4" y="133">Publishes resized jobs</text></g><g class="record" data-ref="publish-upload" tabindex="0" role="button" aria-label="Inspect Publishes upload jobs"><rect class="edge-label-bg" x="378" y="115" width="167.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="461.6" y="133">Publishes upload jobs</text></g><g class="record" data-ref="write-index" tabindex="0" role="button" aria-label="Inspect Writes index records"><rect class="edge-label-bg" x="2854.8" y="115" width="160" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="2934.8" y="133">Writes index records</text></g>
+  </svg></div>
+      <div class="map-caption"><span>Arrows describe operations: actor → resource.</span><span>Position does not imply execution order. Select any element to inspect it.</span></div>
+    </section>
+    <section class="knowledge-section" aria-labelledby="knowledge-heading"><div class="section-heading"><h2 id="knowledge-heading">What remains open</h2><span id="knowledge-count"></span></div><div id="knowledge-list"></div></section>
+    <footer><span>Full source travels with this artifact. Qualifications remain intact.</span><span>Waxwing · experimental MVP</span></footer>
+  </main>
+  <aside id="inspector" hidden aria-label="Model inspector"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside>
+  <script>(() => {
+  'use strict';
+  const payload = document.getElementById('waxwing-source').textContent;
+  const layout = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(payload), (char) => char.charCodeAt(0))));
+  const model = layout.model;
+  const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes'];
+  const index = new Map(collections.flatMap((collection) => model[collection].map((record) => [record.id, { record, collection }])));
+  const svg = document.querySelector('.ww-svg');
+  const viewport = document.getElementById('map-viewport');
+  const inspector = document.getElementById('inspector');
+  const content = document.getElementById('inspector-content');
+  let previousFocus;
+  let zoom = 1;
+  let fitted = true;
+  const name = (ref) => {
+    const record = index.get(ref)?.record;
+    if (record?.memberRef) return `${index.get(record.memberRef)?.record.label ?? record.memberRef} · ${index.get(record.perspectiveRef)?.record.label ?? record.perspectiveRef}`;
+    return record?.label || record?.statement || ref;
+  };
+  const humanize = (key) => key.replace(/([a-z])([A-Z])/g, '$1 $2').replaceAll('_', ' ');
+
+  function el(tag, text, className) {
+    const item = document.createElement(tag);
+    if (text !== undefined) item.textContent = text;
+    if (className) item.className = className;
+    return item;
+  }
+
+  function field(key, value) {
+    const container = el('div', undefined, 'detail-field');
+    container.append(el('span', humanize(key), 'detail-key'));
+    if (value && typeof value === 'object' && value.status) container.append(claim(value));
+    else if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'object') {
+          const nested = el('div', undefined, 'sub-record');
+          if (item.label || item.id) nested.append(el('h4', item.label || item.id));
+          nested.append(objectFields(item));
+          container.append(nested);
+        }
+        else container.append(el('div', key.endsWith('Refs') ? name(item) : String(item), 'detail-value'));
+      }
+      if (!value.length) container.append(el('div', 'None recorded', 'detail-value'));
+    } else if (value && typeof value === 'object') container.append(objectFields(value));
+    else if ((key.endsWith('Ref') || ['from', 'to'].includes(key)) && index.has(value)) {
+      const button = el('button', name(value), 'source-ref');
+      button.addEventListener('click', () => show(value));
+      container.append(button);
+    } else container.append(el('div', String(value), 'detail-value'));
+    return container;
+  }
+
+  function sourceButtons(refs) {
+    const container = el('div');
+    for (const ref of refs ?? []) {
+      const button = el('button', ref, 'source-ref');
+      button.addEventListener('click', () => show(ref));
+      container.append(button);
+    }
+    return container;
+  }
+
+  function claim(value) {
+    const container = el('div', undefined, 'claim');
+    container.append(el('span', value.status, `status-pill ${value.status}`));
+    if (Object.hasOwn(value, 'value')) container.append(el('div', typeof value.value === 'string' && index.has(value.value) ? name(value.value) : String(value.value), 'detail-value'));
+    if (value.reason) container.append(el('div', value.reason, 'detail-value'));
+    if (value.basis) {
+      container.append(el('div', value.basis.explanation, 'claim-basis'));
+      container.append(sourceButtons(value.basis.sourceRefs));
+    }
+    if (value.sourceRefs) container.append(sourceButtons(value.sourceRefs));
+    for (const alternative of value.alternatives ?? []) container.append(claim(alternative));
+    return container;
+  }
+
+  function objectFields(record) {
+    const container = el('div');
+    for (const [key, value] of Object.entries(record)) {
+      if (['id', 'label'].includes(key)) continue;
+      container.append(field(key, value));
+    }
+    return container;
+  }
+
+  function show(ref) {
+    if (inspector.hidden || !inspector.contains(document.activeElement)) previousFocus = document.activeElement;
+    content.replaceChildren();
+    const record = ref === '__model' ? model : index.get(ref)?.record;
+    if (!record) return;
+    content.append(el('h2', ref === '__model' ? 'Model & scope' : name(ref)));
+    content.append(el('div', ref === '__model' ? `${model.schemaVersion} · ${model.id}` : ref, 'record-id'));
+    if (ref === '__model') {
+      content.append(field('title', model.title), field('scope', model.scope));
+      content.append(field('perspectives', model.perspectives));
+      content.append(field('sources', model.sources));
+      const catalog = el('section', undefined, 'detail-section');
+      catalog.append(el('h3', 'All model records'));
+      for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes']) {
+        const row = el('div', undefined, 'detail-field');
+        row.append(el('span', collection, 'detail-key'));
+        for (const item of model[collection]) {
+          const button = el('button', name(item.id), 'source-ref');
+          button.addEventListener('click', () => show(item.id));
+          row.append(button);
+        }
+        catalog.append(row);
+      }
+      content.append(catalog);
+    } else {
+      content.append(objectFields(record));
+      const memberships = model.memberships.filter((item) => item.memberRef === ref || item.group.value === ref || item.group.alternatives?.some((alternative) => alternative.value === ref));
+      const notes = model.notes.filter((item) => item.subjectRefs.includes(ref));
+      for (const [heading, records] of [['Membership and perspective', memberships], ['Related knowledge', notes]]) {
+        if (!records.length) continue;
+        const section = el('section', undefined, 'detail-section');
+        section.append(el('h3', heading));
+        for (const item of records) {
+          const part = el('div', undefined, 'sub-record');
+          part.append(el('h4', item.statement || name(item.perspectiveRef)));
+          part.append(objectFields(item));
+          section.append(part);
+        }
+        content.append(section);
+      }
+    }
+    const raw = el('details');
+    raw.append(el('summary', 'Exact JSON record'), el('pre', JSON.stringify(record, null, 2)));
+    content.append(raw);
+    inspector.hidden = false;
+    inspector.scrollTop = 0;
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.toggle('selected', element.dataset.ref === ref));
+    document.getElementById('close-inspector').focus();
+  }
+
+  function close() {
+    inspector.hidden = true;
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.remove('selected'));
+    if (previousFocus?.isConnected) previousFocus.focus();
+  }
+  document.getElementById('close-inspector').addEventListener('click', close);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !inspector.hidden) close(); });
+  document.getElementById('model-details').addEventListener('click', () => show('__model'));
+  document.querySelector('.brand').addEventListener('click', (event) => { event.preventDefault(); close(); fit(); });
+  svg.addEventListener('click', (event) => { const record = event.target.closest('[data-ref]'); if (record) show(record.dataset.ref); });
+  svg.addEventListener('keydown', (event) => {
+    if (!['Enter', ' '].includes(event.key)) return;
+    const record = event.target.closest('[data-ref]');
+    if (record) { event.preventDefault(); show(record.dataset.ref); }
+  });
+
+  const open = [];
+  function collect(value, owner, path) {
+    if (!value || typeof value !== 'object') return;
+    if (['unknown', 'disputed'].includes(value.status)) open.push({ owner, path, ...value });
+    for (const [key, child] of Object.entries(value)) collect(child, owner, path ? `${path}.${key}` : key);
+  }
+  for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes']) {
+    for (const record of model[collection]) collect(record, record, '');
+  }
+  const list = document.getElementById('knowledge-list');
+  for (const item of open.sort((a, b) => (a.status === 'disputed' ? 0 : 1) - (b.status === 'disputed' ? 0 : 1))) {
+    const button = el('button', undefined, 'knowledge-row');
+    const description = item.owner.statement || (item.owner.memberRef ? `${name(item.owner.memberRef)} · ${name(item.owner.perspectiveRef)}` : `${name(item.owner.id)} · ${humanize(item.path)}`);
+    button.append(el('span', item.status, `status-pill ${item.status}`), el('span', description, 'question'), el('span', '↗', 'row-arrow'));
+    button.addEventListener('click', () => show(item.owner.id));
+    list.append(button);
+  }
+  if (!open.length) list.append(el('p', 'No explicit unknowns or disputes recorded. Partial scope still applies.'));
+  document.getElementById('knowledge-count').textContent = `${open.filter((item) => item.status === 'unknown').length} unknown · ${open.filter((item) => item.status === 'disputed').length} disputed`;
+  document.getElementById('perspective-label').textContent = layout.layout.groupingPerspectiveRef ? `Grouping: ${name(layout.layout.groupingPerspectiveRef)}` : 'No grouping perspective selected';
+
+  function applyZoom() {
+    svg.style.width = `${layout.canvas.width * zoom}px`;
+    svg.style.height = `${layout.canvas.height * zoom}px`;
+    svg.style.marginLeft = `${Math.max(0, (viewport.clientWidth - layout.canvas.width * zoom) / 2)}px`;
+    svg.style.marginTop = `${Math.max(0, (viewport.clientHeight - layout.canvas.height * zoom) / 2)}px`;
+    document.getElementById('zoom-label').textContent = `${Math.round(zoom * 100)}%`;
+  }
+  function fit() { fitted = true; zoom = Math.min(viewport.clientWidth / layout.canvas.width, viewport.clientHeight / layout.canvas.height, 1.3); applyZoom(); viewport.scrollTo(0, 0); }
+  function changeZoom(factor) { fitted = false; zoom = Math.max(.15, Math.min(3, zoom * factor)); applyZoom(); }
+  document.getElementById('zoom-fit').addEventListener('click', fit);
+  document.getElementById('zoom-read').addEventListener('click', () => { fitted = false; zoom = 1; applyZoom(); });
+  document.getElementById('zoom-in').addEventListener('click', () => changeZoom(1.25));
+  document.getElementById('zoom-out').addEventListener('click', () => changeZoom(.8));
+  new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); }).observe(viewport);
+  fit();
+
+  document.getElementById('theme').addEventListener('click', () => {
+    const dark = document.body.classList.toggle('dark');
+    svg.dataset.theme = dark ? 'dark' : 'light';
+    document.getElementById('theme').textContent = dark ? 'Light theme' : 'Dark theme';
+  });
+  function download(contents, filename, type) {
+    const url = URL.createObjectURL(new Blob([contents], { type }));
+    const link = el('a'); link.href = url; link.download = filename;
+    link.hidden = true;
+    document.body.append(link);
+    link.click();
+    setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 1000);
+  }
+  document.getElementById('source-download').addEventListener('click', () => download(JSON.stringify(model, null, 2) + '\n', `${model.id}.model.json`, 'application/json'));
+  document.getElementById('layout-download').addEventListener('click', () => download(JSON.stringify(layout, null, 2) + '\n', `${model.id}.layout.json`, 'application/json'));
+  document.getElementById('svg-download').addEventListener('click', () => {
+    const clean = svg.cloneNode(true);
+    clean.removeAttribute('style');
+    clean.querySelectorAll('.selected').forEach((element) => element.classList.remove('selected'));
+    download('<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clean), `${model.id}.svg`, 'image/svg+xml');
+  });
+})();
+</script>
+</body></html>

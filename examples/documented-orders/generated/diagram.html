@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Order Processing: Current Submission Paths · Waxwing</title><style>:root { color-scheme:light; --bg:#f7f8fa; --surface:#fff; --ink:#17283a; --muted:#657588; --border:#dce3ea; --accent:#087d78; --soft:#edf3f3; --warning:#9c630d; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+body.dark { color-scheme:dark; --bg:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --border:#34495e; --accent:#5dd6c4; --soft:#1b3541; --warning:#f1c778; }
+button,a { -webkit-tap-highlight-color:transparent; }
+button { color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 13px; cursor:pointer; font:inherit; font-size:12px; }
+button:hover { border-color:var(--accent); }
+button:focus-visible,a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.masthead { height:72px; padding:0 38px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:16px; background:var(--surface); }
+.brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink); font-size:12px; font-weight:750; letter-spacing:2px; }
+.brand-mark { background:var(--accent); color:var(--surface); width:29px; height:29px; text-align:center; border-radius:8px; font-size:22px; font-family:Georgia,serif; font-style:italic; line-height:26px; }
+.brand-note { border-left:1px solid var(--border); padding-left:16px; margin-left:6px; color:var(--muted); font-weight:500; font-size:10px; letter-spacing:1.4px; }
+.header-actions { display:flex; gap:8px; }
+main { max-width:1800px; margin:0 auto; padding:32px 38px 20px; }
+.eyebrow { display:flex; gap:9px; align-items:center; font-size:10px; font-weight:650; letter-spacing:1.6px; color:var(--muted); }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.sep { opacity:.5; padding:0 4px; }
+.title-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+h1 { font-size:clamp(21px,2.2vw,34px); font-weight:620; letter-spacing:-1px; margin:12px 0 8px; line-height:1.25; }
+.purpose { margin:0; color:var(--muted); max-width:900px; }
+.scope-line { display:flex; flex-wrap:wrap; gap:22px; margin:17px 0 24px; color:var(--muted); font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.map-panel { border:1px solid var(--border); background:var(--surface); border-radius:12px; overflow:hidden; }
+.map-toolbar { min-height:50px; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+.map-toolbar>div { display:flex; align-items:center; gap:14px; }
+.toolbar-label { font-size:10px; font-weight:700; letter-spacing:1.5px; color:var(--accent); }
+#perspective-label { color:var(--muted); font-size:12px; }
+.zoom-controls { gap:5px!important; }
+.zoom-controls button { padding:3px 10px; min-width:30px; }
+#zoom-label { color:var(--muted); font-size:11px; min-width:34px; }
+#map-viewport { width:100%; height:clamp(330px,43vw,520px); overflow:auto; background:var(--bg); display:block; position:relative; }
+#map-viewport svg { display:block; flex-shrink:0; max-width:none; }
+.map-caption { padding:12px 18px; display:flex; justify-content:space-between; gap:16px; color:var(--muted); font-size:11px; border-top:1px solid var(--border); }
+.knowledge-section { margin-top:25px; }
+.section-heading { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+h2 { font-size:16px; letter-spacing:-.2px; margin:0; font-weight:620; }
+#knowledge-count { color:var(--muted); font-size:12px; }
+#knowledge-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 26px; }
+.knowledge-row { display:flex; align-items:center; gap:13px; text-align:left; background:none; border:0; border-top:1px solid var(--border); border-radius:0; padding:13px 0; width:100%; font-size:12px; }
+.knowledge-row:hover .question { color:var(--accent); }
+.status-pill { display:inline-block; flex-shrink:0; font:10px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; border:1px solid var(--border); padding:2px 7px; border-radius:5px; color:var(--warning); text-transform:uppercase; letter-spacing:.4px; }
+.status-pill.disputed { color:#bd5262; }
+.question { flex:1; }
+.row-arrow { color:var(--muted); }
+footer { border-top:1px solid var(--border); margin-top:25px; padding-top:16px; display:flex; justify-content:space-between; color:var(--muted); font-size:10px; }
+#inspector { position:fixed; z-index:10; top:0; bottom:0; right:0; width:min(480px,100vw); background:var(--surface); box-shadow:-16px 0 55px #071c3625; border-left:1px solid var(--border); overflow-y:auto; }
+#inspector[hidden] { display:none; }
+.inspector-header { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; background:var(--surface); padding:18px 24px; border-bottom:1px solid var(--border); font-size:10px; letter-spacing:1.8px; color:var(--muted); }
+.inspector-header button { font-size:20px; line-height:20px; padding:4px 9px; }
+#inspector-content { padding:23px; }
+#inspector-content h2 { font-size:22px; margin-bottom:5px; overflow-wrap:anywhere; }
+.record-id { font:11px ui-monospace,monospace; color:var(--muted); margin-bottom:22px; }
+.detail-field { margin:16px 0; }
+.detail-key { display:block; color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+.detail-value { white-space:pre-wrap; overflow-wrap:anywhere; }
+.detail-section { border-top:1px solid var(--border); padding-top:14px; margin-top:22px; }
+.detail-section h3 { font-size:14px; margin:0 0 12px; }
+.claim { padding:12px; border:1px solid var(--border); border-radius:8px; margin:8px 0; background:var(--bg); }
+.claim .detail-value { margin-top:8px; }
+.claim-basis { color:var(--muted); font-size:12px; margin-top:10px; }
+.source-ref { display:inline-block; margin:6px 4px 0 0; padding:4px 7px; font-size:10px; }
+.sub-record { margin:10px 0; padding:12px 0; border-bottom:1px solid var(--border); }
+.sub-record h4 { font-size:13px; margin:0 0 7px; }
+details { margin-top:22px; }
+summary { cursor:pointer; font-size:12px; color:var(--muted); }
+pre { font:11px/1.6 ui-monospace,monospace; white-space:pre-wrap; overflow-wrap:anywhere; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:7px; }
+@media(max-width:700px) { .masthead { height:auto; min-height:68px; padding:14px 18px; flex-wrap:wrap; }.brand-note { display:none; }main { padding:24px 18px; }.header-actions { flex-wrap:wrap; }.title-row { align-items:flex-start; }#knowledge-list { grid-template-columns:1fr; }.map-caption { flex-direction:column; gap:4px; }footer { flex-direction:column; gap:5px; }.scope-line { gap:12px; } }
+@media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; } }
+
+[hidden] { display:none!important; }
+.header-link { display:inline-flex; align-items:center; gap:8px; color:var(--ink); border:1px solid var(--border); border-radius:7px; padding:8px 13px; font-size:12px; text-decoration:none; }
+.header-link span { color:var(--accent); }
+.attached-documents { border:1px solid var(--border); border-radius:9px; padding:14px; background:var(--bg); margin:18px 0; }
+.attached-documents h3 { font-size:12px; margin:0 0 8px; color:var(--muted); }
+.document-link { display:block; color:var(--accent); font-size:13px; padding:5px 0; text-decoration:none; }
+#document-reader { max-width:1360px; padding-bottom:80px; }
+.document-breadcrumb { display:flex; gap:13px; align-items:center; margin:4px 0 32px; color:var(--muted); font-size:12px; }
+.document-breadcrumb a { color:var(--accent); text-decoration:none; }
+.document-workspace { display:grid; grid-template-columns:220px minmax(0,1fr); gap:48px; align-items:start; }
+#document-nav { position:sticky; top:24px; max-height:85vh; overflow:auto; padding-right:20px; border-right:1px solid var(--border); }
+.document-nav-link { display:block; margin:8px 0; padding:10px 12px; color:var(--muted); text-decoration:none; border-radius:7px; font-size:13px; overflow-wrap:anywhere; }
+.document-nav-link[aria-current=page] { color:var(--accent); background:var(--soft); font-weight:600; }
+#document-content { min-width:0; max-width:850px; }
+#document-content h1 { margin-top:12px; overflow-wrap:anywhere; }
+.document-attachments { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 28px; }
+.document-attachments a { text-decoration:none; border:1px solid var(--border); border-radius:6px; color:var(--accent); padding:5px 9px; font-size:11px; overflow-wrap:anywhere; }
+.document-card { display:block; margin-top:18px; border:1px solid var(--border); border-radius:10px; padding:20px; text-decoration:none; color:var(--ink); background:var(--surface); font-weight:600; }
+.document-card:hover { border-color:var(--accent); }
+.document-card span { display:block; margin-top:7px; color:var(--muted); font-size:12px; font-weight:400; }
+.markdown-body { line-height:1.8; font-size:15px; overflow-wrap:anywhere; }
+.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4 { line-height:1.35; margin:1.5em 0 .6em; scroll-margin-top:24px; }
+.markdown-body h2 { font-size:22px; border-top:1px solid var(--border); padding-top:22px; }
+.markdown-body h3 { font-size:18px; }
+.markdown-body a { color:var(--accent); text-underline-offset:3px; }
+.markdown-body p { margin:12px 0; }
+.markdown-body blockquote { border-left:3px solid var(--accent); margin:20px 0; padding:8px 20px; background:var(--soft); color:var(--muted); }
+.markdown-body table { display:block; max-width:100%; overflow:auto; border-collapse:collapse; font-size:13px; margin:20px 0; }
+.markdown-body th,.markdown-body td { border:1px solid var(--border); padding:10px 14px; text-align:left; }
+.markdown-body th { background:var(--soft); }
+.markdown-body code { font-size:.85em; background:var(--soft); padding:2px 5px; border-radius:4px; }
+.markdown-body pre { overflow:auto; white-space:pre; padding:18px; font-size:12px; }
+.markdown-body pre code { background:none; padding:0; font-size:inherit; }
+.markdown-body img { max-width:100%; height:auto; }
+.document-source { border-top:1px solid var(--border); padding-top:20px; margin-top:36px; }
+.document-source pre { max-height:420px; overflow:auto; }
+@media(max-width:800px) { .document-workspace { grid-template-columns:1fr; gap:24px; }#document-nav { position:static; max-height:none; padding:0 0 14px; border:0; border-bottom:1px solid var(--border); }.document-nav-link { display:inline-block; margin:4px 4px 0 0; }#document-content { max-width:100%; } }
+</style></head>
+<body>
+  <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions"><a class="header-link" href="#documents">Documents <span>3</span></a><button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
+  <main id="diagram-main">
+    <div class="eyebrow"><span class="live-dot"></span> CURRENT IMPLEMENTATION <span class="sep">/</span> PARTIAL MODEL</div>
+    <div class="title-row"><h1>Order Processing: Current Submission Paths</h1><button id="model-details">Model details ↗</button></div>
+    <p class="purpose">How can orders reach Fulfillment, and what do we actually know about the two routes?</p>
+    <div class="scope-line"><span>fictional production</span><span>fixture-1</span><span>5 components · 5 relationships</span></div>
+    <section class="map-panel" aria-label="Architecture diagram">
+      <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
+      <div id="map-viewport" tabindex="0" aria-label="Diagram canvas. Use zoom controls; scroll to pan."><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-theme="light" viewBox="0 0 1488 507" width="1488" height="507" role="group" aria-labelledby="ww-title ww-description">
+    <title id="ww-title">Order Processing: Current Submission Paths</title><desc id="ww-description">Deployed services and infrastructure resources; service internals are collapsed. Membership claims refer to these represented units. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+    <metadata id="waxwing-source" data-encoding="base64">eyJjYW52YXMiOnsiaGVpZ2h0Ijo1MDcsIndpZHRoIjoxNDg4fSwiZWRnZXMiOlt7ImZyb20iOiJvcmRlci13b3JrZXIiLCJsYWJlbCI6eyJoZWlnaHQiOjQ4LCJ3aWR0aCI6MTE2LjgsIngiOjMzOC44LCJ5IjozNDAuNjY2NjY2NjY2NjY2NjN9LCJwb2ludHMiOlt7IngiOjI5OCwieSI6MzU4LjMzMzMzMzMzMzMzMzN9LHsieCI6MzA4LCJ5IjozNTguMzMzMzMzMzMzMzMzM30seyJ4IjozMDgsInkiOjMzNy42NjY2NjY2NjY2NjY2M30seyJ4Ijo0ODYuNCwieSI6MzM3LjY2NjY2NjY2NjY2NjYzfV0sInJlZiI6ImNvbnN1bWUtb3JkZXIiLCJ0byI6Im9yZGVyLXF1ZXVlIn0seyJmcm9tIjoiY2hlY2tvdXQtYXBpIiwibGFiZWwiOnsiaGVpZ2h0Ijo0OCwid2lkdGgiOjE4MS42LCJ4Ijo4NjMuNCwieSI6MjkzLjMzMzMzMzMzMzMzMzN9LCJwb2ludHMiOlt7IngiOjI5OCwieSI6MTk1LjY2NjY2NjY2NjY2NjY2fSx7IngiOjMwOCwieSI6MTk1LjY2NjY2NjY2NjY2NjY2fSx7IngiOjMwOCwieSI6MTAwfSx7IngiOjc4OC40LCJ5IjoxMDB9LHsieCI6Nzg4LjQsInkiOjM1OC4zMzMzMzMzMzMzMzMzfSx7IngiOjExOTAsInkiOjM1OC4zMzMzMzMzMzMzMzMzfV0sInJlZiI6ImRpcmVjdC1zdWJtaXQiLCJ0byI6ImZ1bGZpbGxtZW50In0seyJmcm9tIjoiY2hlY2tvdXQtYXBpIiwibGFiZWwiOnsiaGVpZ2h0Ijo2Niwid2lkdGgiOjEzOC40LCJ4IjozMjgsInkiOjI2MC42NjY2NjY2NjY2NjY2M30sInBvaW50cyI6W3sieCI6Mjk4LCJ5IjoyNTcuNjY2NjY2NjY2NjY2NjN9LHsieCI6NDc2LjQsInkiOjI1Ny42NjY2NjY2NjY2NjY2M30seyJ4Ijo0NzYuNCwieSI6Mjk2LjMzMzMzMzMzMzMzMzN9LHsieCI6NDg2LjQsInkiOjI5Ni4zMzMzMzMzMzMzMzMzfV0sInJlZiI6ImVucXVldWUtb3JkZXIiLCJ0byI6Im9yZGVyLXF1ZXVlIn0seyJmcm9tIjoiY2hlY2tvdXQtYXBpIiwibGFiZWwiOnsiaGVpZ2h0IjozMCwid2lkdGgiOjEwOS42MDAwMDAwMDAwMDAwMSwieCI6MzQyLjQsInkiOjE3Nn0sInBvaW50cyI6W3sieCI6Mjk4LCJ5IjoyMjYuNjY2NjY2NjY2NjY2NjZ9LHsieCI6MzE4LCJ5IjoyMjYuNjY2NjY2NjY2NjY2NjZ9LHsieCI6MzE4LCJ5IjoxNzN9LHsieCI6NDg2LjQsInkiOjE3M31dLCJyZWYiOiJwZXJzaXN0LW9yZGVyIiwidG8iOiJvcmRlcnMtZGIifSx7ImZyb20iOiJvcmRlci13b3JrZXIiLCJsYWJlbCI6eyJoZWlnaHQiOjQ4LCJ3aWR0aCI6MTM4LjQsIngiOjg4NSwieSI6NDE2LjY2NjY2NjY2NjY2NjYzfSwicG9pbnRzIjpbeyJ4IjoyOTgsInkiOjM5OS42NjY2NjY2NjY2NjY2M30seyJ4IjoxMTkwLCJ5IjozOTkuNjY2NjY2NjY2NjY2NjN9XSwicmVmIjoid29ya2VyLXN1Ym1pdCIsInRvIjoiZnVsZmlsbG1lbnQifV0sImdyb3VwcyI6W3siYm94Ijp7ImhlaWdodCI6MjE4LCJ3aWR0aCI6MjkyLCJ4IjoxMTYwLCJ5IjoyNTIuOTk5OTk5OTk5OTk5OTd9LCJyZWYiOiJmdWxmaWxsbWVudC1zeXN0ZW0ifSx7ImJveCI6eyJoZWlnaHQiOjQzNSwid2lkdGgiOjcxMi40LCJ4IjozNiwieSI6MzZ9LCJyZWYiOiJvcmRlci1zeXN0ZW0ifV0sImxheW91dCI6eyJkaXJlY3Rpb24iOiJSSUdIVCIsImVuZ2luZSI6ImVsay1sYXllcmVkQDAuMTIuMCIsImdyb3VwaW5nUGVyc3BlY3RpdmVSZWYiOiJzeXN0ZW0tc3RydWN0dXJlIn0sIm1vZGVsIjp7ImRvY3VtZW50cyI6W3siYXNzZXRzIjpbXSwiYXR0YWNobWVudHMiOlt7ImtpbmQiOiJncmFwaCIsInJlZiI6Im9yZGVyLXByb2Nlc3NpbmcifV0sImZvcm1hdCI6Im1hcmtkb3duIiwiaWQiOiJzeXN0ZW0tZ3VpZGUiLCJsaW5rcyI6W3siaHJlZiI6Ii4uL3NlcnZpY2VzL3dvcmtlci9SRUFETUUubWQiLCJ0YXJnZXQiOnsia2luZCI6ImRvY3VtZW50IiwicmVmIjoid29ya2VyLWd1aWRlIn19LHsiaHJlZiI6Ii4uL2ludGVyZmFjZXMvc3VibWlzc2lvbi5tZCNyb3V0ZS1zZWxlY3Rpb24iLCJ0YXJnZXQiOnsiaGVhZGluZyI6InJvdXRlLXNlbGVjdGlvbiIsImtpbmQiOiJkb2N1bWVudCIsInJlZiI6InN1Ym1pc3Npb24tZGV0YWlscyJ9fSx7ImhyZWYiOiIjbm9kZT1vcmRlci13b3JrZXIiLCJ0YXJnZXQiOnsia2luZCI6Im5vZGUiLCJyZWYiOiJvcmRlci13b3JrZXIifX0seyJocmVmIjoiI2dyYXBoPW9yZGVyLXByb2Nlc3NpbmciLCJ0YXJnZXQiOnsia2luZCI6ImdyYXBoIiwicmVmIjoib3JkZXItcHJvY2Vzc2luZyJ9fV0sIm1hcmtkb3duIjoiIyBSZWFkaW5nIHRoaXMgc3lzdGVtXG5cblRoaXMgaXMgYSAqKmZpY3Rpb25hbCwgcGFydGlhbCBtb2RlbCoqIG9mIHRoZSBjdXJyZW50IE9yZGVyIFByb2Nlc3Npbmcgc3lzdGVtLlxuSXQgZXhwbGFpbnMgd2hhdCBpcyBlc3RhYmxpc2hlZCBhYm91dCBvcmRlciBzdWJtaXNzaW9uIGFuZCB3aGF0IHJlbWFpbnMgb3Blbi5cblxuIyMgVHdvIGltcGxlbWVudGVkIHJvdXRlc1xuXG5DaGVja291dCBBUEkgY2FuIHN1Ym1pdCB0byBGdWxmaWxsbWVudCBkaXJlY3RseSwgb3IgcHVibGlzaCBhbiBvcmRlciBzdWJtaXNzaW9uXG50aGF0IE9yZGVyIFdvcmtlciBjb25zdW1lcyBiZWZvcmUgY2FsbGluZyBGdWxmaWxsbWVudC4gVGhlIG1vZGVsIGRvZXMgKipub3QqKlxuZXN0YWJsaXNoIHdoaWNoIHJvdXRlIGlzIHByaW1hcnksIHdoaWNoIGlzIGEgZmFsbGJhY2ssIG9yIHdoZXRoZXIgdGhleSBhcmUgZXhjbHVzaXZlLlxuXG5SZWFkIHRoZSBbd29ya2VyIGd1aWRlXSguLi9zZXJ2aWNlcy93b3JrZXIvUkVBRE1FLm1kKSBhbmQgdGhlXG5bc3VibWlzc2lvbiBkZXRhaWxzXSguLi9pbnRlcmZhY2VzL3N1Ym1pc3Npb24ubWQjcm91dGUtc2VsZWN0aW9uKS5cblxufCBRdWVzdGlvbiB8IFJlY29yZGVkIHN0YXRlIHxcbnwtLS18LS0tfFxufCBEb2VzIHRoZSB3b3JrZXIgY29uc3VtZSBmcm9tIE9yZGVyIFF1ZXVlPyB8IEVzdGFibGlzaGVkIHxcbnwgV2hhdCBzZWxlY3RzIGVhY2ggc3VibWlzc2lvbiByb3V0ZT8gfCBVbmtub3duIHxcbnwgV2hvIGFwcHJvdmVzIHByb2R1Y3Rpb24gZGVwbG95bWVudHMgb2YgdGhlIHdvcmtlcj8gfCBEaXNwdXRlZCB8XG5cbiMjIEhvdyB0byByZWFkIHRoZSBhcnJvd3NcblxuQXJyb3dzIGRlc2NyaWJlIG9wZXJhdGlvbnMgZnJvbSBhY3RvciB0byByZXNvdXJjZS4gRm9yIGNvbnN1bXB0aW9uLCB0aGVcblt3b3JrZXJdKCNub2RlPW9yZGVyLXdvcmtlcikgcG9pbnRzIHRvIHRoZSBxdWV1ZSBpdCBjb25zdW1lcyBmcm9tLlxuUG9zaXRpb24gZG9lcyBub3QgZXN0YWJsaXNoIGV4ZWN1dGlvbiBvcmRlci5cblxuPiBUaGVzZSBkb2N1bWVudHMgZXhwbGFpbiB0aGUgZml4dHVyZS4gVGhlaXIgYXR0YWNobWVudCBkb2VzIG5vdCBtYWtlIGV2ZXJ5XG4+IHNlbnRlbmNlIGEgc2VwYXJhdGVseSB2YWxpZGF0ZWQgYXJjaGl0ZWN0dXJhbCBjbGFpbS5cblxuW1JldHVybiB0byB0aGUgZ3JhcGhdKCNncmFwaD1vcmRlci1wcm9jZXNzaW5nKS5cbiIsInRpdGxlIjoiUmVhZGluZyB0aGUgc3lzdGVtIn0seyJhc3NldHMiOltdLCJhdHRhY2htZW50cyI6W3sia2luZCI6Im5vZGUiLCJyZWYiOiJvcmRlci13b3JrZXIifV0sImZvcm1hdCI6Im1hcmtkb3duIiwiaWQiOiJ3b3JrZXItZ3VpZGUiLCJsaW5rcyI6W3siaHJlZiI6Ii4uLy4uL2ludGVyZmFjZXMvc3VibWlzc2lvbi5tZCIsInRhcmdldCI6eyJraW5kIjoiZG9jdW1lbnQiLCJyZWYiOiJzdWJtaXNzaW9uLWRldGFpbHMifX0seyJocmVmIjoiI2VkZ2U9d29ya2VyLXN1Ym1pdCIsInRhcmdldCI6eyJraW5kIjoiZWRnZSIsInJlZiI6Indvcmtlci1zdWJtaXQifX0seyJocmVmIjoiLi4vLi4vZ3VpZGVzL3N5c3RlbS5tZCN0d28taW1wbGVtZW50ZWQtcm91dGVzIiwidGFyZ2V0Ijp7ImhlYWRpbmciOiJ0d28taW1wbGVtZW50ZWQtcm91dGVzIiwia2luZCI6ImRvY3VtZW50IiwicmVmIjoic3lzdGVtLWd1aWRlIn19XSwibWFya2Rvd24iOiIjIE9yZGVyIFdvcmtlclxuXG5UaGUgd29ya2VyIGNvbnN1bWVzIG9yZGVyIHN1Ym1pc3Npb25zIGZyb20gT3JkZXIgUXVldWUgYW5kIGNhbGxzIEZ1bGZpbGxtZW50LlxuSXRzIGludGVybmFsIGZ1bmN0aW9ucyBhbmQgcmVwbGljYSBjb3VudCBhcmUgb3V0c2lkZSB0aGlzIGRpYWdyYW0ncyBzY29wZS5cblxuIyMgUmVzcG9uc2liaWxpdGllc1xuXG4xLiBDb25zdW1lIGEgcXVldWVkIG9yZGVyIHN1Ym1pc3Npb24uXG4yLiBTdWJtaXQgdGhlIG9yZGVyIHRvIEZ1bGZpbGxtZW50LlxuXG5UaGlzIGxpc3QgZGVzY3JpYmVzIHRoZSBmaXh0dXJlJ3MgcmVzcG9uc2liaWxpdGllcy4gSXQgZG9lcyBub3Qgc3BlY2lmeSByZXRyaWVzLFxuaWRlbXBvdGVuY3ksIHRpbWluZyBndWFyYW50ZWVzLCBvciBjb25jdXJyZW5jeSBiZXR3ZWVuIG9yZGVycy5cblxuUmVhZCBbc3VibWlzc2lvbiBkZXRhaWxzXSguLi8uLi9pbnRlcmZhY2VzL3N1Ym1pc3Npb24ubWQpIG9yIGluc3BlY3QgdGhlXG5bd29ya2VyLXRvLUZ1bGZpbGxtZW50IHJlbGF0aW9uc2hpcF0oI2VkZ2U9d29ya2VyLXN1Ym1pdCkuXG5cbiMjIE93bmVyc2hpcCByZW1haW5zIGRpc3B1dGVkXG5cbkNvbW1lcmNlIGFuZCBPcGVyYXRpb25zIHJlcG9ydCBkaWZmZXJlbnQgb3duZXJzIGZvciB0aGUgc2FtZSBleGNsdXNpdmUgZGVwbG95bWVudFxuYXBwcm92YWwgcmVzcG9uc2liaWxpdHksIGVudmlyb25tZW50LCBhbmQgc25hcHNob3QuIE5laXRoZXIgcmVwb3J0IGhhcyBiZWVuXG5zZWxlY3RlZCBhcyBlc3RhYmxpc2hlZCBvd25lcnNoaXAuXG5cbiMjIEV4YW1wbGUgdm9jYWJ1bGFyeVxuXG5gYGBqc29uXG57XG4gIFwiZnJvbVwiOiBcIm9yZGVyLXdvcmtlclwiLFxuICBcImtpbmRcIjogXCJjb25zdW1lc1wiLFxuICBcInRvXCI6IFwib3JkZXItcXVldWVcIlxufVxuYGBgXG5cblRoaXMgaXMgYSByZWxhdGlvbnNoaXAgZXhjZXJwdCwgbm90IGEgY29tcGxldGUgbW9kZWwgb3IgYSB3aXJlIHByb3RvY29sIGNvbnRyYWN0LlxuXG5TZWUgdGhlIFtzeXN0ZW0gZ3VpZGVdKC4uLy4uL2d1aWRlcy9zeXN0ZW0ubWQjdHdvLWltcGxlbWVudGVkLXJvdXRlcykuXG4iLCJ0aXRsZSI6Ik9yZGVyIFdvcmtlciBndWlkZSJ9LHsiYXNzZXRzIjpbXSwiYXR0YWNobWVudHMiOlt7ImtpbmQiOiJlZGdlIiwicmVmIjoid29ya2VyLXN1Ym1pdCJ9LHsia2luZCI6ImVkZ2UiLCJyZWYiOiJkaXJlY3Qtc3VibWl0In1dLCJmb3JtYXQiOiJtYXJrZG93biIsImlkIjoic3VibWlzc2lvbi1kZXRhaWxzIiwibGlua3MiOlt7ImhyZWYiOiIjbm9kZT1jaGVja291dC1hcGkiLCJ0YXJnZXQiOnsia2luZCI6Im5vZGUiLCJyZWYiOiJjaGVja291dC1hcGkifX0seyJocmVmIjoiI25vZGU9b3JkZXItd29ya2VyIiwidGFyZ2V0Ijp7ImtpbmQiOiJub2RlIiwicmVmIjoib3JkZXItd29ya2VyIn19LHsiaHJlZiI6Ii4uL3NlcnZpY2VzL3dvcmtlci9SRUFETUUubWQjcmVzcG9uc2liaWxpdGllcyIsInRhcmdldCI6eyJoZWFkaW5nIjoicmVzcG9uc2liaWxpdGllcyIsImtpbmQiOiJkb2N1bWVudCIsInJlZiI6Indvcmtlci1ndWlkZSJ9fV0sIm1hcmtkb3duIjoiIyBTdWJtaXNzaW9uIGRldGFpbHNcblxuQm90aCBbQ2hlY2tvdXQgQVBJXSgjbm9kZT1jaGVja291dC1hcGkpIGFuZCBbT3JkZXIgV29ya2VyXSgjbm9kZT1vcmRlci13b3JrZXIpXG5oYXZlIGltcGxlbWVudGVkIGNhbGxzIHRvIEZ1bGZpbGxtZW50IGluIHRoaXMgZmljdGlvbmFsIHNuYXBzaG90LlxuXG4jIyBSb3V0ZSBzZWxlY3Rpb25cblxuVGhlIHNlbGVjdGlvbiBjb25kaXRpb25zIGZvciB0aGUgZGlyZWN0IGFuZCBxdWV1ZWQgcm91dGVzIGFyZSAqKnVua25vd24qKi5cbldoZXRoZXIgb25lIG9yZGVyIGNhbiB0YWtlIGJvdGggcm91dGVzIGlzIGFsc28gdW5rbm93bi4gTm8gcHJpbWFyeS9mYWxsYmFja1xuZGVzY3JpcHRpb24gaXMgZXN0YWJsaXNoZWQuXG5cbiMjIEludGVyZmFjZSBkZXRhaWxzXG5cblRoZSBmaXh0dXJlIGRvZXMgbm90IHN1cHBseSB0aGUgcmVxdWVzdCBzY2hlbWEsIGVuZHBvaW50IHBhdGgsIGF1dGhlbnRpY2F0aW9uXG5tZWNoYW5pc20sIHJlc3BvbnNlIGNvZGVzLCBvciByZXRyeSBjb250cmFjdC4gVGhpcyBkb2N1bWVudCBkZWxpYmVyYXRlbHkgbGVhdmVzXG50aG9zZSB1bnNwZWNpZmllZCByYXRoZXIgdGhhbiBpbnZlbnRpbmcgYSBwbGF1c2libGUgQVBJLlxuXG5BbiBhY3R1YWwgaW50ZXJmYWNlIGNvbnRyYWN0IGNvdWxkIGJlIHdyaXR0ZW4gaW4gYW4gb3JkaW5hcnkgZG9jdW1lbnQgbGlrZSB0aGlzO1xudGhlIHRvb2wgZG9lcyBub3QgdHJlYXQgY29udHJhY3RzIGFzIGEgc3BlY2lhbCB0eXBlLlxuXG5bUmVhZCB0aGUgd29ya2VyIGd1aWRlXSguLi9zZXJ2aWNlcy93b3JrZXIvUkVBRE1FLm1kI3Jlc3BvbnNpYmlsaXRpZXMpLlxuIiwidGl0bGUiOiJTdWJtaXNzaW9uIGRldGFpbHMifV0sImVudGl0aWVzIjpbeyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJJbnRlcm5hbCBmdW5jdGlvbnMgYW5kIGVuZHBvaW50cyJdLCJyZWFzb24iOiJFeHBsYWluIHNlcnZpY2UgaW50ZXJhY3Rpb25zIHdpdGhvdXQgZXhwYW5kaW5nIGludGVybmFsIGltcGxlbWVudGF0aW9uLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGVzZSByZXNwb25zaWJpbGl0aWVzIGFyZSBzdGlwdWxhdGVkIGluIHRoZSBmaWN0aW9uYWwgaW52ZW50b3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJSZXF1ZXN0IGhhbmRsaW5nLCBvcmRlciBwZXJzaXN0ZW5jZSwgYW5kIHN1Ym1pc3Npb24gYWRhcHRlcnMuIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGludmVudG9yeSBzdXBwbGllcyB0aGlzIGNhdGVnb3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6Ikxpc3RlZCBhcyBkZXBsb3llZCBpbiBmaXh0dXJlLTEuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImlkIjoiY2hlY2tvdXQtYXBpIiwibGFiZWwiOiJDaGVja291dCBBUEkifSx7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIlRhYmxlcywgc2NoZW1hLCBhbmQgdHJhbnNhY3Rpb24gZGV0YWlscyJdLCJyZWFzb24iOiJFeHBsYWluIHNlcnZpY2UgaW50ZXJhY3Rpb25zIHdpdGhvdXQgZXhwYW5kaW5nIGludGVybmFsIGltcGxlbWVudGF0aW9uLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGVzZSByZXNwb25zaWJpbGl0aWVzIGFyZSBzdGlwdWxhdGVkIGluIHRoZSBmaWN0aW9uYWwgaW52ZW50b3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJTdG9yYWdlIG9mIG9yZGVyIHJlY29yZHMuIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGludmVudG9yeSBzdXBwbGllcyB0aGlzIGNhdGVnb3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJkYXRhc3RvcmUifSwiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiTGlzdGVkIGFzIGRlcGxveWVkIGluIGZpeHR1cmUtMS4iLCJzb3VyY2VSZWZzIjpbInJ1bnRpbWUtaW52ZW50b3J5Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJvcmRlcnMtZGIiLCJsYWJlbCI6Ik9yZGVycyBEQiJ9LHsiYWJzdHJhY3Rpb24iOnsib21pdHMiOlsiQnJva2VyIGludGVybmFscyBhbmQgY29uZmlndXJhdGlvbiJdLCJyZWFzb24iOiJFeHBsYWluIHNlcnZpY2UgaW50ZXJhY3Rpb25zIHdpdGhvdXQgZXhwYW5kaW5nIGludGVybmFsIGltcGxlbWVudGF0aW9uLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGVzZSByZXNwb25zaWJpbGl0aWVzIGFyZSBzdGlwdWxhdGVkIGluIHRoZSBmaWN0aW9uYWwgaW52ZW50b3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJUcmFuc3BvcnQgb2Ygb3JkZXIgc3VibWlzc2lvbnMuIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGludmVudG9yeSBzdXBwbGllcyB0aGlzIGNhdGVnb3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJxdWV1ZSJ9LCJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJMaXN0ZWQgYXMgZGVwbG95ZWQgaW4gZml4dHVyZS0xLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJpZCI6Im9yZGVyLXF1ZXVlIiwibGFiZWwiOiJPcmRlciBRdWV1ZSJ9LHsiYWJzdHJhY3Rpb24iOnsib21pdHMiOlsiSW50ZXJuYWwgZnVuY3Rpb25zIGFuZCByZXBsaWNhIGNvdW50Il0sInJlYXNvbiI6IkV4cGxhaW4gc2VydmljZSBpbnRlcmFjdGlvbnMgd2l0aG91dCBleHBhbmRpbmcgaW50ZXJuYWwgaW1wbGVtZW50YXRpb24uIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZXNlIHJlc3BvbnNpYmlsaXRpZXMgYXJlIHN0aXB1bGF0ZWQgaW4gdGhlIGZpY3Rpb25hbCBpbnZlbnRvcnkuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6IlF1ZXVlIGNvbnN1bWVyIGFuZCBmdWxmaWxsbWVudCBhZGFwdGVyLiJ9fSwiY2F0ZWdvcnkiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGUgZml4dHVyZSBpbnZlbnRvcnkgc3VwcGxpZXMgdGhpcyBjYXRlZ29yeS4iLCJzb3VyY2VSZWZzIjpbInJ1bnRpbWUtaW52ZW50b3J5Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoic2VydmljZSJ9LCJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJMaXN0ZWQgYXMgZGVwbG95ZWQgaW4gZml4dHVyZS0xLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJpZCI6Im9yZGVyLXdvcmtlciIsImxhYmVsIjoiT3JkZXIgV29ya2VyIn0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJJbnRlcm5hbCBmdWxmaWxsbWVudCB3b3JrZmxvdyJdLCJyZWFzb24iOiJFeHBsYWluIHNlcnZpY2UgaW50ZXJhY3Rpb25zIHdpdGhvdXQgZXhwYW5kaW5nIGludGVybmFsIGltcGxlbWVudGF0aW9uLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGVzZSByZXNwb25zaWJpbGl0aWVzIGFyZSBzdGlwdWxhdGVkIGluIHRoZSBmaWN0aW9uYWwgaW52ZW50b3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJPcmRlciBhY2NlcHRhbmNlIGFuZCBkaXNwYXRjaCBvcGVyYXRpb25zLiJ9fSwiY2F0ZWdvcnkiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJUaGUgZml4dHVyZSBpbnZlbnRvcnkgc3VwcGxpZXMgdGhpcyBjYXRlZ29yeS4iLCJzb3VyY2VSZWZzIjpbInJ1bnRpbWUtaW52ZW50b3J5Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoic2VydmljZSJ9LCJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJMaXN0ZWQgYXMgZGVwbG95ZWQgaW4gZml4dHVyZS0xLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJpZCI6ImZ1bGZpbGxtZW50IiwibGFiZWwiOiJGdWxmaWxsbWVudCJ9XSwiZ3JvdXBzIjpbeyJpZCI6Im9yZGVyLXN5c3RlbSIsImxhYmVsIjoiT3JkZXIgUHJvY2Vzc2luZyIsIm1lYW5pbmciOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJBIHN5c3RlbSBncm91cGluZzsgaXQgbWFrZXMgbm8gc2VjdXJpdHkgb3Igb3duZXJzaGlwIGNsYWltLiIsInNvdXJjZVJlZnMiOlsic3lzdGVtLWJvdW5kYXJ5Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiVGhlIGN1cnJlbnQgT3JkZXIgUHJvY2Vzc2luZyBzeXN0ZW0gYm91bmRhcnkgaW4gdGhlIGZpeHR1cmUgc2VydmljZSBjYXRhbG9nLiJ9LCJwZXJzcGVjdGl2ZVJlZiI6InN5c3RlbS1zdHJ1Y3R1cmUifSx7ImlkIjoiZnVsZmlsbG1lbnQtc3lzdGVtIiwibGFiZWwiOiJGdWxmaWxsbWVudCBQbGF0Zm9ybSIsIm1lYW5pbmciOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHRlcm5hbCByZWxhdGl2ZSB0byBPcmRlciBQcm9jZXNzaW5nLCB3aXRob3V0IGFzc2VydGluZyBhIG5ldHdvcmsgY3Jvc3NpbmcuIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJUaGUgc2VwYXJhdGUgc3lzdGVtIGNvbnRhaW5pbmcgRnVsZmlsbG1lbnQuIn0sInBlcnNwZWN0aXZlUmVmIjoic3lzdGVtLXN0cnVjdHVyZSJ9LHsiaWQiOiJjb21tZXJjZSIsImxhYmVsIjoiQ29tbWVyY2UiLCJtZWFuaW5nIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRGVmaW5lcyB0aGUgY2FuZGlkYXRlIG93bmVyIGlkZW50aXR5LCBub3QgYWNjZXB0ZWQgd29ya2VyIG1lbWJlcnNoaXAuIiwic291cmNlUmVmcyI6WyJjb21tZXJjZS1yZXBvcnQiXX0sInN0YXR1cyI6InJlcG9ydGVkIiwidmFsdWUiOiJBbiBvcmdhbml6YXRpb25hbCBvd25lciBuYW1lZCBieSB0aGUgQ29tbWVyY2UgcmVwcmVzZW50YXRpdmUuIn0sInBlcnNwZWN0aXZlUmVmIjoicnVudGltZS1vd25lcnNoaXAifSx7ImlkIjoib3BlcmF0aW9ucyIsImxhYmVsIjoiT3BlcmF0aW9ucyIsIm1lYW5pbmciOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJEZWZpbmVzIHRoZSBjYW5kaWRhdGUgb3duZXIgaWRlbnRpdHksIG5vdCBhY2NlcHRlZCB3b3JrZXIgbWVtYmVyc2hpcC4iLCJzb3VyY2VSZWZzIjpbIm9wZXJhdGlvbnMtcmVwb3J0Il19LCJzdGF0dXMiOiJyZXBvcnRlZCIsInZhbHVlIjoiQW4gb3JnYW5pemF0aW9uYWwgb3duZXIgbmFtZWQgYnkgdGhlIE9wZXJhdGlvbnMgcmVwcmVzZW50YXRpdmUuIn0sInBlcnNwZWN0aXZlUmVmIjoicnVudGltZS1vd25lcnNoaXAifV0sImlkIjoib3JkZXItcHJvY2Vzc2luZyIsIm1lbWJlcnNoaXBzIjpbeyJncm91cCI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGNhdGFsb2cgZXhwbGljaXRseSBhc3NpZ25zIHRoaXMgc3lzdGVtIG1lbWJlcnNoaXAuIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJvcmRlci1zeXN0ZW0ifSwiaWQiOiJhcGktc3lzdGVtIiwibWVtYmVyUmVmIjoiY2hlY2tvdXQtYXBpIiwicGVyc3BlY3RpdmVSZWYiOiJzeXN0ZW0tc3RydWN0dXJlIn0seyJncm91cCI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGNhdGFsb2cgZXhwbGljaXRseSBhc3NpZ25zIHRoaXMgc3lzdGVtIG1lbWJlcnNoaXAuIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJvcmRlci1zeXN0ZW0ifSwiaWQiOiJkYi1zeXN0ZW0iLCJtZW1iZXJSZWYiOiJvcmRlcnMtZGIiLCJwZXJzcGVjdGl2ZVJlZiI6InN5c3RlbS1zdHJ1Y3R1cmUifSx7Imdyb3VwIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgY2F0YWxvZyBleHBsaWNpdGx5IGFzc2lnbnMgdGhpcyBzeXN0ZW0gbWVtYmVyc2hpcC4iLCJzb3VyY2VSZWZzIjpbInN5c3RlbS1ib3VuZGFyeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6Im9yZGVyLXN5c3RlbSJ9LCJpZCI6InF1ZXVlLXN5c3RlbSIsIm1lbWJlclJlZiI6Im9yZGVyLXF1ZXVlIiwicGVyc3BlY3RpdmVSZWYiOiJzeXN0ZW0tc3RydWN0dXJlIn0seyJncm91cCI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGNhdGFsb2cgZXhwbGljaXRseSBhc3NpZ25zIHRoaXMgc3lzdGVtIG1lbWJlcnNoaXAuIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJvcmRlci1zeXN0ZW0ifSwiaWQiOiJ3b3JrZXItc3lzdGVtIiwibWVtYmVyUmVmIjoib3JkZXItd29ya2VyIiwicGVyc3BlY3RpdmVSZWYiOiJzeXN0ZW0tc3RydWN0dXJlIn0seyJncm91cCI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGNhdGFsb2cgZXhwbGljaXRseSBhc3NpZ25zIHRoaXMgc3lzdGVtIG1lbWJlcnNoaXAuIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJmdWxmaWxsbWVudC1zeXN0ZW0ifSwiaWQiOiJmdWxmaWxsbWVudC1tZW1iZXJzaGlwIiwibWVtYmVyUmVmIjoiZnVsZmlsbG1lbnQiLCJwZXJzcGVjdGl2ZVJlZiI6InN5c3RlbS1zdHJ1Y3R1cmUifSx7Imdyb3VwIjp7ImFsdGVybmF0aXZlcyI6W3siYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJDb21tZXJjZSByZXBvcnRzIGN1cnJlbnQgb3duZXJzaGlwLiIsInNvdXJjZVJlZnMiOlsiY29tbWVyY2UtcmVwb3J0Il19LCJzdGF0dXMiOiJyZXBvcnRlZCIsInZhbHVlIjoiY29tbWVyY2UifSx7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiT3BlcmF0aW9ucyByZXBvcnRzIGN1cnJlbnQgb3duZXJzaGlwLiIsInNvdXJjZVJlZnMiOlsib3BlcmF0aW9ucy1yZXBvcnQiXX0sInN0YXR1cyI6InJlcG9ydGVkIiwidmFsdWUiOiJvcGVyYXRpb25zIn1dLCJyZWFzb24iOiJUaGUgdHdvIHJlcG9ydHMgZGlzYWdyZWUgYWJvdXQgZXhjbHVzaXZlIHByb2R1Y3Rpb24tZGVwbG95bWVudCBhcHByb3ZhbCBhdXRob3JpdHkgZm9yIHRoZSBzYW1lIHdvcmtlciBzZXJ2aWNlIGFuZCBzbmFwc2hvdC4gTm8gcmVzb2x2aW5nIHJlY29yZCBpcyBlc3RhYmxpc2hlZC4iLCJzdGF0dXMiOiJkaXNwdXRlZCJ9LCJpZCI6Indvcmtlci1vd25lciIsIm1lbWJlclJlZiI6Im9yZGVyLXdvcmtlciIsInBlcnNwZWN0aXZlUmVmIjoicnVudGltZS1vd25lcnNoaXAifV0sIm5vdGVzIjpbeyJhbnN3ZXIiOnsicmVhc29uIjoiVGhlIGZpeHR1cmUgZG9lcyBub3QgZXN0YWJsaXNoIGV4Y2x1c2l2aXR5IG9yIGR1cGxpY2F0ZSBzdWJtaXNzaW9uIGJlaGF2aW9yLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1jb25uZWN0aW9ucyJdLCJzdGF0dXMiOiJ1bmtub3duIn0sImlkIjoiZHVhbC1zdWJtaXNzaW9uIiwic3RhdGVtZW50IjoiQ2FuIG9uZSBvcmRlciB0YWtlIGJvdGggZGlyZWN0IGFuZCBxdWV1ZWQgc3VibWlzc2lvbiByb3V0ZXM/Iiwic3ViamVjdFJlZnMiOlsiZGlyZWN0LXN1Ym1pdCIsImVucXVldWUtb3JkZXIiLCJ3b3JrZXItc3VibWl0Il0sInRvcGljIjoiYmVoYXZpb3IifSx7ImFuc3dlciI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkEgbWFpbnRhaW5lciBleHBsYW5hdGlvbjsgb3BlcmF0aW9uYWwgZWZmZWN0aXZlbmVzcyBoYXMgbm90IGJlZW4gZXN0YWJsaXNoZWQuIiwic291cmNlUmVmcyI6WyJxdWV1ZS1yYXRpb25hbGUtcmVwb3J0Il19LCJzdGF0dXMiOiJyZXBvcnRlZCIsInZhbHVlIjoiVG8gYWJzb3JiIEZ1bGZpbGxtZW50IG91dGFnZXMuIn0sImlkIjoicXVldWUtcmF0aW9uYWxlIiwic3RhdGVtZW50IjoiV2h5IHdhcyB0aGUgZXhpc3RpbmcgcXVldWUgaW50cm9kdWNlZD8iLCJzdWJqZWN0UmVmcyI6WyJvcmRlci1xdWV1ZSJdLCJ0b3BpYyI6InJhdGlvbmFsZSJ9LHsiYW5zd2VyIjp7InJlYXNvbiI6Ik5vIGRlbGl2ZXJ5IGd1YXJhbnRlZXMsIHJldHJ5IGJlaGF2aW9yLCBvciBpZGVtcG90ZW5jeSBldmlkZW5jZSB3YXMgc3VwcGxpZWQuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWNvbm5lY3Rpb25zIl0sInN0YXR1cyI6InVua25vd24ifSwiaWQiOiJkZWxpdmVyeS1ndWFyYW50ZWVzIiwic3RhdGVtZW50IjoiV2hhdCBkZWxpdmVyeSBhbmQgcmV0cnkgZ3VhcmFudGVlcyBhcHBseSB0byBxdWV1ZWQgb3JkZXJzPyIsInN1YmplY3RSZWZzIjpbIm9yZGVyLXF1ZXVlIiwiY29uc3VtZS1vcmRlciJdLCJ0b3BpYyI6ImJlaGF2aW9yIn0seyJhbnN3ZXIiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJEbyBub3QgdHVybiBhbiB1bmtub3duIHNlbGVjdGlvbiBydWxlIGludG8gYW4gaW52ZW50ZWQgZmFsbGJhY2sgb3IgbWlncmF0aW9uIHN0b3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1jb25uZWN0aW9ucyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6IlR3byBjdXJyZW50bHkgaW1wbGVtZW50ZWQgcm91dGVzOyBuZWl0aGVyIGlzIGVzdGFibGlzaGVkIGFzIHRoZSBwcmltYXJ5LCBmYWxsYmFjaywgb3IgZXhjbHVzaXZlIHJvdXRlLiJ9LCJpZCI6InBhdGgtZnJhbWluZyIsInN0YXRlbWVudCI6IkhvdyBzaG91bGQgdGhlIHR3byBzdWJtaXNzaW9uIHJvdXRlcyBiZSBkZXNjcmliZWQ/Iiwic3ViamVjdFJlZnMiOlsiZGlyZWN0LXN1Ym1pdCIsImVucXVldWUtb3JkZXIiLCJ3b3JrZXItc3VibWl0Il0sInRvcGljIjoiaW50ZXJwcmV0YXRpb24ifV0sInBlcnNwZWN0aXZlcyI6W3siaWQiOiJzeXN0ZW0tc3RydWN0dXJlIiwibGFiZWwiOiJTeXN0ZW0gc3RydWN0dXJlIiwibWVhbmluZyI6IkNhdGFsb2cgbWVtYmVyc2hpcCBpbiBvbmUgY3VycmVudCBzeXN0ZW07IG5vIG93bmVyc2hpcCwgZGVwbG95bWVudCwgb3IgbmV0d29yayBpc29sYXRpb24gaXMgaW1wbGllZC4iLCJwZXJpb2QiOiJmaXh0dXJlLTEiLCJzY29wZSI6IlRoZSBmaXZlIHJlcHJlc2VudGVkIHJ1bnRpbWUgZW50aXRpZXMgaW4gZmljdGlvbmFsIHByb2R1Y3Rpb24uIn0seyJpZCI6InJ1bnRpbWUtb3duZXJzaGlwIiwibGFiZWwiOiJSdW50aW1lIG93bmVyc2hpcCIsIm1lYW5pbmciOiJFeGNsdXNpdmUgYXV0aG9yaXR5IHRvIGFwcHJvdmUgcHJvZHVjdGlvbiBkZXBsb3ltZW50cyBvZiB0aGUgcmVwcmVzZW50ZWQgdW5pdCwgYXMgcmVwb3J0ZWQgYnkgdGhlIHR3byByZXByZXNlbnRhdGl2ZXMuIiwicGVyaW9kIjoiZml4dHVyZS0xIiwic2NvcGUiOiJUaGUgd2hvbGUgT3JkZXIgV29ya2VyIHNlcnZpY2UgaW4gZmljdGlvbmFsIHByb2R1Y3Rpb24sIG5vdCBhbiBpbnRlcm5hbCBjb21wb25lbnQuIn1dLCJyZWxhdGlvbnNoaXBzIjpbeyJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IGxpc3RlZCBpbiB0aGUgY3VycmVudCBmaWN0aW9uYWwgaW1wbGVtZW50YXRpb24uIiwic291cmNlUmVmcyI6WyJydW50aW1lLWNvbm5lY3Rpb25zIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiZnJvbSI6ImNoZWNrb3V0LWFwaSIsImlkIjoicGVyc2lzdC1vcmRlciIsImtpbmQiOiJ3cml0ZXMiLCJsYWJlbCI6IldyaXRlcyBvcmRlcnMiLCJ0byI6Im9yZGVycy1kYiJ9LHsiY29uZGl0aW9uIjp7InJlYXNvbiI6IlRoZSBjb25kaXRpb24gc2VsZWN0aW5nIHF1ZXVlZCBzdWJtaXNzaW9uIGlzIHVuYXZhaWxhYmxlLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1jb25uZWN0aW9ucyJdLCJzdGF0dXMiOiJ1bmtub3duIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgbGlzdGVkIGluIHRoZSBjdXJyZW50IGZpY3Rpb25hbCBpbXBsZW1lbnRhdGlvbi4iLCJzb3VyY2VSZWZzIjpbInJ1bnRpbWUtY29ubmVjdGlvbnMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoiY2hlY2tvdXQtYXBpIiwiaWQiOiJlbnF1ZXVlLW9yZGVyIiwia2luZCI6InB1Ymxpc2hlcyIsImxhYmVsIjoiUHVibGlzaGVzIG9yZGVyIHN1Ym1pc3Npb25zIiwidG8iOiJvcmRlci1xdWV1ZSJ9LHsiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBsaXN0ZWQgaW4gdGhlIGN1cnJlbnQgZmljdGlvbmFsIGltcGxlbWVudGF0aW9uLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1jb25uZWN0aW9ucyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJvcmRlci13b3JrZXIiLCJpZCI6ImNvbnN1bWUtb3JkZXIiLCJraW5kIjoiY29uc3VtZXMiLCJsYWJlbCI6IkNvbnN1bWVzIG9yZGVyIHN1Ym1pc3Npb25zIiwidG8iOiJvcmRlci1xdWV1ZSJ9LHsiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBsaXN0ZWQgaW4gdGhlIGN1cnJlbnQgZmljdGlvbmFsIGltcGxlbWVudGF0aW9uLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1jb25uZWN0aW9ucyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJvcmRlci13b3JrZXIiLCJpZCI6Indvcmtlci1zdWJtaXQiLCJraW5kIjoiY2FsbHMiLCJsYWJlbCI6IlN1Ym1pdHMgb3JkZXJzIHRvIEZ1bGZpbGxtZW50IiwidG8iOiJmdWxmaWxsbWVudCJ9LHsiY29uZGl0aW9uIjp7InJlYXNvbiI6IlRoZSBjb25kaXRpb24gc2VsZWN0aW5nIGRpcmVjdCBzdWJtaXNzaW9uIGlzIHVuYXZhaWxhYmxlLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1jb25uZWN0aW9ucyJdLCJzdGF0dXMiOiJ1bmtub3duIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgbGlzdGVkIGluIHRoZSBjdXJyZW50IGZpY3Rpb25hbCBpbXBsZW1lbnRhdGlvbi4iLCJzb3VyY2VSZWZzIjpbInJ1bnRpbWUtY29ubmVjdGlvbnMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoiY2hlY2tvdXQtYXBpIiwiaWQiOiJkaXJlY3Qtc3VibWl0Iiwia2luZCI6ImNhbGxzIiwibGFiZWwiOiJTdWJtaXRzIG9yZGVycyBkaXJlY3RseSIsInRvIjoiZnVsZmlsbG1lbnQifV0sInNjaGVtYVZlcnNpb24iOiIwLjMtZHJhZnQiLCJzY29wZSI6eyJhYnN0cmFjdGlvbiI6IkRlcGxveWVkIHNlcnZpY2VzIGFuZCBpbmZyYXN0cnVjdHVyZSByZXNvdXJjZXM7IHNlcnZpY2UgaW50ZXJuYWxzIGFyZSBjb2xsYXBzZWQuIE1lbWJlcnNoaXAgY2xhaW1zIHJlZmVyIHRvIHRoZXNlIHJlcHJlc2VudGVkIHVuaXRzLiIsImNvdmVyYWdlIjoicGFydGlhbCIsImVudmlyb25tZW50IjoiZmljdGlvbmFsIHByb2R1Y3Rpb24iLCJleGNsdWRlcyI6WyJQcm9wb3NlZCBvciBpbnRlbmRlZCBmdXR1cmUgdG9wb2xvZ3kiLCJBdXRoZW50aWNhdGlvbiBhbmQgY3VzdG9tZXIgaW50ZXJmYWNlcyIsIlJlcGxpY2EgY291bnRzLCBkYXRhYmFzZSBzY2hlbWFzLCBhbmQgZGVwbG95bWVudCBuZXR3b3JrcyJdLCJpbmNsdWRlcyI6WyJGaXZlIHJ1bnRpbWUgZW50aXRpZXMgYW5kIHRoZWlyIGN1cnJlbnQgY29ubmVjdGlvbnMiLCJTeXN0ZW0gbWVtYmVyc2hpcCBhbmQgdGhlIHdvcmtlciBvd25lcnNoaXAgZGlzcHV0ZSIsIk1pc3Npbmcgcm91dGUgY29uZGl0aW9ucyBhbmQgcmVwb3J0ZWQgcXVldWUgcmF0aW9uYWxlIl0sInF1ZXN0aW9uIjoiSG93IGNhbiBvcmRlcnMgcmVhY2ggRnVsZmlsbG1lbnQsIGFuZCB3aGF0IGRvIHdlIGFjdHVhbGx5IGtub3cgYWJvdXQgdGhlIHR3byByb3V0ZXM/Iiwic25hcHNob3QiOiJmaXh0dXJlLTEiLCJ0aW1lZnJhbWUiOiJjdXJyZW50In0sInNvdXJjZXMiOlt7ImRlc2NyaXB0aW9uIjoiU3RpcHVsYXRlZCBkZXBsb3llZCBlbnRpdGllcywgY2F0ZWdvcmllcywgYW5kIGludGVybmFsIHJlc3BvbnNpYmlsaXRpZXMuIiwiaWQiOiJydW50aW1lLWludmVudG9yeSIsImtpbmQiOiJmaXh0dXJlIiwibG9jYXRvciI6Ii4uL29yZGVyLXByb2Nlc3NpbmcvZXZpZGVuY2UubWQjcnVudGltZS1pbnZlbnRvcnkifSx7ImRlc2NyaXB0aW9uIjoiU3RpcHVsYXRlZCBjdXJyZW50IGNvbm5lY3Rpb25zIGFuZCBtaXNzaW5nIGJlaGF2aW9yYWwga25vd2xlZGdlLiIsImlkIjoicnVudGltZS1jb25uZWN0aW9ucyIsImtpbmQiOiJmaXh0dXJlIiwibG9jYXRvciI6Ii4uL29yZGVyLXByb2Nlc3NpbmcvZXZpZGVuY2UubWQjcnVudGltZS1jb25uZWN0aW9ucyJ9LHsiZGVzY3JpcHRpb24iOiJTdGlwdWxhdGVkIHN5c3RlbSBjYXRhbG9nIGJvdW5kYXJpZXM7IG5vIHNlY3VyaXR5IG9yIG93bmVyc2hpcCBpbXBsaWNhdGlvbi4iLCJpZCI6InN5c3RlbS1ib3VuZGFyeSIsImtpbmQiOiJmaXh0dXJlIiwibG9jYXRvciI6Ii4uL29yZGVyLXByb2Nlc3NpbmcvZXZpZGVuY2UubWQjc3lzdGVtLWJvdW5kYXJ5In0seyJkZXNjcmlwdGlvbiI6IkZpY3Rpb25hbCBDb21tZXJjZSBvd25lcnNoaXAgY2xhaW0uIiwiaWQiOiJjb21tZXJjZS1yZXBvcnQiLCJraW5kIjoiZml4dHVyZSIsImxvY2F0b3IiOiIuLi9vcmRlci1wcm9jZXNzaW5nL2V2aWRlbmNlLm1kI2NvbW1lcmNlLW93bmVyc2hpcC1yZXBvcnQifSx7ImRlc2NyaXB0aW9uIjoiRmljdGlvbmFsIE9wZXJhdGlvbnMgb3duZXJzaGlwIGNsYWltLiIsImlkIjoib3BlcmF0aW9ucy1yZXBvcnQiLCJraW5kIjoiZml4dHVyZSIsImxvY2F0b3IiOiIuLi9vcmRlci1wcm9jZXNzaW5nL2V2aWRlbmNlLm1kI29wZXJhdGlvbnMtb3duZXJzaGlwLXJlcG9ydCJ9LHsiZGVzY3JpcHRpb24iOiJGaWN0aW9uYWwgbWFpbnRhaW5lciBleHBsYW5hdGlvbjsgbm90IGFuIG9wZXJhdGlvbmFsIGd1YXJhbnRlZS4iLCJpZCI6InF1ZXVlLXJhdGlvbmFsZS1yZXBvcnQiLCJraW5kIjoiZml4dHVyZSIsImxvY2F0b3IiOiIuLi9vcmRlci1wcm9jZXNzaW5nL2V2aWRlbmNlLm1kI3F1ZXVlLXJhdGlvbmFsZS1yZXBvcnQifV0sInRpdGxlIjoiT3JkZXIgUHJvY2Vzc2luZzogQ3VycmVudCBTdWJtaXNzaW9uIFBhdGhzIn0sIm1vZGVsRGlnZXN0IjoiMmExZjUwODlkYmYzM2RmMDRkMDg1YTdlZDgwN2M4YmQ4OTBjMjg2ZWFiZWRiYjRmYjRkZWUwZDc2ZGRiZGFmMCIsIm5vZGVzIjpbeyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjY2LCJ5IjoxNjQuNjY2NjY2NjY2NjY2NjZ9LCJyZWYiOiJjaGVja291dC1hcGkifSx7ImJveCI6eyJoZWlnaHQiOjEyNCwid2lkdGgiOjIzMiwieCI6MTE5MCwieSI6MzE3fSwicmVmIjoiZnVsZmlsbG1lbnQifSx7ImJveCI6eyJoZWlnaHQiOjEyNCwid2lkdGgiOjIzMiwieCI6NDg2LjQsInkiOjI1NX0sInJlZiI6Im9yZGVyLXF1ZXVlIn0seyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjY2LCJ5IjozMTd9LCJyZWYiOiJvcmRlci13b3JrZXIifSx7ImJveCI6eyJoZWlnaHQiOjEyNCwid2lkdGgiOjIzMiwieCI6NDg2LjQsInkiOjExMX0sInJlZiI6Im9yZGVycy1kYiJ9XSwic2NoZW1hVmVyc2lvbiI6IjAuMi1kcmFmdCJ9</metadata>
+    <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
+    <g class="record" data-ref="order-system" tabindex="0" role="button" aria-label="Inspect Order Processing"><rect class="frame" x="36" y="36" width="712.4" height="435" rx="16"/><text class="frame-title" x="58" y="66">Order Processing</text></g><g class="record" data-ref="fulfillment-system" tabindex="0" role="button" aria-label="Inspect Fulfillment Platform"><rect class="frame" x="1160" y="253" width="292" height="218" rx="16"/><text class="frame-title" x="1182" y="283">Fulfillment Platform</text></g><g class="record" data-ref="consume-order" tabindex="0" role="button" aria-label="Inspect Consumes order submissions"><g class=""><path class="edge-hit" d="M298,358.333 L308,358.333 L308,337.667 L486.4,337.667"/><path class="edge-line" d="M298,358.333 L308,358.333 L308,337.667 L486.4,337.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="direct-submit" tabindex="0" role="button" aria-label="Inspect Submits orders directly"><g class=""><path class="edge-hit" d="M298,195.667 L308,195.667 L308,100 L788.4,100 L788.4,358.333 L1190,358.333"/><path class="edge-line" d="M298,195.667 L308,195.667 L308,100 L788.4,100 L788.4,358.333 L1190,358.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="enqueue-order" tabindex="0" role="button" aria-label="Inspect Publishes order submissions"><g class=""><path class="edge-hit" d="M298,257.667 L476.4,257.667 L476.4,296.333 L486.4,296.333"/><path class="edge-line" d="M298,257.667 L476.4,257.667 L476.4,296.333 L486.4,296.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="persist-order" tabindex="0" role="button" aria-label="Inspect Writes orders"><g class=""><path class="edge-hit" d="M298,226.667 L318,226.667 L318,173 L486.4,173"/><path class="edge-line" d="M298,226.667 L318,226.667 L318,173 L486.4,173" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="worker-submit" tabindex="0" role="button" aria-label="Inspect Submits orders to Fulfillment"><g class=""><path class="edge-hit" d="M298,399.667 L1190,399.667"/><path class="edge-line" d="M298,399.667 L1190,399.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout-api" tabindex="0" role="button" aria-label="Inspect Checkout API"><g class="category-service">
+      <rect class="node-box" x="66" y="164.667" width="232" height="124" rx="12"/>
+      <rect class="accent" x="84" y="183.667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="98" y="189.667">service</text>
+      <text class="node-title" x="84" y="216.667">Checkout API</text>
+      <text class="node-status" x="84" y="239.667">established · present</text>
+      <text class="node-link" x="84" y="270.667">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="fulfillment" tabindex="0" role="button" aria-label="Inspect Fulfillment"><g class="category-service">
+      <rect class="node-box" x="1190" y="317" width="232" height="124" rx="12"/>
+      <rect class="accent" x="1208" y="336" width="6" height="6" rx="2"/>
+      <text class="node-category" x="1222" y="342">service</text>
+      <text class="node-title" x="1208" y="369">Fulfillment</text>
+      <text class="node-status" x="1208" y="392">established · present</text>
+      <text class="node-link" x="1208" y="423">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="order-queue" tabindex="0" role="button" aria-label="Inspect Order Queue"><g class="category-queue">
+      <rect class="node-box" x="486.4" y="255" width="232" height="124" rx="12"/>
+      <rect class="accent" x="504.4" y="274" width="6" height="6" rx="2"/>
+      <text class="node-category" x="518.4" y="280">queue</text>
+      <text class="node-title" x="504.4" y="307">Order Queue</text>
+      <text class="node-status" x="504.4" y="330">established · present</text>
+      <text class="node-alert" x="504.4" y="361">1 unknown · 1 reported</text>
+    </g></g><g class="record" data-ref="order-worker" tabindex="0" role="button" aria-label="Inspect Order Worker"><g class="category-service">
+      <rect class="node-box" x="66" y="317" width="232" height="124" rx="12"/>
+      <rect class="accent" x="84" y="336" width="6" height="6" rx="2"/>
+      <text class="node-category" x="98" y="342">service</text>
+      <text class="node-title" x="84" y="369">Order Worker</text>
+      <text class="node-status" x="84" y="392">established · present</text>
+      <text class="node-alert" x="84" y="423">1 disputed · 2 reported</text>
+    </g></g><g class="record" data-ref="orders-db" tabindex="0" role="button" aria-label="Inspect Orders DB"><g class="category-datastore">
+      <rect class="node-box" x="486.4" y="111" width="232" height="124" rx="12"/>
+      <rect class="accent" x="504.4" y="130" width="6" height="6" rx="2"/>
+      <text class="node-category" x="518.4" y="136">datastore</text>
+      <text class="node-title" x="504.4" y="163">Orders DB</text>
+      <text class="node-status" x="504.4" y="186">established · present</text>
+      <text class="node-link" x="504.4" y="217">Inspect evidence ↗</text>
+    </g></g><g class="record" data-ref="consume-order" tabindex="0" role="button" aria-label="Inspect Consumes order submissions"><rect class="edge-label-bg" x="338.8" y="340.667" width="116.8" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="397.2" y="358.667">Consumes order</text><text class="edge-label" text-anchor="middle" x="397.2" y="376.667">submissions</text></g><g class="record" data-ref="direct-submit" tabindex="0" role="button" aria-label="Inspect Submits orders directly"><rect class="edge-label-bg" x="863.4" y="293.333" width="181.6" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="954.2" y="311.333">Submits orders directly</text><text class="edge-label edge-note" text-anchor="middle" x="954.2" y="329.333">Condition unknown</text></g><g class="record" data-ref="enqueue-order" tabindex="0" role="button" aria-label="Inspect Publishes order submissions"><rect class="edge-label-bg" x="328" y="260.667" width="138.4" height="66" rx="5"/><text class="edge-label" text-anchor="middle" x="397.2" y="278.667">Publishes order</text><text class="edge-label" text-anchor="middle" x="397.2" y="296.667">submissions</text><text class="edge-label edge-note" text-anchor="middle" x="397.2" y="314.667">Condition unknown</text></g><g class="record" data-ref="persist-order" tabindex="0" role="button" aria-label="Inspect Writes orders"><rect class="edge-label-bg" x="342.4" y="176" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="397.2" y="194">Writes orders</text></g><g class="record" data-ref="worker-submit" tabindex="0" role="button" aria-label="Inspect Submits orders to Fulfillment"><rect class="edge-label-bg" x="885" y="416.667" width="138.4" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="954.2" y="434.667">Submits orders to</text><text class="edge-label" text-anchor="middle" x="954.2" y="452.667">Fulfillment</text></g>
+  </svg></div>
+      <div class="map-caption"><span>Arrows describe operations: actor → resource.</span><span>Position does not imply execution order. Select any element to inspect it.</span></div>
+    </section>
+    <section class="knowledge-section" aria-labelledby="knowledge-heading"><div class="section-heading"><h2 id="knowledge-heading">What remains open</h2><span id="knowledge-count"></span></div><div id="knowledge-list"></div></section>
+    <footer><span>Full source travels with this artifact. Qualifications remain intact.</span><span>Waxwing · experimental MVP</span></footer>
+  </main>
+  <main id="document-reader" hidden aria-label="Documents">
+    <div class="document-breadcrumb"><a href="#">← Graph</a><span>/</span><a href="#documents">Documents</a></div>
+    <div class="document-workspace"><nav id="document-nav" aria-label="Included documents"></nav><section id="document-content" aria-live="polite"></section></div>
+  </main>
+  <template id="ww-document-system-guide"><article class="markdown-body"><h1 id="ww-doc-system-guide--reading-this-system">Reading this system</h1>
+<p>This is a <strong>fictional, partial model</strong> of the current Order Processing system.
+It explains what is established about order submission and what remains open.</p>
+<h2 id="ww-doc-system-guide--two-implemented-routes">Two implemented routes</h2>
+<p>Checkout API can submit to Fulfillment directly, or publish an order submission
+that Order Worker consumes before calling Fulfillment. The model does <strong>not</strong>
+establish which route is primary, which is a fallback, or whether they are exclusive.</p>
+<p>Read the <a href="#document=worker-guide">worker guide</a> and the
+<a href="#document=submission-details&amp;heading=route-selection">submission details</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Question</th>
+<th>Recorded state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Does the worker consume from Order Queue?</td>
+<td>Established</td>
+</tr>
+<tr>
+<td>What selects each submission route?</td>
+<td>Unknown</td>
+</tr>
+<tr>
+<td>Who approves production deployments of the worker?</td>
+<td>Disputed</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ww-doc-system-guide--how-to-read-the-arrows">How to read the arrows</h2>
+<p>Arrows describe operations from actor to resource. For consumption, the
+<a href="#graph=order-processing&amp;node=order-worker">worker</a> points to the queue it consumes from.
+Position does not establish execution order.</p>
+<blockquote>
+<p>These documents explain the fixture. Their attachment does not make every
+sentence a separately validated architectural claim.</p>
+</blockquote>
+<p><a href="#graph=order-processing">Return to the graph</a>.</p>
+</article></template><template id="ww-document-worker-guide"><article class="markdown-body"><h1 id="ww-doc-worker-guide--order-worker">Order Worker</h1>
+<p>The worker consumes order submissions from Order Queue and calls Fulfillment.
+Its internal functions and replica count are outside this diagram's scope.</p>
+<h2 id="ww-doc-worker-guide--responsibilities">Responsibilities</h2>
+<ol>
+<li>Consume a queued order submission.</li>
+<li>Submit the order to Fulfillment.</li>
+</ol>
+<p>This list describes the fixture's responsibilities. It does not specify retries,
+idempotency, timing guarantees, or concurrency between orders.</p>
+<p>Read <a href="#document=submission-details">submission details</a> or inspect the
+<a href="#graph=order-processing&amp;edge=worker-submit">worker-to-Fulfillment relationship</a>.</p>
+<h2 id="ww-doc-worker-guide--ownership-remains-disputed">Ownership remains disputed</h2>
+<p>Commerce and Operations report different owners for the same exclusive deployment
+approval responsibility, environment, and snapshot. Neither report has been
+selected as established ownership.</p>
+<h2 id="ww-doc-worker-guide--example-vocabulary">Example vocabulary</h2>
+<pre><code class="language-json">{
+  &quot;from&quot;: &quot;order-worker&quot;,
+  &quot;kind&quot;: &quot;consumes&quot;,
+  &quot;to&quot;: &quot;order-queue&quot;
+}
+</code></pre>
+<p>This is a relationship excerpt, not a complete model or a wire protocol contract.</p>
+<p>See the <a href="#document=system-guide&amp;heading=two-implemented-routes">system guide</a>.</p>
+</article></template><template id="ww-document-submission-details"><article class="markdown-body"><h1 id="ww-doc-submission-details--submission-details">Submission details</h1>
+<p>Both <a href="#graph=order-processing&amp;node=checkout-api">Checkout API</a> and <a href="#graph=order-processing&amp;node=order-worker">Order Worker</a>
+have implemented calls to Fulfillment in this fictional snapshot.</p>
+<h2 id="ww-doc-submission-details--route-selection">Route selection</h2>
+<p>The selection conditions for the direct and queued routes are <strong>unknown</strong>.
+Whether one order can take both routes is also unknown. No primary/fallback
+description is established.</p>
+<h2 id="ww-doc-submission-details--interface-details">Interface details</h2>
+<p>The fixture does not supply the request schema, endpoint path, authentication
+mechanism, response codes, or retry contract. This document deliberately leaves
+those unspecified rather than inventing a plausible API.</p>
+<p>An actual interface contract could be written in an ordinary document like this;
+the tool does not treat contracts as a special type.</p>
+<p><a href="#document=worker-guide&amp;heading=responsibilities">Read the worker guide</a>.</p>
+</article></template>
+  <aside id="inspector" hidden aria-label="Model inspector"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside>
+  <script>(() => {
+  'use strict';
+  const payload = document.getElementById('waxwing-source').textContent;
+  const layout = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(payload), (char) => char.charCodeAt(0))));
+  const model = layout.model;
+  const documents = model.documents ?? [];
+  const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes', 'documents'];
+  const index = new Map(collections.flatMap((collection) => (model[collection] ?? []).map((record) => [record.id, { record, collection }])));
+  const svg = document.querySelector('.ww-svg');
+  const viewport = document.getElementById('map-viewport');
+  const inspector = document.getElementById('inspector');
+  const content = document.getElementById('inspector-content');
+  let previousFocus;
+  let zoom = 1;
+  let fitted = true;
+  const name = (ref) => {
+    const record = index.get(ref)?.record;
+    if (record?.memberRef) return `${index.get(record.memberRef)?.record.label ?? record.memberRef} · ${index.get(record.perspectiveRef)?.record.label ?? record.perspectiveRef}`;
+    return record?.label || record?.title || record?.statement || ref;
+  };
+  const humanize = (key) => key.replace(/([a-z])([A-Z])/g, '$1 $2').replaceAll('_', ' ');
+
+  function el(tag, text, className) {
+    const item = document.createElement(tag);
+    if (text !== undefined) item.textContent = text;
+    if (className) item.className = className;
+    return item;
+  }
+
+  function field(key, value) {
+    const container = el('div', undefined, 'detail-field');
+    container.append(el('span', humanize(key), 'detail-key'));
+    if (value && typeof value === 'object' && value.status) container.append(claim(value));
+    else if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'object') {
+          const nested = el('div', undefined, 'sub-record');
+          if (item.label || item.id) nested.append(el('h4', item.label || item.id));
+          nested.append(objectFields(item));
+          container.append(nested);
+        }
+        else container.append(el('div', key.endsWith('Refs') ? name(item) : String(item), 'detail-value'));
+      }
+      if (!value.length) container.append(el('div', 'None recorded', 'detail-value'));
+    } else if (value && typeof value === 'object') container.append(objectFields(value));
+    else if ((key.endsWith('Ref') || ['from', 'to'].includes(key)) && index.has(value)) {
+      const button = el('button', name(value), 'source-ref');
+      button.addEventListener('click', () => show(value));
+      container.append(button);
+    } else container.append(el('div', String(value), 'detail-value'));
+    return container;
+  }
+
+  function sourceButtons(refs) {
+    const container = el('div');
+    for (const ref of refs ?? []) {
+      const button = el('button', ref, 'source-ref');
+      button.addEventListener('click', () => show(ref));
+      container.append(button);
+    }
+    return container;
+  }
+
+  function claim(value) {
+    const container = el('div', undefined, 'claim');
+    container.append(el('span', value.status, `status-pill ${value.status}`));
+    if (Object.hasOwn(value, 'value')) container.append(el('div', typeof value.value === 'string' && index.has(value.value) ? name(value.value) : String(value.value), 'detail-value'));
+    if (value.reason) container.append(el('div', value.reason, 'detail-value'));
+    if (value.basis) {
+      container.append(el('div', value.basis.explanation, 'claim-basis'));
+      container.append(sourceButtons(value.basis.sourceRefs));
+    }
+    if (value.sourceRefs) container.append(sourceButtons(value.sourceRefs));
+    for (const alternative of value.alternatives ?? []) container.append(claim(alternative));
+    return container;
+  }
+
+  function objectFields(record) {
+    const container = el('div');
+    for (const [key, value] of Object.entries(record)) {
+      if (['id', 'label'].includes(key)) continue;
+      container.append(field(key, value));
+    }
+    return container;
+  }
+
+  function displayRecord(ref) {
+    if (inspector.hidden || !inspector.contains(document.activeElement)) previousFocus = document.activeElement;
+    content.replaceChildren();
+    const record = ref === '__model' ? model : index.get(ref)?.record;
+    if (!record) return;
+    content.append(el('h2', ref === '__model' ? 'Model & scope' : name(ref)));
+    content.append(el('div', ref === '__model' ? `${model.schemaVersion} · ${model.id}` : ref, 'record-id'));
+    const attached = documents.filter((doc) => doc.attachments.some((target) => ref === '__model' ? target.kind === 'graph' && target.ref === model.id : target.ref === ref && ['node', 'edge'].includes(target.kind)));
+    if (attached.length) {
+      const section = el('section', undefined, 'attached-documents');
+      section.append(el('h3', 'Documents'));
+      for (const doc of attached) {
+        const link = el('a', `${doc.title} ↗`, 'document-link');
+        link.href = `#document=${encodeURIComponent(doc.id)}`; section.append(link);
+      }
+      content.append(section);
+    }
+    if (ref === '__model') {
+      content.append(field('title', model.title), field('scope', model.scope));
+      content.append(field('perspectives', model.perspectives));
+      content.append(field('sources', model.sources));
+      const catalog = el('section', undefined, 'detail-section');
+      catalog.append(el('h3', 'All model records'));
+      for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes', 'documents']) {
+        const row = el('div', undefined, 'detail-field');
+        row.append(el('span', collection, 'detail-key'));
+        for (const item of model[collection] ?? []) {
+          const button = el('button', name(item.id), 'source-ref');
+          button.addEventListener('click', () => show(item.id));
+          row.append(button);
+        }
+        catalog.append(row);
+      }
+      content.append(catalog);
+    } else {
+      content.append(objectFields(record));
+      const memberships = model.memberships.filter((item) => item.memberRef === ref || item.group.value === ref || item.group.alternatives?.some((alternative) => alternative.value === ref));
+      const notes = model.notes.filter((item) => item.subjectRefs.includes(ref));
+      for (const [heading, records] of [['Membership and perspective', memberships], ['Related knowledge', notes]]) {
+        if (!records.length) continue;
+        const section = el('section', undefined, 'detail-section');
+        section.append(el('h3', heading));
+        for (const item of records) {
+          const part = el('div', undefined, 'sub-record');
+          part.append(el('h4', item.statement || name(item.perspectiveRef)));
+          part.append(objectFields(item));
+          section.append(part);
+        }
+        content.append(section);
+      }
+    }
+    const raw = el('details');
+    raw.append(el('summary', 'Exact JSON record'), el('pre', JSON.stringify(record, null, 2)));
+    content.append(raw);
+    inspector.hidden = false;
+    inspector.scrollTop = 0;
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.toggle('selected', element.dataset.ref === ref));
+    document.getElementById('close-inspector').focus();
+  }
+
+  function hideInspector() {
+    inspector.hidden = true;
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.remove('selected'));
+    if (previousFocus?.isConnected) previousFocus.focus();
+  }
+  function targetHash(target) {
+    const params = new URLSearchParams();
+    if (target.kind === 'document') params.set('document', target.ref);
+    else {
+      params.set('graph', model.id);
+      if (target.kind !== 'graph') params.set(target.kind, target.ref);
+    }
+    return `#${params}`;
+  }
+  function navigate(hash) {
+    if (location.hash === hash || (!location.hash && hash === '#')) applyRoute();
+    else location.hash = hash;
+  }
+  function show(ref) {
+    const collection = index.get(ref)?.collection;
+    const kind = { documents: 'document', entities: 'node', relationships: 'edge' }[collection];
+    navigate(kind ? targetHash({ kind, ref }) : `#record=${encodeURIComponent(ref)}`);
+  }
+  function close() { navigate('#'); }
+  const reader = document.getElementById('document-reader');
+  const documentContent = document.getElementById('document-content');
+  const diagramMain = document.getElementById('diagram-main');
+  const documentNav = document.getElementById('document-nav');
+  documentNav.append(el('div', 'DOCUMENTS', 'detail-key'));
+  for (const doc of documents) {
+    const link = el('a', doc.title, 'document-nav-link');
+    link.href = targetHash({ kind: 'document', ref: doc.id });
+    link.dataset.document = doc.id; documentNav.append(link);
+  }
+  function documentScreen(doc, heading) {
+    document.title = `${doc?.title ?? 'Documents'} · ${model.title} · Waxwing`;
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren();
+    documentNav.querySelectorAll('a').forEach((link) => {
+      if (link.dataset.document === doc?.id) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    if (!doc) {
+      documentContent.append(el('div', 'REFERENCE LIBRARY', 'eyebrow'), el('h1', 'Documents'));
+      documentContent.append(el('p', 'Detailed explanations attached to this graph and its components.', 'purpose'));
+      for (const item of documents) {
+        const link = el('a', item.title, 'document-card'); link.href = targetHash({ kind: 'document', ref: item.id });
+        const subjects = item.attachments.map((target) => target.kind === 'graph' ? model.title : name(target.ref));
+        link.append(el('span', subjects.join(' · ') || 'Included document')); documentContent.append(link);
+      }
+      if (!documents.length) documentContent.append(el('p', 'No documents included.'));
+    } else {
+      documentContent.append(el('div', 'DOCUMENT', 'eyebrow'), el('h1', doc.title));
+      const attachments = el('div', undefined, 'document-attachments');
+      for (const target of doc.attachments) {
+        const link = el('a', `${target.kind} · ${target.kind === 'graph' ? model.title : name(target.ref)}`);
+        link.href = targetHash(target); attachments.append(link);
+      }
+      documentContent.append(attachments);
+      documentContent.append(document.getElementById(`ww-document-${doc.id}`).content.cloneNode(true));
+      const raw = el('details', undefined, 'document-source');
+      raw.append(el('summary', 'Original Markdown'), el('pre', doc.markdown));
+      const button = el('button', 'Download .md');
+      button.addEventListener('click', () => download(doc.markdown, `${doc.id}.md`, 'text/markdown;charset=utf-8'));
+      raw.append(button); documentContent.append(raw);
+      if (heading !== undefined) {
+        const destination = document.getElementById(`ww-doc-${doc.id}--${heading}`);
+        if (!destination) { unavailable('The requested document heading does not exist.'); return; }
+        destination.scrollIntoView({ block: 'start' });
+      }
+    }
+    if (heading === undefined) window.scrollTo(0, 0);
+  }
+  function unavailable(message) {
+    document.title = 'Link unavailable · Waxwing';
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren(el('h1', 'Link unavailable'), el('p', message));
+    const link = el('a', 'Return to graph'); link.href = '#'; documentContent.append(link);
+  }
+  function applyRoute() {
+    const hash = location.hash.slice(1);
+    if (hash === 'documents') { documentScreen(); return; }
+    const params = new URLSearchParams(hash), keys = [...params.keys()];
+    if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'heading', 'graph', 'node', 'edge', 'record'].includes(key))) { unavailable('This link uses an unsupported or ambiguous target.'); return; }
+    if (params.has('document')) {
+      if (keys.some((key) => !['document', 'heading'].includes(key))) { unavailable('This link names conflicting destinations.'); return; }
+      const doc = documents.find((item) => item.id === params.get('document'));
+      if (!doc) { unavailable('The requested document is not included in this export.'); return; }
+      documentScreen(doc, params.has('heading') ? params.get('heading') : undefined); return;
+    }
+    if (params.has('heading') || ['node', 'edge', 'record'].filter((key) => params.has(key)).length > 1 || (params.has('graph') && params.get('graph') !== model.id)) { unavailable('The requested graph or record is not available.'); return; }
+    const wasReading = !reader.hidden;
+    reader.hidden = true; diagramMain.hidden = false;
+    if (wasReading) { window.scrollTo(0, 0); if (fitted) fit(); }
+    document.title = `${model.title} · Waxwing`;
+    const key = ['node', 'edge', 'record'].find((key) => params.has(key));
+    if (!key) { hideInspector(); return; }
+    const ref = params.get(key), entry = index.get(ref);
+    if ((key === 'node' && entry?.collection !== 'entities') || (key === 'edge' && entry?.collection !== 'relationships') || (key === 'record' && ref !== '__model' && (!entry || entry.collection === 'documents'))) { unavailable('The requested record does not exist or has a different type.'); return; }
+    displayRecord(ref);
+  }
+  window.addEventListener('hashchange', applyRoute);
+  document.getElementById('close-inspector').addEventListener('click', close);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !inspector.hidden) close(); });
+  document.getElementById('model-details').addEventListener('click', () => show('__model'));
+  document.querySelector('.brand').addEventListener('click', (event) => { event.preventDefault(); close(); fit(); });
+  svg.addEventListener('click', (event) => { const record = event.target.closest('[data-ref]'); if (record) show(record.dataset.ref); });
+  svg.addEventListener('keydown', (event) => {
+    if (!['Enter', ' '].includes(event.key)) return;
+    const record = event.target.closest('[data-ref]');
+    if (record) { event.preventDefault(); show(record.dataset.ref); }
+  });
+
+  const open = [];
+  function collect(value, owner, path) {
+    if (!value || typeof value !== 'object') return;
+    if (['unknown', 'disputed'].includes(value.status)) open.push({ owner, path, ...value });
+    for (const [key, child] of Object.entries(value)) collect(child, owner, path ? `${path}.${key}` : key);
+  }
+  for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes']) {
+    for (const record of model[collection]) collect(record, record, '');
+  }
+  const list = document.getElementById('knowledge-list');
+  for (const item of open.sort((a, b) => (a.status === 'disputed' ? 0 : 1) - (b.status === 'disputed' ? 0 : 1))) {
+    const button = el('button', undefined, 'knowledge-row');
+    const description = item.owner.statement || (item.owner.memberRef ? `${name(item.owner.memberRef)} · ${name(item.owner.perspectiveRef)}` : `${name(item.owner.id)} · ${humanize(item.path)}`);
+    button.append(el('span', item.status, `status-pill ${item.status}`), el('span', description, 'question'), el('span', '↗', 'row-arrow'));
+    button.addEventListener('click', () => show(item.owner.id));
+    list.append(button);
+  }
+  if (!open.length) list.append(el('p', 'No explicit unknowns or disputes recorded. Partial scope still applies.'));
+  document.getElementById('knowledge-count').textContent = `${open.filter((item) => item.status === 'unknown').length} unknown · ${open.filter((item) => item.status === 'disputed').length} disputed`;
+  document.getElementById('perspective-label').textContent = layout.layout.groupingPerspectiveRef ? `Grouping: ${name(layout.layout.groupingPerspectiveRef)}` : 'No grouping perspective selected';
+
+  function applyZoom() {
+    svg.style.width = `${layout.canvas.width * zoom}px`;
+    svg.style.height = `${layout.canvas.height * zoom}px`;
+    svg.style.marginLeft = `${Math.max(0, (viewport.clientWidth - layout.canvas.width * zoom) / 2)}px`;
+    svg.style.marginTop = `${Math.max(0, (viewport.clientHeight - layout.canvas.height * zoom) / 2)}px`;
+    document.getElementById('zoom-label').textContent = `${Math.round(zoom * 100)}%`;
+  }
+  function fit() { fitted = true; zoom = Math.min(viewport.clientWidth / layout.canvas.width, viewport.clientHeight / layout.canvas.height, 1.3); applyZoom(); viewport.scrollTo(0, 0); }
+  function changeZoom(factor) { fitted = false; zoom = Math.max(.15, Math.min(3, zoom * factor)); applyZoom(); }
+  document.getElementById('zoom-fit').addEventListener('click', fit);
+  document.getElementById('zoom-read').addEventListener('click', () => { fitted = false; zoom = 1; applyZoom(); });
+  document.getElementById('zoom-in').addEventListener('click', () => changeZoom(1.25));
+  document.getElementById('zoom-out').addEventListener('click', () => changeZoom(.8));
+  new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); }).observe(viewport);
+  fit();
+
+  document.getElementById('theme').addEventListener('click', () => {
+    const dark = document.body.classList.toggle('dark');
+    svg.dataset.theme = dark ? 'dark' : 'light';
+    document.getElementById('theme').textContent = dark ? 'Light theme' : 'Dark theme';
+  });
+  function download(contents, filename, type) {
+    const url = URL.createObjectURL(new Blob([contents], { type }));
+    const link = el('a'); link.href = url; link.download = filename;
+    link.hidden = true;
+    document.body.append(link);
+    link.click();
+    setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 1000);
+  }
+  document.getElementById('source-download').addEventListener('click', () => download(JSON.stringify(model, null, 2) + '\n', `${model.id}.model.json`, 'application/json'));
+  document.getElementById('layout-download').addEventListener('click', () => download(JSON.stringify(layout, null, 2) + '\n', `${model.id}.layout.json`, 'application/json'));
+  document.getElementById('svg-download').addEventListener('click', () => {
+    const clean = svg.cloneNode(true);
+    clean.removeAttribute('style');
+    clean.querySelectorAll('.selected').forEach((element) => element.classList.remove('selected'));
+    download('<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clean), `${model.id}.svg`, 'image/svg+xml');
+  });
+  applyRoute();
+})();
+</script>
+</body></html>

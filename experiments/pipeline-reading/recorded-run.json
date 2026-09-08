@@ -1,0 +1,165 @@
+{
+  "recordedDate": "2026-09-08",
+  "runtime": {
+    "node": "v25.8.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "previewPython": "3.9.6"
+  },
+  "dependencies": {
+    "elkjs": "0.12.0",
+    "ajv": "8.17.1"
+  },
+  "sourceSha256": {
+    "package.json": "1ecc9033a4dc1f0117b0e930f8d992f57b84cd0744e96a61489146d19056429e",
+    "package-lock.json": "02784172578c9ffcd91954265ef2d033cbcc75876e298244026d11636295aeed",
+    "experiments/pipeline-reading/fixture.mjs": "5c7274dc5adf1ba07250b3a56b016adbff9f0cdb65c6a42fcf2d069f3d22b5e1",
+    "experiments/pipeline-reading/evidence.md": "8c19d169eb479d47d8dc1f3bd1bc0693c515fb54141b482ea604cfcc6780555a",
+    "experiments/pipeline-reading/placement.mjs": "c79ac356ac9833d8fbafe2cb27b4cb5cd621532749e7a4b39d63afe8866d9a11",
+    "experiments/pipeline-reading/run.mjs": "69c6ad9273063594282a25c6d1324f34191a807e0007912abebe144c94443c06",
+    "experiments/pipeline-reading/page.mjs": "0717aea35b8e3e5370d6089b30038c90a2453e0399459363d8903a41552979f3",
+    "modules/layout/index.mjs": "a8db728f3108c89a5b3dbcd21405d9f54168b47442a10c355bf52f366cd77428",
+    "modules/layout/validate.mjs": "4d23c08270f9c0a0d9996f1bd4eddebc12adf016698e1f31524facab8ec381af",
+    "modules/model/index.mjs": "53a311fe919d4324b01af8d187396fab7663aade7bec7c015b1a32d2de176230",
+    "modules/shared/model.mjs": "0fe45b3e79d54dd48996d3b1febf4084783cd0b0ca2177b425ccc252a397f99c",
+    "modules/render/index.mjs": "1f4d71f07ef6b70469a6b3f45bf6f5f2a4ed597cef2ef887f3c2d5c8422a91a7",
+    "modules/render/artifacts.mjs": "bd9dd67cfd51dacd2ee238f2d436160cd1c26125e76ba18d3eb8d3f4425abc44",
+    "modules/render/diagram.css": "08a04d030d74372c1249ba83cf9a2518a0dc7f8adb7946f2f9c76ea67a15f05e",
+    "modules/render/viewer.css": "7730f458284d67f95e4202e4780c47d74555421d6c981143b0cf2d5e548692a8",
+    "modules/render/viewer.js": "2778e22912b3e95954f343ba64342d9be6452bdac079f94b8f1a8468d4e92909",
+    "schemas/system-model.schema.json": "2e204355a8f3f3db75bfc89021a740d01fe471a3c9c0cabee13fdda95be7d30e",
+    "schemas/layout.schema.json": "9d81b017c0066d539c8c87c8a4e7a6bdab4d9f294acf6af50ea12e4ad9763b70",
+    "experiments/pipeline-reading/generated/model.json": "9ad831772ef0cad6348e0d703436d2b46e78cf15321080e8e3437df1cfa334cb"
+  },
+  "results": {
+    "criterion": "Each successive stage lies entirely to the right of the previous stage; target 5/5.",
+    "sequence": [
+      "upload-api",
+      "upload-queue",
+      "resize-worker",
+      "resized-queue",
+      "index-worker",
+      "index-db"
+    ],
+    "baseline": {
+      "transitions": [
+        {
+          "from": "upload-api",
+          "to": "upload-queue",
+          "fromX": 36,
+          "fromRight": 268,
+          "toX": 662.4,
+          "advancesRight": true,
+          "movesLeft": false
+        },
+        {
+          "from": "upload-queue",
+          "to": "resize-worker",
+          "fromX": 662.4,
+          "fromRight": 894.4,
+          "toX": 36,
+          "advancesRight": false,
+          "movesLeft": true
+        },
+        {
+          "from": "resize-worker",
+          "to": "resized-queue",
+          "fromX": 36,
+          "fromRight": 268,
+          "toX": 662.4,
+          "advancesRight": true,
+          "movesLeft": false
+        },
+        {
+          "from": "resized-queue",
+          "to": "index-worker",
+          "fromX": 662.4,
+          "fromRight": 894.4,
+          "toX": 36,
+          "advancesRight": false,
+          "movesLeft": true
+        },
+        {
+          "from": "index-worker",
+          "to": "index-db",
+          "fromX": 36,
+          "fromRight": 268,
+          "toX": 662.4,
+          "advancesRight": true,
+          "movesLeft": false
+        }
+      ],
+      "advancesRight": 3,
+      "movesLeft": 2,
+      "total": 5,
+      "canvas": {
+        "width": 930.4,
+        "height": 662
+      },
+      "fitScaleAt1200px": 1
+    },
+    "comparison": {
+      "transitions": [
+        {
+          "from": "upload-api",
+          "to": "upload-queue",
+          "fromX": 36,
+          "fromRight": 268,
+          "toX": 655.2,
+          "advancesRight": true,
+          "movesLeft": false
+        },
+        {
+          "from": "upload-queue",
+          "to": "resize-worker",
+          "fromX": 655.2,
+          "fromRight": 887.2,
+          "toX": 1267.2,
+          "advancesRight": true,
+          "movesLeft": false
+        },
+        {
+          "from": "resize-worker",
+          "to": "resized-queue",
+          "fromX": 1267.2,
+          "fromRight": 1499.2,
+          "toX": 1893.6000000000001,
+          "advancesRight": true,
+          "movesLeft": false
+        },
+        {
+          "from": "resized-queue",
+          "to": "index-worker",
+          "fromX": 1893.6000000000001,
+          "fromRight": 2125.6000000000004,
+          "toX": 2512.8,
+          "advancesRight": true,
+          "movesLeft": false
+        },
+        {
+          "from": "index-worker",
+          "to": "index-db",
+          "fromX": 2512.8,
+          "fromRight": 2744.8,
+          "toX": 3124.8,
+          "advancesRight": true,
+          "movesLeft": false
+        }
+      ],
+      "advancesRight": 5,
+      "movesLeft": 0,
+      "total": 5,
+      "canvas": {
+        "width": 3392.8,
+        "height": 196
+      },
+      "fitScaleAt1200px": 0.3536901674133459
+    },
+    "checks": {
+      "bothLayoutsValid": true,
+      "sameOriginalModelRecoveredFromBothFormats": true,
+      "originalOperationDirectionsPreserved": true,
+      "questionOnlyChangeLeavesGeometryIdentical": true
+    }
+  }
+}

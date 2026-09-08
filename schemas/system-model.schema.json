@@ -1,0 +1,919 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Waxwing JSON 1 \u2014 drafts 0.2, 0.3, and 0.4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "title",
+    "scope",
+    "sources",
+    "perspectives",
+    "entities",
+    "groups",
+    "memberships",
+    "relationships",
+    "notes"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "enum": [
+        "0.2-draft",
+        "0.3-draft",
+        "0.4-draft"
+      ]
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "title": {
+      "$ref": "#/$defs/text"
+    },
+    "scope": {
+      "$ref": "#/$defs/scope"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "locator",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "kind": {
+            "enum": [
+              "code",
+              "configuration",
+              "documentation",
+              "human",
+              "fixture"
+            ]
+          },
+          "locator": {
+            "$ref": "#/$defs/text"
+          },
+          "description": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "existence",
+          "category",
+          "abstraction"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "label": {
+            "$ref": "#/$defs/text"
+          },
+          "existence": {
+            "$ref": "#/$defs/booleanKnowledge"
+          },
+          "category": {
+            "$ref": "#/$defs/categoryKnowledge"
+          },
+          "abstraction": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "represents",
+              "omits",
+              "reason"
+            ],
+            "properties": {
+              "represents": {
+                "$ref": "#/$defs/textKnowledge"
+              },
+              "omits": {
+                "$ref": "#/$defs/texts"
+              },
+              "reason": {
+                "$ref": "#/$defs/text"
+              },
+              "level": {
+                "$ref": "#/$defs/text"
+              }
+            }
+          }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "perspectiveRef",
+          "meaning"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "label": {
+            "$ref": "#/$defs/text"
+          },
+          "meaning": {
+            "$ref": "#/$defs/textKnowledge"
+          },
+          "perspectiveRef": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "memberships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "memberRef",
+          "perspectiveRef",
+          "group"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "memberRef": {
+            "$ref": "#/$defs/id"
+          },
+          "group": {
+            "$ref": "#/$defs/refKnowledge"
+          },
+          "perspectiveRef": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "from",
+          "to",
+          "kind",
+          "label",
+          "existence"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "from": {
+            "$ref": "#/$defs/id"
+          },
+          "to": {
+            "$ref": "#/$defs/id"
+          },
+          "kind": {
+            "enum": [
+              "calls",
+              "writes",
+              "reads",
+              "publishes",
+              "consumes"
+            ]
+          },
+          "label": {
+            "$ref": "#/$defs/text"
+          },
+          "existence": {
+            "$ref": "#/$defs/booleanKnowledge"
+          },
+          "condition": {
+            "$ref": "#/$defs/textKnowledge"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "subjectRefs",
+          "topic",
+          "statement",
+          "answer"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "subjectRefs": {
+            "$ref": "#/$defs/refs"
+          },
+          "topic": {
+            "enum": [
+              "behavior",
+              "rationale",
+              "interpretation"
+            ]
+          },
+          "statement": {
+            "$ref": "#/$defs/text"
+          },
+          "answer": {
+            "$ref": "#/$defs/textKnowledge"
+          }
+        }
+      }
+    },
+    "perspectives": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "meaning",
+          "scope",
+          "period"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "label": {
+            "$ref": "#/$defs/text"
+          },
+          "meaning": {
+            "$ref": "#/$defs/text"
+          },
+          "scope": {
+            "$ref": "#/$defs/text"
+          },
+          "period": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "format",
+          "markdown",
+          "attachments",
+          "links",
+          "assets"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "title": {
+            "$ref": "#/$defs/text"
+          },
+          "format": {
+            "const": "markdown"
+          },
+          "markdown": {
+            "type": "string"
+          },
+          "attachments": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "ref"
+              ],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "graph",
+                    "node",
+                    "edge"
+                  ]
+                },
+                "ref": {
+                  "$ref": "#/$defs/id"
+                },
+                "graphRef": {
+                  "$ref": "#/$defs/id"
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "href",
+                "target"
+              ],
+              "properties": {
+                "href": {
+                  "type": "string"
+                },
+                "target": {
+                  "$ref": "#/$defs/documentTarget"
+                }
+              }
+            }
+          },
+          "assets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "href",
+                "mimeType",
+                "data"
+              ],
+              "properties": {
+                "href": {
+                  "$ref": "#/$defs/text"
+                },
+                "mimeType": {
+                  "enum": [
+                    "image/png",
+                    "image/jpeg",
+                    "image/gif",
+                    "image/webp"
+                  ]
+                },
+                "data": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "graphs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/graph"
+      }
+    },
+    "rootGraphRef": {
+      "$ref": "#/$defs/id"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "texts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/text"
+      },
+      "uniqueItems": true
+    },
+    "refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/id"
+      },
+      "uniqueItems": true
+    },
+    "basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sourceRefs",
+        "explanation"
+      ],
+      "properties": {
+        "sourceRefs": {
+          "$ref": "#/$defs/refs"
+        },
+        "explanation": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "value",
+        "basis"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "established",
+            "reported",
+            "inferred"
+          ]
+        },
+        "value": {
+          "type": [
+            "string",
+            "boolean"
+          ]
+        },
+        "basis": {
+          "$ref": "#/$defs/basis"
+        }
+      }
+    },
+    "knowledge": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/assertion"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "$ref": "#/$defs/text"
+            },
+            "sourceRefs": {
+              "$ref": "#/$defs/refs"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason",
+            "alternatives"
+          ],
+          "properties": {
+            "status": {
+              "const": "disputed"
+            },
+            "reason": {
+              "$ref": "#/$defs/text"
+            },
+            "alternatives": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/assertion"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "textKnowledge": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/knowledge"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "$ref": "#/$defs/text"
+            },
+            "alternatives": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "$ref": "#/$defs/text"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "booleanKnowledge": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/knowledge"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "alternatives": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "refKnowledge": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/knowledge"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "$ref": "#/$defs/id"
+            },
+            "alternatives": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "$ref": "#/$defs/id"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "category": {
+      "enum": [
+        "service",
+        "datastore",
+        "queue",
+        "actor"
+      ]
+    },
+    "categoryKnowledge": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/knowledge"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "value": {
+              "$ref": "#/$defs/category"
+            },
+            "alternatives": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "$ref": "#/$defs/category"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "documentTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "ref"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "document",
+            "graph",
+            "node",
+            "edge"
+          ]
+        },
+        "ref": {
+          "$ref": "#/$defs/id"
+        },
+        "heading": {
+          "$ref": "#/$defs/text"
+        },
+        "graphRef": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timeframe",
+        "environment",
+        "snapshot",
+        "coverage",
+        "question",
+        "includes",
+        "excludes",
+        "abstraction"
+      ],
+      "properties": {
+        "timeframe": {
+          "const": "current"
+        },
+        "environment": {
+          "$ref": "#/$defs/text"
+        },
+        "snapshot": {
+          "$ref": "#/$defs/text"
+        },
+        "coverage": {
+          "const": "partial"
+        },
+        "question": {
+          "$ref": "#/$defs/text"
+        },
+        "includes": {
+          "$ref": "#/$defs/texts"
+        },
+        "excludes": {
+          "$ref": "#/$defs/texts"
+        },
+        "abstraction": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "refsAssertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "value",
+        "basis"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "established",
+            "reported",
+            "inferred"
+          ]
+        },
+        "value": {
+          "$ref": "#/$defs/refs"
+        },
+        "basis": {
+          "$ref": "#/$defs/basis"
+        }
+      }
+    },
+    "refsKnowledge": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/refsAssertion"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "$ref": "#/$defs/text"
+            },
+            "sourceRefs": {
+              "$ref": "#/$defs/refs"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason",
+            "alternatives"
+          ],
+          "properties": {
+            "status": {
+              "const": "disputed"
+            },
+            "reason": {
+              "$ref": "#/$defs/text"
+            },
+            "alternatives": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/refsAssertion"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "expansion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "graphRef",
+        "nodeRef",
+        "meaning",
+        "boundaries"
+      ],
+      "properties": {
+        "graphRef": {
+          "$ref": "#/$defs/id"
+        },
+        "nodeRef": {
+          "$ref": "#/$defs/id"
+        },
+        "meaning": {
+          "$ref": "#/$defs/textKnowledge"
+        },
+        "boundaries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "relationshipRef",
+              "detail"
+            ],
+            "properties": {
+              "relationshipRef": {
+                "$ref": "#/$defs/id"
+              },
+              "detail": {
+                "$ref": "#/$defs/refsKnowledge"
+              }
+            }
+          }
+        }
+      }
+    },
+    "graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "scope",
+        "entityRefs",
+        "contextRefs",
+        "relationshipRefs",
+        "membershipRefs"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "title": {
+          "$ref": "#/$defs/text"
+        },
+        "scope": {
+          "$ref": "#/$defs/scope"
+        },
+        "entityRefs": {
+          "$ref": "#/$defs/refs"
+        },
+        "contextRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "relationshipRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "membershipRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "uniqueItems": true
+        },
+        "expands": {
+          "$ref": "#/$defs/expansion"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": "0.2-draft"
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "documents": false
+        }
+      },
+      "else": {
+        "required": [
+          "documents"
+        ],
+        "properties": {
+          "documents": true
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": "0.4-draft"
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ]
+      },
+      "then": {
+        "required": [
+          "graphs",
+          "rootGraphRef"
+        ],
+        "properties": {
+          "graphs": true,
+          "rootGraphRef": true
+        }
+      },
+      "else": {
+        "properties": {
+          "graphs": false,
+          "rootGraphRef": false
+        }
+      }
+    }
+  ]
+}

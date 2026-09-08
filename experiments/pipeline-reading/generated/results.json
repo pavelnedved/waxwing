@@ -1,0 +1,131 @@
+{
+  "criterion": "Each successive stage lies entirely to the right of the previous stage; target 5/5.",
+  "sequence": [
+    "upload-api",
+    "upload-queue",
+    "resize-worker",
+    "resized-queue",
+    "index-worker",
+    "index-db"
+  ],
+  "baseline": {
+    "transitions": [
+      {
+        "from": "upload-api",
+        "to": "upload-queue",
+        "fromX": 36,
+        "fromRight": 268,
+        "toX": 662.4,
+        "advancesRight": true,
+        "movesLeft": false
+      },
+      {
+        "from": "upload-queue",
+        "to": "resize-worker",
+        "fromX": 662.4,
+        "fromRight": 894.4,
+        "toX": 36,
+        "advancesRight": false,
+        "movesLeft": true
+      },
+      {
+        "from": "resize-worker",
+        "to": "resized-queue",
+        "fromX": 36,
+        "fromRight": 268,
+        "toX": 662.4,
+        "advancesRight": true,
+        "movesLeft": false
+      },
+      {
+        "from": "resized-queue",
+        "to": "index-worker",
+        "fromX": 662.4,
+        "fromRight": 894.4,
+        "toX": 36,
+        "advancesRight": false,
+        "movesLeft": true
+      },
+      {
+        "from": "index-worker",
+        "to": "index-db",
+        "fromX": 36,
+        "fromRight": 268,
+        "toX": 662.4,
+        "advancesRight": true,
+        "movesLeft": false
+      }
+    ],
+    "advancesRight": 3,
+    "movesLeft": 2,
+    "total": 5,
+    "canvas": {
+      "width": 930.4,
+      "height": 662
+    },
+    "fitScaleAt1200px": 1
+  },
+  "comparison": {
+    "transitions": [
+      {
+        "from": "upload-api",
+        "to": "upload-queue",
+        "fromX": 36,
+        "fromRight": 268,
+        "toX": 655.2,
+        "advancesRight": true,
+        "movesLeft": false
+      },
+      {
+        "from": "upload-queue",
+        "to": "resize-worker",
+        "fromX": 655.2,
+        "fromRight": 887.2,
+        "toX": 1267.2,
+        "advancesRight": true,
+        "movesLeft": false
+      },
+      {
+        "from": "resize-worker",
+        "to": "resized-queue",
+        "fromX": 1267.2,
+        "fromRight": 1499.2,
+        "toX": 1893.6000000000001,
+        "advancesRight": true,
+        "movesLeft": false
+      },
+      {
+        "from": "resized-queue",
+        "to": "index-worker",
+        "fromX": 1893.6000000000001,
+        "fromRight": 2125.6000000000004,
+        "toX": 2512.8,
+        "advancesRight": true,
+        "movesLeft": false
+      },
+      {
+        "from": "index-worker",
+        "to": "index-db",
+        "fromX": 2512.8,
+        "fromRight": 2744.8,
+        "toX": 3124.8,
+        "advancesRight": true,
+        "movesLeft": false
+      }
+    ],
+    "advancesRight": 5,
+    "movesLeft": 0,
+    "total": 5,
+    "canvas": {
+      "width": 3392.8,
+      "height": 196
+    },
+    "fitScaleAt1200px": 0.3536901674133459
+  },
+  "checks": {
+    "bothLayoutsValid": true,
+    "sameOriginalModelRecoveredFromBothFormats": true,
+    "originalOperationDirectionsPreserved": true,
+    "questionOnlyChangeLeavesGeometryIdentical": true
+  }
+}

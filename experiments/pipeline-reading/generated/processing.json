@@ -1,0 +1,569 @@
+{
+  "schemaVersion": "0.1-draft",
+  "model": {
+    "schemaVersion": "0.2-draft",
+    "id": "image-pipeline",
+    "title": "Image Processing Pipeline",
+    "scope": {
+      "timeframe": "current",
+      "environment": "fictional production",
+      "snapshot": "pipeline-fixture-1",
+      "coverage": "partial",
+      "question": "Follow one successfully processed image from upload to its index record.",
+      "includes": [
+        "The six deployed components on the successful processing path",
+        "Their five operation relationships"
+      ],
+      "excludes": [
+        "Retries and failure paths",
+        "Worker replicas and broker internals",
+        "Ownership and deployment boundaries"
+      ],
+      "abstraction": "Deployed services, queues, and one datastore; each component represents all of its instances."
+    },
+    "sources": [
+      {
+        "id": "fixture-spec",
+        "kind": "fixture",
+        "locator": "../evidence.md",
+        "description": "Stipulated current behavior in this fully synthetic experiment."
+      }
+    ],
+    "perspectives": [],
+    "groups": [],
+    "memberships": [],
+    "entities": [
+      {
+        "id": "upload-api",
+        "label": "Upload API",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "Upload API is deployed in pipeline-fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly classifies Upload API as service."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Accepts an image and publishes its upload job.",
+            "basis": {
+              "sourceRefs": [
+                "fixture-spec"
+              ],
+              "explanation": "This responsibility is stipulated in the fixture specification."
+            }
+          },
+          "omits": [
+            "Internal implementation and replica count"
+          ],
+          "reason": "Keep the successful processing path at component level."
+        }
+      },
+      {
+        "id": "upload-queue",
+        "label": "Upload Queue",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "Upload Queue is deployed in pipeline-fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "queue",
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly classifies Upload Queue as queue."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Carries upload jobs to the resize worker.",
+            "basis": {
+              "sourceRefs": [
+                "fixture-spec"
+              ],
+              "explanation": "This responsibility is stipulated in the fixture specification."
+            }
+          },
+          "omits": [
+            "Internal implementation and replica count"
+          ],
+          "reason": "Keep the successful processing path at component level."
+        }
+      },
+      {
+        "id": "resize-worker",
+        "label": "Resize Worker",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "Resize Worker is deployed in pipeline-fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly classifies Resize Worker as service."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Consumes an upload job, resizes its image, and publishes a resized-image job.",
+            "basis": {
+              "sourceRefs": [
+                "fixture-spec"
+              ],
+              "explanation": "This responsibility is stipulated in the fixture specification."
+            }
+          },
+          "omits": [
+            "Internal implementation and replica count"
+          ],
+          "reason": "Keep the successful processing path at component level."
+        }
+      },
+      {
+        "id": "resized-queue",
+        "label": "Resized Queue",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "Resized Queue is deployed in pipeline-fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "queue",
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly classifies Resized Queue as queue."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Carries resized-image jobs to the index worker.",
+            "basis": {
+              "sourceRefs": [
+                "fixture-spec"
+              ],
+              "explanation": "This responsibility is stipulated in the fixture specification."
+            }
+          },
+          "omits": [
+            "Internal implementation and replica count"
+          ],
+          "reason": "Keep the successful processing path at component level."
+        }
+      },
+      {
+        "id": "index-worker",
+        "label": "Index Worker",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "Index Worker is deployed in pipeline-fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly classifies Index Worker as service."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Consumes a resized-image job and writes the resulting index record.",
+            "basis": {
+              "sourceRefs": [
+                "fixture-spec"
+              ],
+              "explanation": "This responsibility is stipulated in the fixture specification."
+            }
+          },
+          "omits": [
+            "Internal implementation and replica count"
+          ],
+          "reason": "Keep the successful processing path at component level."
+        }
+      },
+      {
+        "id": "index-db",
+        "label": "Index DB",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "Index DB is deployed in pipeline-fixture-1."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "datastore",
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly classifies Index DB as datastore."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Stores the completed image index records.",
+            "basis": {
+              "sourceRefs": [
+                "fixture-spec"
+              ],
+              "explanation": "This responsibility is stipulated in the fixture specification."
+            }
+          },
+          "omits": [
+            "Internal implementation and replica count"
+          ],
+          "reason": "Keep the successful processing path at component level."
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "id": "publish-upload",
+        "from": "upload-api",
+        "to": "upload-queue",
+        "kind": "publishes",
+        "label": "Publishes upload jobs",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly establishes that upload-api publishes upload-queue."
+          }
+        }
+      },
+      {
+        "id": "consume-upload",
+        "from": "resize-worker",
+        "to": "upload-queue",
+        "kind": "consumes",
+        "label": "Consumes upload jobs",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly establishes that resize-worker consumes upload-queue."
+          }
+        }
+      },
+      {
+        "id": "publish-resized",
+        "from": "resize-worker",
+        "to": "resized-queue",
+        "kind": "publishes",
+        "label": "Publishes resized jobs",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly establishes that resize-worker publishes resized-queue."
+          }
+        }
+      },
+      {
+        "id": "consume-resized",
+        "from": "index-worker",
+        "to": "resized-queue",
+        "kind": "consumes",
+        "label": "Consumes resized jobs",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly establishes that index-worker consumes resized-queue."
+          }
+        }
+      },
+      {
+        "id": "write-index",
+        "from": "index-worker",
+        "to": "index-db",
+        "kind": "writes",
+        "label": "Writes index records",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture explicitly establishes that index-worker writes index-db."
+          }
+        }
+      }
+    ],
+    "notes": [
+      {
+        "id": "successful-processing",
+        "subjectRefs": [
+          "upload-api",
+          "upload-queue",
+          "resize-worker",
+          "resized-queue",
+          "index-worker",
+          "index-db",
+          "publish-upload",
+          "consume-upload",
+          "publish-resized",
+          "consume-resized",
+          "write-index"
+        ],
+        "topic": "behavior",
+        "statement": "What sequence does one successfully processed image follow?",
+        "answer": {
+          "status": "established",
+          "value": "Upload API publishes the image job to Upload Queue. Resize Worker consumes that job, resizes its image, then publishes its result to Resized Queue. Index Worker consumes that result and writes the image index record to Index DB.",
+          "basis": {
+            "sourceRefs": [
+              "fixture-spec"
+            ],
+            "explanation": "The fixture stipulates this per-image causal sequence explicitly. It is not inferred from dependency arrows. Failure and retry behavior is outside this partial model."
+          }
+        }
+      }
+    ]
+  },
+  "modelDigest": "afa7cdc92a5639bda9be724e374457cc8e6f3bfe44568380d3f194f3436ec05e",
+  "layout": {
+    "engine": "elk-layered@0.12.0+experiment-consumer-placement-v1",
+    "direction": "RIGHT",
+    "groupingPerspectiveRef": null
+  },
+  "canvas": {
+    "width": 3392.8,
+    "height": 196
+  },
+  "nodes": [
+    {
+      "ref": "index-db",
+      "box": {
+        "x": 3124.8,
+        "y": 36,
+        "width": 232,
+        "height": 124
+      }
+    },
+    {
+      "ref": "index-worker",
+      "box": {
+        "x": 2512.8,
+        "y": 36,
+        "width": 232,
+        "height": 124
+      }
+    },
+    {
+      "ref": "resize-worker",
+      "box": {
+        "x": 1267.2,
+        "y": 36,
+        "width": 232,
+        "height": 124
+      }
+    },
+    {
+      "ref": "resized-queue",
+      "box": {
+        "x": 1893.6000000000001,
+        "y": 36,
+        "width": 232,
+        "height": 124
+      }
+    },
+    {
+      "ref": "upload-api",
+      "box": {
+        "x": 36,
+        "y": 36,
+        "width": 232,
+        "height": 124
+      }
+    },
+    {
+      "ref": "upload-queue",
+      "box": {
+        "x": 655.2,
+        "y": 36,
+        "width": 232,
+        "height": 124
+      }
+    }
+  ],
+  "groups": [],
+  "edges": [
+    {
+      "ref": "consume-resized",
+      "from": "index-worker",
+      "to": "resized-queue",
+      "points": [
+        {
+          "x": 2512.8,
+          "y": 98
+        },
+        {
+          "x": 2125.6000000000004,
+          "y": 98
+        }
+      ],
+      "label": {
+        "x": 2235.6000000000004,
+        "y": 115,
+        "width": 167.20000000000002,
+        "height": 30
+      }
+    },
+    {
+      "ref": "consume-upload",
+      "from": "resize-worker",
+      "to": "upload-queue",
+      "points": [
+        {
+          "x": 1267.2,
+          "y": 98
+        },
+        {
+          "x": 887.2,
+          "y": 98
+        }
+      ],
+      "label": {
+        "x": 997.2,
+        "y": 115,
+        "width": 160,
+        "height": 30
+      }
+    },
+    {
+      "ref": "publish-resized",
+      "from": "resize-worker",
+      "to": "resized-queue",
+      "points": [
+        {
+          "x": 1499.2,
+          "y": 98
+        },
+        {
+          "x": 1893.6000000000001,
+          "y": 98
+        }
+      ],
+      "label": {
+        "x": 1609.2,
+        "y": 115,
+        "width": 174.4,
+        "height": 30
+      }
+    },
+    {
+      "ref": "publish-upload",
+      "from": "upload-api",
+      "to": "upload-queue",
+      "points": [
+        {
+          "x": 268,
+          "y": 98
+        },
+        {
+          "x": 655.2,
+          "y": 98
+        }
+      ],
+      "label": {
+        "x": 378,
+        "y": 115,
+        "width": 167.20000000000002,
+        "height": 30
+      }
+    },
+    {
+      "ref": "write-index",
+      "from": "index-worker",
+      "to": "index-db",
+      "points": [
+        {
+          "x": 2744.8,
+          "y": 98
+        },
+        {
+          "x": 3124.8,
+          "y": 98
+        }
+      ],
+      "label": {
+        "x": 2854.8,
+        "y": 115,
+        "width": 160,
+        "height": 30
+      }
+    }
+  ]
+}
