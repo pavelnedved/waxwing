@@ -24,7 +24,7 @@ test('sequence model validates scope, five occurrences, and an explicit unknown 
   const before = clone(), result = validateModel(model);
   assert.equal(result.ok, true);
   assert.equal(result.summary.steps, 5);
-  assert.equal(result.summary.unknown, 1);
+  assert.equal(result.summary.unknown, 2);
   assert.deepEqual(model, before);
 });
 

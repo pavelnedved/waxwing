@@ -2,22 +2,24 @@
   'use strict';
   const layout = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(document.getElementById('waxwing-source').textContent), (c) => c.charCodeAt(0))));
   const model = layout.model, svg = document.querySelector('.ww-svg');
+  const behavior = model.describes === 'behavior';
   const viewport = document.getElementById('map-viewport'), inspector = document.getElementById('inspector'), content = document.getElementById('inspector-content');
   const main = document.getElementById('diagram-main'), reader = document.getElementById('document-reader'), docContent = document.getElementById('document-content');
-  const records = new Map(['participants', 'steps', 'sources', 'notes', 'documents'].flatMap((kind) => model[kind].map((record) => [record.id, { kind, record }])));
+  const records = new Map(['participants', 'steps', 'sources', 'notes', 'documents', 'blocks'].flatMap((kind) => (model[kind] ?? []).map((record) => [record.id, { kind, record }])));
   const name = (id) => records.get(id)?.record.label ?? records.get(id)?.record.title ?? records.get(id)?.record.statement ?? id;
   let previousFocus;
   const el = (tag, text, className) => { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (className) node.className = className; return node; };
   function link(label, href) { const a = el('a', label, 'document-link'); a.href = href; return a; }
   function recordURL(id) {
     const kind = records.get(id)?.kind;
-    return kind === 'documents' ? `#document=${id}` : `#graph=${model.id}&${kind === 'participants' ? 'node' : kind === 'steps' ? 'edge' : 'record'}=${id}`;
+    return kind === 'documents' ? `#document=${id}` : `#graph=${model.id}&${kind === 'participants' ? 'node' : kind === 'steps' ? 'edge' : kind === 'blocks' ? 'block' : 'record'}=${id}`;
   }
   function reference(id) { return link(name(id), recordURL(id)); }
   function claim(value) {
     const box = el('div', undefined, 'claim'); box.append(el('span', value.status, `status-pill ${value.status}`));
     if (Object.hasOwn(value, 'value')) {
-      if (Array.isArray(value.value)) { const list = el('ol'); for (const id of value.value) { const item = el('li'); item.append(reference(id)); list.append(item); } box.append(list); }
+      if (Array.isArray(value.value)) { const list = el('ol'); for (const id of value.value) { const item = el('li'); item.append(reference(id)); list.append(item); } box.append(value.value.length ? list : el('p', 'Empty body: no interaction specified here.')); }
+      else if (value.value && typeof value.value === 'object') box.append(fields(value.value));
       else box.append(el('p', String(value.value)));
     }
     if (value.reason) box.append(el('p', value.reason));
@@ -30,7 +32,7 @@
     const container = el('div');
     for (const [key, value] of Object.entries(record)) {
       if (['id', 'label', 'title', 'documents', 'assets'].includes(key)) continue;
-      const field = el('div', undefined, 'detail-field'); field.append(el('span', key.replace(/([a-z])([A-Z])/g, '$1 $2'), 'detail-key'));
+      const field = el('div', undefined, 'detail-field'); field.append(el('span', ({ point: 'Entry point', participantRef: 'Participant', itemRef: 'Starting step or block' })[key] ?? key.replace(/([a-z])([A-Z])/g, '$1 $2'), 'detail-key'));
       if (value?.status) field.append(claim(value));
       else if (Array.isArray(value)) for (const item of value) {
         if (item?.id && records.has(item.id)) field.append(reference(item.id));
@@ -38,18 +40,22 @@
         else field.append(typeof item === 'object' ? fields(item) : el('div', String(item)));
       }
       else if (value && typeof value === 'object') field.append(fields(value));
-      else if (['from', 'to', 'replyTo'].includes(key)) field.append(reference(value));
+      else if (['from', 'to', 'replyTo', 'participantRef', 'itemRef'].includes(key)) field.append(reference(value));
       else field.append(el('div', String(value)));
       container.append(field);
     }
     return container;
   }
   function show(id) {
-    const record = id === '__model' ? model : id === '__order' ? { order: model.order } : records.get(id)?.record;
+    const record = id === '__model' ? model : id === '__entry' ? model.entry ?? { entry: 'Not declared in this source. Column position does not identify a workflow start.' } : id === '__order' ? { order: model.order } : records.get(id)?.record;
     if (!record) return unavailable('The requested record does not exist.');
     if (!inspector.contains(document.activeElement)) previousFocus = document.activeElement;
-    content.replaceChildren(el('h2', id === '__model' ? 'Model & scope' : id === '__order' ? 'Recorded scenario order' : name(id)), fields(record));
-    if (records.get(id)?.kind === 'steps') content.prepend(el('p', `Step ${model.order.value.indexOf(id) + 1} of ${model.order.value.length}`, 'record-id'));
+    content.replaceChildren(el('h2', id === '__model' ? 'Model & scope' : id === '__entry' ? 'Workflow entry & trigger' : id === '__order' ? behavior ? 'Root body order' : 'Recorded scenario order' : name(id)), fields(record));
+    if (id === '__entry') content.prepend(el('p', 'Entry is relative to the declared workflow scope. The upstream trigger is a separate claim.', 'record-id'));
+    const entryValues = model.entry?.point.status === 'disputed' ? model.entry.point.alternatives : model.entry?.point.value ? [model.entry.point] : [];
+    if (entryValues.some((candidate) => [candidate.value.participantRef, candidate.value.itemRef].includes(id))) content.append(link('Workflow entry & trigger', `#graph=${model.id}&record=__entry`));
+    if (records.get(id)?.kind === 'steps') content.prepend(el('p', behavior ? 'Interaction definition within its enclosing body; not an observed occurrence.' : `Step ${model.order.value.indexOf(id) + 1} of ${model.order.value.length}`, 'record-id'));
+    if (records.get(id)?.kind === 'blocks') content.prepend(el('p', record.kind === 'loop' ? 'Repeat this body for each item. No fixed iteration count is implied.' : 'Take the true or false arm. Alternative paths are not knowledge disputes.', 'record-id'));
     for (const doc of model.documents.filter((d) => d.attachments.some((a) => a.ref === (id === '__model' ? model.id : id)))) content.append(reference(doc.id));
     for (const note of model.notes.filter((n) => n.subjectRefs.includes(id))) content.append(reference(note.id));
     svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('selected', item.dataset.ref === id));
@@ -89,17 +95,17 @@
     const hash = location.hash.slice(1); close();
     if (hash === 'documents') { docScreen(); return; }
     const params = new URLSearchParams(hash), keys = [...params.keys()];
-    if (new Set(keys).size !== keys.length || keys.some((key) => !['graph', 'node', 'edge', 'record', 'document', 'heading'].includes(key))) return unavailable('Invalid sequence reference.');
+    if (new Set(keys).size !== keys.length || keys.some((key) => !['graph', 'node', 'edge', 'block', 'record', 'document', 'heading'].includes(key))) return unavailable('Invalid sequence reference.');
     if (params.has('document')) {
       if (keys.some((key) => !['document', 'heading'].includes(key))) return unavailable('Ambiguous document reference.');
       docScreen(params.get('document'), params.has('heading') ? params.get('heading') : undefined); return;
     }
-    if (params.has('heading') || (params.has('graph') && params.get('graph') !== model.id) || ['node', 'edge', 'record'].filter((key) => params.has(key)).length > 1) return unavailable('Invalid or ambiguous sequence reference.');
+    if (params.has('heading') || (params.has('graph') && params.get('graph') !== model.id) || ['node', 'edge', 'block', 'record'].filter((key) => params.has(key)).length > 1) return unavailable('Invalid or ambiguous sequence reference.');
     main.hidden = false; reader.hidden = true; document.title = `${model.title} · Waxwing`; applyZoom();
-    const key = ['node', 'edge', 'record'].find((key) => params.has(key));
+    const key = ['node', 'edge', 'block', 'record'].find((key) => params.has(key));
     if (!key) return;
     const id = params.get(key), kind = records.get(id)?.kind;
-    if ((key === 'node' && kind !== 'participants') || (key === 'edge' && kind !== 'steps') || (key === 'record' && !kind && !['__model','__order'].includes(id)) || kind === 'documents') return unavailable('The requested reference has the wrong type or does not exist.');
+    if ((key === 'node' && kind !== 'participants') || (key === 'edge' && kind !== 'steps') || (key === 'block' && kind !== 'blocks') || (key === 'record' && !kind && !['__model','__order','__entry'].includes(id)) || kind === 'documents') return unavailable('The requested reference has the wrong type or does not exist.');
     show(id);
   }
   const navigate = (url) => { if (location.hash === url || (!location.hash && url === '#')) route(); else location.hash = url; };
@@ -114,6 +120,7 @@
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !inspector.hidden) navigate(`#graph=${model.id}`); });
   document.getElementById('model-details').addEventListener('click', () => navigate(`#graph=${model.id}&record=__model`));
   document.getElementById('order-details').addEventListener('click', () => navigate(`#graph=${model.id}&record=__order`));
+  document.getElementById('entry-details').addEventListener('click', () => navigate(`#graph=${model.id}&record=__entry`));
   document.getElementById('theme').addEventListener('click', (event) => {
     const dark = document.body.classList.toggle('dark'); svg.dataset.theme = dark ? 'dark' : 'light'; event.target.textContent = dark ? 'Light theme' : 'Dark theme';
   });

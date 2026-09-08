@@ -63,12 +63,13 @@ export function fragmentTarget(href, documentId, graphId) {
   if (!fragment.includes('=')) return { kind: 'document', ref: documentId, ...(fragment ? { heading: decodeURIComponent(fragment) } : {}) };
   const params = new URLSearchParams(fragment);
   const keys = [...params.keys()];
-  if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'graph', 'node', 'edge', 'heading'].includes(key))) throw new Error(`Invalid internal link "${href}".`);
+  if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'graph', 'node', 'edge', 'block', 'heading'].includes(key))) throw new Error(`Invalid internal link "${href}".`);
   if (params.has('document')) {
-    if (['graph', 'node', 'edge'].some((key) => params.has(key))) throw new Error(`Ambiguous internal link "${href}".`);
+    if (['graph', 'node', 'edge', 'block'].some((key) => params.has(key))) throw new Error(`Ambiguous internal link "${href}".`);
     return { kind: 'document', ref: params.get('document'), ...(params.has('heading') ? { heading: params.get('heading') } : {}) };
   }
-  if (params.has('heading') || (params.has('node') && params.has('edge')) || (typeof graphId === 'string' && params.has('graph') && params.get('graph') !== graphId)) throw new Error(`Invalid graph link "${href}".`);
+  if (params.has('heading') || ['node', 'edge', 'block'].filter((key) => params.has(key)).length > 1 || (typeof graphId === 'string' && params.has('graph') && params.get('graph') !== graphId)) throw new Error(`Invalid graph link "${href}".`);
+  if (params.has('block')) return { kind: 'block', ref: params.get('block'), ...(typeof graphId !== 'string' && params.has('graph') ? { graphRef: params.get('graph') } : {}) };
   if (params.has('node')) return { kind: 'node', ref: params.get('node'), ...(typeof graphId !== 'string' && params.has('graph') ? { graphRef: params.get('graph') } : {}) };
   if (params.has('edge')) return { kind: 'edge', ref: params.get('edge'), ...(typeof graphId !== 'string' && params.has('graph') ? { graphRef: params.get('graph') } : {}) };
   if (params.has('graph')) return { kind: 'graph', ref: params.get('graph') };
@@ -92,6 +93,7 @@ export function documentDiagnostics(model) {
     const valid = value.kind === 'graph' ? graphsOf(model).some((graph) => graph.id === value.ref) :
       value.kind === 'node' ? model.entities.some((item) => item.id === value.ref) :
       value.kind === 'edge' ? model.relationships.some((item) => item.id === value.ref) :
+      value.kind === 'block' ? model.diagramType === 'sequence' && model.schemaVersion === '0.2-sequence-draft' && model.blocks.some((item) => item.id === value.ref) :
       value.kind === 'document' && !attachment && docs.has(value.ref);
     if (value.graphRef !== undefined) {
       const graph = graphsOf(model).find((item) => item.id === value.graphRef);

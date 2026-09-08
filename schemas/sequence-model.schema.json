@@ -110,6 +110,9 @@
     },
     "documents": {
       "$ref": "system-model.schema.json#/properties/documents"
+    },
+    "entry": {
+      "$ref": "sequence-entry.schema.json"
     }
   }
 }

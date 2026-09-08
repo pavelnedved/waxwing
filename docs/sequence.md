@@ -6,6 +6,11 @@ It is a separate JSON 1 contract, not a new skin or an automatic conversion from
 architecture dependencies. Use `npm run demo:sequence` to try the
 [fictional timeout-and-retry example](../examples/sequence/README.md).
 
+For loops and if/else describing current behavior across alternative paths, use
+the separate [behavior contract](sequence-behavior.md) and
+`npm run demo:sequence:markets`. This page documents the original scenario
+version, which remains supported without reinterpretation.
+
 ## JSON 1: scenario meaning
 
 The schema is [sequence-model.schema.json](../schemas/sequence-model.schema.json).
@@ -21,6 +26,7 @@ document definitions, without requiring architecture entities or dependencies.
 | `participants` | Each has `id`, `label`, and a qualified `meaning` describing what it represents. |
 | `steps` | Individually identified messages, replies, and local events. Repeated interactions remain separate records. |
 | `order` | A qualified claim whose value lists every step ID exactly once, in semantic order. |
+| `entry` | Optional qualified workflow entry and separate upstream trigger; see the [entry contract](sequence-entry.md). |
 | `notes` | Qualified answers to behavior/rationale/interpretation questions, attached through participant or step IDs. |
 | `documents` | The same registered Markdown and complete-source mechanism used by architecture diagrams. |
 
@@ -35,7 +41,8 @@ notes/documents for additional unresolved details. `kind` is one of:
   must be reversed, and that message must occur earlier in every asserted order.
   Replies are explicit; the tool never generates them automatically.
 - **`event`**: a local event such as a timeout, with `from` and `to` naming the
-  same participant. Its loop is not a call to another service.
+  same participant. Its bent arrow is not a call to another service or a
+  repetition block.
 
 A self-directed message is also drawable. `replyTo` is not allowed on other
 kinds. IDs are unique across the model, including its diagram ID.
@@ -85,9 +92,11 @@ and report the limitation. Do not promote uncertainty merely to produce SVG.
 routes/label boxes. Geometry records refer to source IDs and do not reauthor
 labels, operation kinds, qualifications, or ordering.
 
-The generator sorts participants by ID for reproducible horizontal placement,
-then lays out rows in `order.value` order with space for wrapped labels. Left/right
-position does not imply responsibility or precedence. Downward position does
+When an [entry](sequence-entry.md) is asserted, the generator places its participant
+leftmost and labels the starting interaction with its qualification. Otherwise
+it does not select a start. Remaining participants use alphabetical ID order.
+Rows follow `order.value` with space for wrapped labels. Column order does not
+imply responsibility or a left-to-right call sequence. Downward position does
 express the asserted order. Spacing does not measure time. There are no activation
 bars or implied blocking intervals.
 
@@ -144,9 +153,10 @@ all documents and supported images; no assumed source folder structure is needed
 
 ## Deliberate first-version limits
 
-One model contains one scenario. There are no branches, loop fragments,
+In `0.1-sequence-draft`, one model contains one scenario. There are no branches, loop fragments,
 concurrency blocks, activation bars, measured durations, message transport modes,
 subsequence expansion, or automatic architecture-to-sequence conversion.
 Cross-model component identity and packaged navigation between architecture and
 sequence artifacts are also deferred; explicit ordinary external links still work.
-We will extend this contract using concrete feedback from real projects.
+The [behavior version](sequence-behavior.md) adds collection loops and binary
+conditionals; the other limits above remain.

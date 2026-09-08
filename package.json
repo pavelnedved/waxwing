@@ -14,7 +14,8 @@
     "demo:basic": "node bin/waxwing.mjs build examples/order-processing/model.json examples/order-processing/generated --group system-structure",
     "demo:documents": "node bin/waxwing.mjs build examples/documented-orders/model.json examples/documented-orders/generated --group system-structure",
     "demo:subgraphs": "node bin/waxwing.mjs build examples/subgraphs/model.json examples/subgraphs/generated",
-    "demo:sequence": "node bin/waxwing.mjs build examples/sequence/model.json examples/sequence/generated"
+    "demo:sequence": "node bin/waxwing.mjs build examples/sequence/model.json examples/sequence/generated",
+    "demo:sequence:markets": "node bin/waxwing.mjs build examples/sequence-markets/model.json examples/sequence-markets/generated"
   },
   "dependencies": {
     "ajv": "8.17.1",

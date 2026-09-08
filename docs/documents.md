@@ -6,6 +6,13 @@ document-free JSON 1 `0.2-draft` and JSON 2 `0.1-draft` remain supported.
 Examples below use the single-graph contract; the subgraph guide defines the
 additional `graphRef` context for multi-graph node/edge targets.
 
+[Sequence scenarios](sequence.md#documents-and-references) reuse these rules:
+`node` means participant, `edge` means step, and `graph` means the sequence model.
+[Sequence behavior](sequence-behavior.md#documents-and-references) additionally
+supports block attachments and links such as `#block=market-loop`. Block targets
+are specific to that version; architecture and original sequence contracts do
+not accept them.
+
 ## What you configure
 
 A document has a stable `id`, a `title`, Markdown content, and explicit

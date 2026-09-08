@@ -213,13 +213,20 @@
             "ref": "retry"
           }
         ],
-        "markdown": "# Reading the timeout and retry\n\nThis [sequence](#graph=checkout-retry) describes one fictional scenario. Read it\nfrom top to bottom; the distances between steps do not encode elapsed time.\n\n## What happens\n\n[Checkout](#node=checkout) sends an order request, then Orders requests payment.\nThe [timeout](#edge=timeout) happens locally at Checkout while the payment result\nhas not yet arrived at Orders. The [successful payment reply](#edge=paid) goes\nto Orders. Checkout then [retries the order request](#edge=retry).\n\nThe original request and retry are separate occurrences. Sharing endpoints does\nnot make them one dependency edge. The reply explicitly names the payment\nmessage it answers; it does not imply a response to Checkout.\n\n## What this does not establish\n\nThe model does not say that the retry causes a duplicate charge. Deduplication\nand the eventual response are unknown and recorded as such in the note attached\nto the retry and Orders. There is no second payment request in the drawing.\n\nThis document attaches to the scenario, Checkout, and the retry step. Its links\nwork in the exported HTML without the source Markdown file.\n",
+        "markdown": "# Reading the timeout and retry\n\nThis [sequence](#graph=checkout-retry) describes one fictional scenario. Read it\nfrom top to bottom; the distances between steps do not encode elapsed time.\n\nThe declared entry is [Checkout's first request](#edge=submit), so Checkout is\nplaced on the left. The upstream trigger is explicitly unknown. Inspect the\nentry participant or step, then **Workflow entry & trigger**, for its evidence.\nThe remaining columns do not imply a left-to-right execution order.\n\n## What happens\n\n[Checkout](#node=checkout) sends an order request, then Orders requests payment.\nThe [timeout](#edge=timeout) happens locally at Checkout while the payment result\nhas not yet arrived at Orders. The [successful payment reply](#edge=paid) goes\nto Orders. Checkout then [retries the order request](#edge=retry).\n\nThe original request and retry are separate occurrences. Sharing endpoints does\nnot make them one dependency edge. The reply explicitly names the payment\nmessage it answers; it does not imply a response to Checkout.\n\n## What this does not establish\n\nThe model does not say that the retry causes a duplicate charge. Deduplication\nand the eventual response are unknown and recorded as such in the note attached\nto the retry and Orders. There is no second payment request in the drawing.\n\nThis document attaches to the scenario, Checkout, and the retry step. Its links\nwork in the exported HTML without the source Markdown file.\n",
         "links": [
           {
             "href": "#graph=checkout-retry",
             "target": {
               "kind": "graph",
               "ref": "checkout-retry"
+            }
+          },
+          {
+            "href": "#edge=submit",
+            "target": {
+              "kind": "edge",
+              "ref": "submit"
             }
           },
           {
@@ -253,58 +260,80 @@
         ],
         "assets": []
       }
-    ]
+    ],
+    "entry": {
+      "point": {
+        "status": "established",
+        "value": {
+          "participantRef": "checkout",
+          "itemRef": "submit"
+        },
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "The fictional evidence explicitly defines this item as the entry to the scoped workflow."
+        }
+      },
+      "trigger": {
+        "status": "unknown",
+        "reason": "The fixture does not establish what launches this scoped workflow. No user action, scheduler, or upstream caller is inferred.",
+        "sourceRefs": [
+          "fixture"
+        ]
+      }
+    }
   },
-  "modelDigest": "84de8df79c66a9f3665768242f7cdbdb9e8d457b30b314872dd6ba02b5a08554",
+  "modelDigest": "eee005150e30beb9b360228de37c39e703ae4e1fe3c2cbdb090c3a68bb9b075c",
   "layout": {
     "engine": "waxwing-sequence",
     "version": "1"
   },
   "canvas": {
     "width": 1032,
-    "height": 666
+    "height": 708
   },
   "participants": [
     {
       "ref": "checkout",
       "box": {
         "x": 60,
-        "y": 72,
+        "y": 96,
         "width": 232,
         "height": 84
       },
       "lifeline": {
         "x": 176,
-        "startY": 156,
-        "endY": 626
+        "startY": 180,
+        "endY": 668
       }
     },
     {
       "ref": "orders",
       "box": {
         "x": 400,
-        "y": 72,
+        "y": 96,
         "width": 232,
         "height": 84
       },
       "lifeline": {
         "x": 516,
-        "startY": 156,
-        "endY": 626
+        "startY": 180,
+        "endY": 668
       }
     },
     {
       "ref": "payments",
       "box": {
         "x": 740,
-        "y": 72,
+        "y": 96,
         "width": 232,
         "height": 84
       },
       "lifeline": {
         "x": 856,
-        "startY": 156,
-        "endY": 626
+        "startY": 180,
+        "endY": 668
       }
     }
   ],
@@ -316,18 +345,18 @@
       "points": [
         {
           "x": 176,
-          "y": 234
+          "y": 276
         },
         {
           "x": 516,
-          "y": 234
+          "y": 276
         }
       ],
       "label": {
-        "x": 246,
-        "y": 196,
-        "width": 200,
-        "height": 30
+        "x": 235.2,
+        "y": 220,
+        "width": 221.6,
+        "height": 48
       }
     },
     {
@@ -337,16 +366,16 @@
       "points": [
         {
           "x": 516,
-          "y": 308
+          "y": 350
         },
         {
           "x": 856,
-          "y": 308
+          "y": 350
         }
       ],
       "label": {
         "x": 575.2,
-        "y": 270,
+        "y": 312,
         "width": 221.6,
         "height": 30
       }
@@ -358,24 +387,24 @@
       "points": [
         {
           "x": 176,
-          "y": 400
+          "y": 442
         },
         {
           "x": 476.8,
-          "y": 400
+          "y": 442
         },
         {
           "x": 476.8,
-          "y": 424
+          "y": 466
         },
         {
           "x": 176,
-          "y": 424
+          "y": 466
         }
       ],
       "label": {
         "x": 194,
-        "y": 344,
+        "y": 386,
         "width": 264.8,
         "height": 48
       }
@@ -387,16 +416,16 @@
       "points": [
         {
           "x": 856,
-          "y": 498
+          "y": 540
         },
         {
           "x": 516,
-          "y": 498
+          "y": 540
         }
       ],
       "label": {
         "x": 578.8,
-        "y": 460,
+        "y": 502,
         "width": 214.4,
         "height": 30
       }
@@ -408,16 +437,16 @@
       "points": [
         {
           "x": 176,
-          "y": 590
+          "y": 632
         },
         {
           "x": 516,
-          "y": 590
+          "y": 632
         }
       ],
       "label": {
         "x": 217.2,
-        "y": 534,
+        "y": 576,
         "width": 257.6,
         "height": 48
       }

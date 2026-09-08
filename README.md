@@ -105,6 +105,27 @@ is retained as valid source; the basic renderer reports a limitation instead of
 choosing an order. See the [sequence contract](docs/sequence.md) and
 [ingestion prompt](prompts/ingestion/sequence.md).
 
+To describe loops and alternative paths in current behavior:
+
+```sh
+npm run demo:sequence:markets
+```
+
+Open [the market collector demo](examples/sequence-markets/generated/diagram.html).
+For each market, it chooses a live or closing quote, then saves the selected
+quote. A nested **IF / ELSE** frame shows the alternatives inside a **LOOP**
+frame; completion appears after the loop. Select a block header for evidence,
+explicit unknowns, and attached Markdown. See the
+[behavior contract](docs/sequence-behavior.md) for the source format and limits.
+Both existing demos remain: `npm run demo` builds the architecture with subgraphs
+and documents, and `npm run demo:sequence` builds the single retry scenario.
+
+Both sequence demos declare **where their scoped workflow starts**, with an
+explicitly unknown upstream trigger. The entry participant is placed leftmost
+and the starting step is marked. Select **Workflow entry** to inspect the evidence.
+Other columns do not imply execution order. The [entry rules](docs/sequence-entry.md)
+cover unknown/disputed entries and compatibility with models that omit this field.
+
 ## Explicit entry and exit points
 
 To construct JSON 1 from code, existing documents, and human clarification,
@@ -143,7 +164,7 @@ Your own producer
 | `waxwing/layout` | Generate and validate JSON 2; ELK supplies automatic geometry. |
 | `waxwing/render` | Render a valid JSON 2 without running the layout engine. |
 | `waxwing/artifacts` | Extract embedded JSON 2 and recover JSON 1. |
-| `waxwing/sequence` | Independently validate, lay out, and render a basic sequence scenario. |
+| `waxwing/sequence` | Independently validate, lay out, and render a sequence scenario or structured behavior. |
 
 These are subpath exports of one local npm package. They can be imported
 independently; separately published packages are not part of the MVP. See

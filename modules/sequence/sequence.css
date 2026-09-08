@@ -4,3 +4,11 @@
 .sequence-svg .uncertain .edge-line { stroke:var(--warning); }
 .sequence-svg .uncertain .edge-label { fill:var(--warning); }
 .sequence-svg .record.selected .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.sequence-svg .control-frame { fill:none; stroke:var(--line); stroke-width:1.5; }
+.sequence-svg .control-divider { stroke:var(--line); stroke-width:1; stroke-dasharray:5 4; }
+.sequence-svg .control-band { fill:var(--canvas); }
+.sequence-svg .control-title, .sequence-svg .control-label { font-size:12px; }
+.sequence-svg .control-title { font-weight:600; }
+.sequence-svg .control-label { fill:var(--muted); }
+.sequence-svg .control-block { cursor:pointer; }
+.sequence-svg .control-block:hover .control-frame, .sequence-svg .control-block:focus-within .control-frame, .sequence-svg .control-block.selected .control-frame { stroke:var(--accent); stroke-width:3; }

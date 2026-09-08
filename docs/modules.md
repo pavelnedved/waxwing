@@ -101,6 +101,16 @@ The source contract and geometry differ from architecture diagrams; see the
 [sequence API and rules](sequence.md). Documents and complete source recovery
 retain their existing behavior.
 
+The same API accepts the [behavior version](sequence-behavior.md), with nested
+loop/if blocks and direct-child body orders. Its JSON 2 adds block headers and
+body regions; validation preserves source containment as well as order.
+Behavior documents can also attach to a block. Version 1 scenarios keep their
+original meaning and schema; neither version is converted automatically.
+
+Both drafts accept the additive [entry declaration](sequence-entry.md). Its
+participant placement and visible start cue derive from source claims; existing
+artifacts without entry metadata remain supported without invented defaults.
+
 ## CLI boundary
 
 `bin/waxwing.mjs` dynamically loads the module required for each command. Run
@@ -126,6 +136,7 @@ modules/
   documents/   Explicit file loading, Markdown resolution and rendering
   layout/      ELK adapter and JSON 2 validation
   render/      SVG/HTML generation, viewer assets, source recovery
+  sequence/    Scenario/behavior validation, deterministic layout, SVG/HTML viewer
   shared/      canonical serialization, semantic helpers, text metrics
 schemas/       JSON 1 and JSON 2 contracts
 bin/           CLI orchestration and filesystem output

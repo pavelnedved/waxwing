@@ -3,6 +3,11 @@
 This [sequence](#graph=checkout-retry) describes one fictional scenario. Read it
 from top to bottom; the distances between steps do not encode elapsed time.
 
+The declared entry is [Checkout's first request](#edge=submit), so Checkout is
+placed on the left. The upstream trigger is explicitly unknown. Inspect the
+entry participant or step, then **Workflow entry & trigger**, for its evidence.
+The remaining columns do not imply a left-to-right execution order.
+
 ## What happens
 
 [Checkout](#node=checkout) sends an order request, then Orders requests payment.

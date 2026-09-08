@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Waxwing scoped sequence entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "point",
+    "trigger"
+  ],
+  "properties": {
+    "point": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "value",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "established",
+                "reported",
+                "inferred"
+              ]
+            },
+            "value": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "participantRef",
+                "itemRef"
+              ],
+              "properties": {
+                "participantRef": {
+                  "$ref": "system-model.schema.json#/$defs/id"
+                },
+                "itemRef": {
+                  "$ref": "system-model.schema.json#/$defs/id"
+                }
+              }
+            },
+            "basis": {
+              "$ref": "system-model.schema.json#/$defs/basis"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "$ref": "system-model.schema.json#/$defs/text"
+            },
+            "sourceRefs": {
+              "$ref": "system-model.schema.json#/$defs/refs"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason",
+            "alternatives"
+          ],
+          "properties": {
+            "status": {
+              "const": "disputed"
+            },
+            "reason": {
+              "$ref": "system-model.schema.json#/$defs/text"
+            },
+            "alternatives": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "value",
+                  "basis"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "established",
+                      "reported",
+                      "inferred"
+                    ]
+                  },
+                  "value": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "participantRef",
+                      "itemRef"
+                    ],
+                    "properties": {
+                      "participantRef": {
+                        "$ref": "system-model.schema.json#/$defs/id"
+                      },
+                      "itemRef": {
+                        "$ref": "system-model.schema.json#/$defs/id"
+                      }
+                    }
+                  },
+                  "basis": {
+                    "$ref": "system-model.schema.json#/$defs/basis"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "trigger": {
+      "$ref": "system-model.schema.json#/$defs/textKnowledge"
+    }
+  }
+}

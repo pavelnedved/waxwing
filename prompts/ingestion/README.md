@@ -12,7 +12,7 @@ Choose the diagram by the question it should answer:
 | Question | Workflow |
 |---|---|
 | What components exist, where are their boundaries, and what depends on what? | [Architecture](workflow.md) |
-| What interactions occur, and in what order, within one specific scenario? | [Basic sequence](sequence.md) |
+| What interactions occur in one scenario, or repeat/branch in scoped current behavior? | [Sequence](sequence.md) |
 
 These are different concerns with separate JSON 1 contracts. Select one useful
 scope; do not automatically generate multiple diagram types from the same facts.

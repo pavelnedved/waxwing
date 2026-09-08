@@ -182,3 +182,65 @@ The regenerated sequence example includes JSON 2, SVG, and self-contained HTML.
 Browser-triggered downloads and direct `file://` opening remain unverified under
 the earlier environment limitations. Automated CLI export and source recovery
 are verified; no bypass of those browser limitations was attempted.
+
+## Sequence loops and if/else
+
+The full suite passes 140 tests, including 20 behavior tests. The separate
+`0.2-sequence-draft` contract preserves the original scenario version. New
+coverage includes nested collection loops/conditionals, explicit empty arms,
+storage-order independence, qualified predicates and visitation order, unresolved
+body-order blockers, unsupported execution modes, containment cycles, multiple
+parents, orphan definitions, and reply validation across branches and loop
+contexts. Geometry checks reject moved interactions, swapped regions, missing
+frames, and false containment. Complete source and Markdown recover from SVG/HTML
+in every skin, including after CLI input files are removed. Failed layout leaves
+the previous HTML intact.
+
+Browser checks on the fictional market collector verified:
+
+- The conditional and its two arms sit inside the collection loop. The save
+  follows the selected arm inside the loop; completion sits outside the loop.
+- Selecting loop and conditional headers opens the corresponding definitions,
+  evidence, body references, and attached Markdown. The loop inspector retains
+  unknown visitation order separately from established sequential execution.
+- Markdown links navigate to a block and an interaction. Reload preserves the
+  block URL; Back restores the document and Forward restores the block inspector.
+- Standard/light and Engineering/dark were visually inspected, as were the
+  document reader, 100% zoom, and Fit width. At the narrow preview width, Fit is
+  an overview; 100% requires scrolling to read the full diagram.
+- No browser console errors were captured.
+
+Browser checking found that a whole-frame accessible button could select an
+interior arrow at its center. The accessible target now covers the frame header;
+selection was rechecked successfully, and generated-markup coverage guards it.
+
+Both sequence demos were regenerated. The default architecture demo remains
+unchanged. Browser-triggered downloads and direct `file://` opening retain the
+earlier unverified status; no bypass was attempted. These checks do not establish
+program correctness, predicate equivalence, concurrency behavior, or arbitrary
+diagram readability.
+
+## Explicit sequence entry
+
+The full suite passes 152 tests, including 12 entry tests. Coverage checks both
+sequence contracts; separate trigger qualification; ID renaming and storage-order
+independence; omitted, unknown, disputed, reported, and inferred entries; entries
+at a root step, loop, or conditional; actor/reference/evidence consistency;
+rejection of later or nested starts; unresolved ordering remaining unresolved;
+leftmost placement and label/header space in JSON 2; source/digest preservation;
+all skins; and complete recovery. Trigger-only changes preserve geometry while
+remaining covered by the source digest. Existing sequence CLI recovery tests
+now also exercise entry claims after input files are removed.
+
+The regenerated market demo was checked in the browser. The declared entry
+participant and starting interaction display their qualification. The entry
+inspector shows evidence, links to the participant and interaction, and a
+separately unknown upstream trigger. Entry-to-step links and the return link
+work; reload retains the entry URL, Back returns to the step, and Forward
+restores entry inspection. The cue was visually inspected at 100% in Standard
+light and Engineering dark, and Fit width still works. No browser console errors
+were captured. Both sequence demos were regenerated with explicit scoped entry.
+
+Documentation links and viewer script syntax were checked. The earlier
+limitations on browser-triggered downloads and direct `file://` verification
+remain; they were not bypassed.

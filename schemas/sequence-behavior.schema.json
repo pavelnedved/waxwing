@@ -1,0 +1,538 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Waxwing sequence behavior JSON 1 \u2014 draft 0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "diagramType",
+    "id",
+    "title",
+    "scope",
+    "sources",
+    "participants",
+    "steps",
+    "order",
+    "notes",
+    "documents",
+    "describes",
+    "blocks"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "0.2-sequence-draft"
+    },
+    "diagramType": {
+      "const": "sequence"
+    },
+    "id": {
+      "$ref": "system-model.schema.json#/$defs/id"
+    },
+    "title": {
+      "$ref": "system-model.schema.json#/$defs/text"
+    },
+    "scope": {
+      "$ref": "system-model.schema.json#/$defs/scope"
+    },
+    "sources": {
+      "$ref": "system-model.schema.json#/properties/sources"
+    },
+    "participants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "meaning"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "label": {
+            "$ref": "system-model.schema.json#/$defs/text"
+          },
+          "meaning": {
+            "$ref": "system-model.schema.json#/$defs/textKnowledge"
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "label",
+          "kind",
+          "from",
+          "to",
+          "assertion"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "label": {
+            "$ref": "system-model.schema.json#/$defs/text"
+          },
+          "kind": {
+            "enum": [
+              "message",
+              "reply",
+              "event"
+            ]
+          },
+          "from": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "to": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "replyTo": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "assertion": {
+            "$ref": "system-model.schema.json#/$defs/booleanKnowledge"
+          }
+        }
+      }
+    },
+    "order": {
+      "$ref": "#/$defs/order"
+    },
+    "notes": {
+      "$ref": "system-model.schema.json#/properties/notes"
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "title",
+          "format",
+          "markdown",
+          "attachments",
+          "links",
+          "assets"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "title": {
+            "$ref": "system-model.schema.json#/$defs/text"
+          },
+          "format": {
+            "const": "markdown"
+          },
+          "markdown": {
+            "type": "string"
+          },
+          "attachments": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "ref"
+              ],
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "graph",
+                    "node",
+                    "edge",
+                    "block"
+                  ]
+                },
+                "ref": {
+                  "$ref": "system-model.schema.json#/$defs/id"
+                },
+                "graphRef": {
+                  "$ref": "system-model.schema.json#/$defs/id"
+                }
+              }
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "href",
+                "target"
+              ],
+              "properties": {
+                "href": {
+                  "type": "string"
+                },
+                "target": {
+                  "$ref": "#/$defs/documentTarget"
+                }
+              }
+            }
+          },
+          "assets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "href",
+                "mimeType",
+                "data"
+              ],
+              "properties": {
+                "href": {
+                  "$ref": "system-model.schema.json#/$defs/text"
+                },
+                "mimeType": {
+                  "enum": [
+                    "image/png",
+                    "image/jpeg",
+                    "image/gif",
+                    "image/webp"
+                  ]
+                },
+                "data": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "describes": {
+      "const": "behavior"
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "assertion",
+              "kind",
+              "collection",
+              "item",
+              "execution",
+              "iterationOrder",
+              "body"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "system-model.schema.json#/$defs/id"
+              },
+              "label": {
+                "$ref": "system-model.schema.json#/$defs/text"
+              },
+              "assertion": {
+                "$ref": "system-model.schema.json#/$defs/booleanKnowledge"
+              },
+              "kind": {
+                "const": "loop"
+              },
+              "collection": {
+                "$ref": "system-model.schema.json#/$defs/textKnowledge"
+              },
+              "item": {
+                "$ref": "system-model.schema.json#/$defs/text"
+              },
+              "execution": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "value",
+                      "basis"
+                    ],
+                    "properties": {
+                      "status": {
+                        "enum": [
+                          "established",
+                          "reported",
+                          "inferred"
+                        ]
+                      },
+                      "value": {
+                        "enum": [
+                          "sequential",
+                          "concurrent"
+                        ]
+                      },
+                      "basis": {
+                        "$ref": "system-model.schema.json#/$defs/basis"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "reason"
+                    ],
+                    "properties": {
+                      "status": {
+                        "const": "unknown"
+                      },
+                      "reason": {
+                        "$ref": "system-model.schema.json#/$defs/text"
+                      },
+                      "sourceRefs": {
+                        "$ref": "system-model.schema.json#/$defs/refs"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "status",
+                      "reason",
+                      "alternatives"
+                    ],
+                    "properties": {
+                      "status": {
+                        "const": "disputed"
+                      },
+                      "reason": {
+                        "$ref": "system-model.schema.json#/$defs/text"
+                      },
+                      "alternatives": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": [
+                            "status",
+                            "value",
+                            "basis"
+                          ],
+                          "properties": {
+                            "status": {
+                              "enum": [
+                                "established",
+                                "reported",
+                                "inferred"
+                              ]
+                            },
+                            "value": {
+                              "enum": [
+                                "sequential",
+                                "concurrent"
+                              ]
+                            },
+                            "basis": {
+                              "$ref": "system-model.schema.json#/$defs/basis"
+                            }
+                          }
+                        },
+                        "minItems": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              "iterationOrder": {
+                "$ref": "system-model.schema.json#/$defs/textKnowledge"
+              },
+              "body": {
+                "$ref": "#/$defs/order"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "label",
+              "assertion",
+              "kind",
+              "condition",
+              "then",
+              "else"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "system-model.schema.json#/$defs/id"
+              },
+              "label": {
+                "$ref": "system-model.schema.json#/$defs/text"
+              },
+              "assertion": {
+                "$ref": "system-model.schema.json#/$defs/booleanKnowledge"
+              },
+              "kind": {
+                "const": "if"
+              },
+              "condition": {
+                "$ref": "system-model.schema.json#/$defs/textKnowledge"
+              },
+              "then": {
+                "$ref": "#/$defs/order"
+              },
+              "else": {
+                "$ref": "#/$defs/order"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "entry": {
+      "$ref": "sequence-entry.schema.json"
+    }
+  },
+  "$defs": {
+    "order": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "value",
+            "basis"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "established",
+                "reported",
+                "inferred"
+              ]
+            },
+            "value": {
+              "type": "array",
+              "items": {
+                "$ref": "system-model.schema.json#/$defs/id"
+              },
+              "uniqueItems": true
+            },
+            "basis": {
+              "$ref": "system-model.schema.json#/$defs/basis"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "$ref": "system-model.schema.json#/$defs/text"
+            },
+            "sourceRefs": {
+              "$ref": "system-model.schema.json#/$defs/refs"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "reason",
+            "alternatives"
+          ],
+          "properties": {
+            "status": {
+              "const": "disputed"
+            },
+            "reason": {
+              "$ref": "system-model.schema.json#/$defs/text"
+            },
+            "alternatives": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "status",
+                  "value",
+                  "basis"
+                ],
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "established",
+                      "reported",
+                      "inferred"
+                    ]
+                  },
+                  "value": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "system-model.schema.json#/$defs/id"
+                    },
+                    "uniqueItems": true
+                  },
+                  "basis": {
+                    "$ref": "system-model.schema.json#/$defs/basis"
+                  }
+                }
+              },
+              "minItems": 2
+            }
+          }
+        }
+      ]
+    },
+    "documentTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "ref"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "document",
+            "graph",
+            "node",
+            "edge",
+            "block"
+          ]
+        },
+        "ref": {
+          "$ref": "system-model.schema.json#/$defs/id"
+        },
+        "heading": {
+          "$ref": "system-model.schema.json#/$defs/text"
+        },
+        "graphRef": {
+          "$ref": "system-model.schema.json#/$defs/id"
+        }
+      }
+    }
+  }
+}

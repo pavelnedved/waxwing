@@ -1,0 +1,761 @@
+{
+  "schemaVersion": "0.2-sequence-layout-draft",
+  "diagramType": "sequence",
+  "model": {
+    "schemaVersion": "0.2-sequence-draft",
+    "diagramType": "sequence",
+    "describes": "behavior",
+    "id": "market-collection",
+    "title": "Collect a quote for each market",
+    "scope": {
+      "timeframe": "current",
+      "environment": "Fictional market-data collector",
+      "snapshot": "Fixture v1",
+      "coverage": "partial",
+      "question": "How does each market choose live or historical data before saving its quote?",
+      "includes": [
+        "Sequential iteration over configured markets.",
+        "A binary market-open condition, two alternative request/reply pairs, and saving the selected quote."
+      ],
+      "excludes": [
+        "Concurrency, failure handling, retries, elapsed time, and the actual set or number of markets."
+      ],
+      "abstraction": "Current interaction behavior with a conditional inside a collection loop, not a recorded execution."
+    },
+    "sources": [
+      {
+        "id": "fixture",
+        "kind": "fixture",
+        "locator": "evidence.md",
+        "description": "Fictional market-data collection rules."
+      }
+    ],
+    "participants": [
+      {
+        "id": "collector",
+        "label": "Market Collector",
+        "meaning": {
+          "status": "established",
+          "value": "Coordinates one market at a time.",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      },
+      {
+        "id": "historical",
+        "label": "Historical Data",
+        "meaning": {
+          "status": "established",
+          "value": "Supplies the closing quote for a closed market.",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      },
+      {
+        "id": "live",
+        "label": "Live Data",
+        "meaning": {
+          "status": "established",
+          "value": "Supplies a live quote for an open market.",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      },
+      {
+        "id": "storage",
+        "label": "Quote Storage",
+        "meaning": {
+          "status": "established",
+          "value": "Receives the selected quote for this market.",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      }
+    ],
+    "steps": [
+      {
+        "id": "load-markets",
+        "label": "Load configured markets",
+        "kind": "event",
+        "from": "collector",
+        "to": "collector",
+        "assertion": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      },
+      {
+        "id": "request-live",
+        "label": "Request live quote for market",
+        "kind": "message",
+        "from": "collector",
+        "to": "live",
+        "assertion": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      },
+      {
+        "id": "reply-live",
+        "label": "Live quote",
+        "kind": "reply",
+        "from": "live",
+        "to": "collector",
+        "assertion": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        },
+        "replyTo": "request-live"
+      },
+      {
+        "id": "request-close",
+        "label": "Request closing quote for market",
+        "kind": "message",
+        "from": "collector",
+        "to": "historical",
+        "assertion": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      },
+      {
+        "id": "reply-close",
+        "label": "Closing quote",
+        "kind": "reply",
+        "from": "historical",
+        "to": "collector",
+        "assertion": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        },
+        "replyTo": "request-close"
+      },
+      {
+        "id": "save-quote",
+        "label": "Save selected quote for market",
+        "kind": "message",
+        "from": "collector",
+        "to": "storage",
+        "assertion": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      },
+      {
+        "id": "complete",
+        "label": "Collection pass complete",
+        "kind": "event",
+        "from": "collector",
+        "to": "collector",
+        "assertion": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      }
+    ],
+    "blocks": [
+      {
+        "id": "market-loop",
+        "label": "Configured markets",
+        "kind": "loop",
+        "assertion": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        },
+        "collection": {
+          "status": "established",
+          "value": "configured markets",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        },
+        "item": "market",
+        "execution": {
+          "status": "established",
+          "value": "sequential",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        },
+        "iterationOrder": {
+          "status": "unknown",
+          "reason": "The fixture establishes one-at-a-time processing, but not which market is visited first.",
+          "sourceRefs": [
+            "fixture"
+          ]
+        },
+        "body": {
+          "status": "established",
+          "value": [
+            "quote-route",
+            "save-quote"
+          ],
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      },
+      {
+        "id": "quote-route",
+        "label": "Select the quote source",
+        "kind": "if",
+        "assertion": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        },
+        "condition": {
+          "status": "established",
+          "value": "market.isOpen is true",
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        },
+        "then": {
+          "status": "established",
+          "value": [
+            "request-live",
+            "reply-live"
+          ],
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        },
+        "else": {
+          "status": "established",
+          "value": [
+            "request-close",
+            "reply-close"
+          ],
+          "basis": {
+            "sourceRefs": [
+              "fixture"
+            ],
+            "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+          }
+        }
+      }
+    ],
+    "order": {
+      "status": "established",
+      "value": [
+        "load-markets",
+        "market-loop",
+        "complete"
+      ],
+      "basis": {
+        "sourceRefs": [
+          "fixture"
+        ],
+        "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+      }
+    },
+    "notes": [
+      {
+        "id": "iteration-count",
+        "subjectRefs": [
+          "market-loop"
+        ],
+        "topic": "behavior",
+        "statement": "How many times does the body run?",
+        "answer": {
+          "status": "unknown",
+          "reason": "The configured collection varies. The body runs once per item and zero times for an empty collection; no concrete count is supplied.",
+          "sourceRefs": [
+            "fixture"
+          ]
+        }
+      }
+    ],
+    "documents": [
+      {
+        "id": "reading-markets",
+        "title": "Reading the loop and conditional",
+        "format": "markdown",
+        "attachments": [
+          {
+            "kind": "graph",
+            "ref": "market-collection"
+          },
+          {
+            "kind": "block",
+            "ref": "market-loop"
+          },
+          {
+            "kind": "block",
+            "ref": "quote-route"
+          },
+          {
+            "kind": "edge",
+            "ref": "save-quote"
+          }
+        ],
+        "markdown": "# Reading the loop and conditional\n\nThis [behavior diagram](#graph=market-collection) shows a family of possible\nexecutions. It does not claim that both quote sources were called in one iteration.\n\n## The loop\n\nThe declared entry is [loading configured markets](#edge=load-markets), performed\nby Market Collector. That declaration places the collector on the left; its\nposition is derived from evidence-backed source meaning. The upstream trigger\nremains unknown, and the other columns do not imply a left-to-right call order.\n\nThe [market loop](#block=market-loop) repeats its body for each configured market,\none at a time. The drawing shows that body once. The actual collection size and\nthe ordering of individual markets are not supplied. An empty collection runs\nthe body zero times.\n\n## The conditional\n\nThe [quote-source conditional](#block=quote-route) tests whether `market.isOpen`\nis true. The true arm calls Live Data; the false arm calls Historical Data.\nRead downward within the selected arm, not from the true arm into the false arm.\nEach reply belongs to the request in its own arm.\n\nThe [save step](#edge=save-quote) follows whichever arm was selected and remains\ninside the loop. The [completion event](#edge=complete) is outside the loop and\nfollows the collection pass.\n\n## What an established claim means here\n\nBoth arms are established behavior definitions. That does not mean both execute\nin one iteration. The runtime condition chooses an arm; no knowledge dispute is\nbeing resolved. A diagram author does not need the runtime value of `market.isOpen`\nto document the condition and both arms honestly.\n",
+        "links": [
+          {
+            "href": "#graph=market-collection",
+            "target": {
+              "kind": "graph",
+              "ref": "market-collection"
+            }
+          },
+          {
+            "href": "#edge=load-markets",
+            "target": {
+              "kind": "edge",
+              "ref": "load-markets"
+            }
+          },
+          {
+            "href": "#block=market-loop",
+            "target": {
+              "kind": "block",
+              "ref": "market-loop"
+            }
+          },
+          {
+            "href": "#block=quote-route",
+            "target": {
+              "kind": "block",
+              "ref": "quote-route"
+            }
+          },
+          {
+            "href": "#edge=save-quote",
+            "target": {
+              "kind": "edge",
+              "ref": "save-quote"
+            }
+          },
+          {
+            "href": "#edge=complete",
+            "target": {
+              "kind": "edge",
+              "ref": "complete"
+            }
+          }
+        ],
+        "assets": []
+      }
+    ],
+    "entry": {
+      "point": {
+        "status": "established",
+        "value": {
+          "participantRef": "collector",
+          "itemRef": "load-markets"
+        },
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "The fictional evidence explicitly defines this item as the entry to the scoped workflow."
+        }
+      },
+      "trigger": {
+        "status": "unknown",
+        "reason": "The fixture does not establish what launches this scoped workflow. No user action, scheduler, or upstream caller is inferred.",
+        "sourceRefs": [
+          "fixture"
+        ]
+      }
+    }
+  },
+  "modelDigest": "b32a0d71544f861b9b93ad24640c93a32001771e95bb85c17c5002546b82011f",
+  "layout": {
+    "engine": "waxwing-sequence",
+    "version": "2"
+  },
+  "canvas": {
+    "width": 1536,
+    "height": 1270
+  },
+  "participants": [
+    {
+      "ref": "collector",
+      "box": {
+        "x": 100,
+        "y": 96,
+        "width": 232,
+        "height": 84
+      },
+      "lifeline": {
+        "x": 216,
+        "startY": 180,
+        "endY": 1230
+      }
+    },
+    {
+      "ref": "historical",
+      "box": {
+        "x": 468,
+        "y": 96,
+        "width": 232,
+        "height": 84
+      },
+      "lifeline": {
+        "x": 584,
+        "startY": 180,
+        "endY": 1230
+      }
+    },
+    {
+      "ref": "live",
+      "box": {
+        "x": 836,
+        "y": 96,
+        "width": 232,
+        "height": 84
+      },
+      "lifeline": {
+        "x": 952,
+        "startY": 180,
+        "endY": 1230
+      }
+    },
+    {
+      "ref": "storage",
+      "box": {
+        "x": 1204,
+        "y": 96,
+        "width": 232,
+        "height": 84
+      },
+      "lifeline": {
+        "x": 1320,
+        "startY": 180,
+        "endY": 1230
+      }
+    }
+  ],
+  "steps": [
+    {
+      "ref": "load-markets",
+      "from": "collector",
+      "to": "collector",
+      "points": [
+        {
+          "x": 216,
+          "y": 276
+        },
+        {
+          "x": 495.20000000000005,
+          "y": 276
+        },
+        {
+          "x": 495.20000000000005,
+          "y": 300
+        },
+        {
+          "x": 216,
+          "y": 300
+        }
+      ],
+      "label": {
+        "x": 234,
+        "y": 220,
+        "width": 243.20000000000002,
+        "height": 48
+      }
+    },
+    {
+      "ref": "request-live",
+      "from": "collector",
+      "to": "live",
+      "points": [
+        {
+          "x": 216,
+          "y": 646
+        },
+        {
+          "x": 952,
+          "y": 646
+        }
+      ],
+      "label": {
+        "x": 433.6,
+        "y": 608,
+        "width": 300.8,
+        "height": 30
+      }
+    },
+    {
+      "ref": "reply-live",
+      "from": "live",
+      "to": "collector",
+      "points": [
+        {
+          "x": 952,
+          "y": 720
+        },
+        {
+          "x": 216,
+          "y": 720
+        }
+      ],
+      "label": {
+        "x": 509.2,
+        "y": 682,
+        "width": 149.6,
+        "height": 30
+      }
+    },
+    {
+      "ref": "request-close",
+      "from": "collector",
+      "to": "historical",
+      "points": [
+        {
+          "x": 216,
+          "y": 872
+        },
+        {
+          "x": 584,
+          "y": 872
+        }
+      ],
+      "label": {
+        "x": 264,
+        "y": 816,
+        "width": 272,
+        "height": 48
+      }
+    },
+    {
+      "ref": "reply-close",
+      "from": "historical",
+      "to": "collector",
+      "points": [
+        {
+          "x": 584,
+          "y": 946
+        },
+        {
+          "x": 216,
+          "y": 946
+        }
+      ],
+      "label": {
+        "x": 314.4,
+        "y": 908,
+        "width": 171.20000000000002,
+        "height": 30
+      }
+    },
+    {
+      "ref": "save-quote",
+      "from": "collector",
+      "to": "storage",
+      "points": [
+        {
+          "x": 216,
+          "y": 1058
+        },
+        {
+          "x": 1320,
+          "y": 1058
+        }
+      ],
+      "label": {
+        "x": 614,
+        "y": 1020,
+        "width": 308,
+        "height": 30
+      }
+    },
+    {
+      "ref": "complete",
+      "from": "collector",
+      "to": "collector",
+      "points": [
+        {
+          "x": 216,
+          "y": 1170
+        },
+        {
+          "x": 502.4,
+          "y": 1170
+        },
+        {
+          "x": 502.4,
+          "y": 1194
+        },
+        {
+          "x": 216,
+          "y": 1194
+        }
+      ],
+      "label": {
+        "x": 234,
+        "y": 1132,
+        "width": 250.4,
+        "height": 30
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "ref": "quote-route",
+      "box": {
+        "x": 38,
+        "y": 490,
+        "width": 1460,
+        "height": 506
+      },
+      "header": {
+        "x": 46,
+        "y": 498,
+        "width": 1444,
+        "height": 52
+      },
+      "regions": [
+        {
+          "branch": "then",
+          "box": {
+            "x": 50,
+            "y": 558,
+            "width": 1436,
+            "height": 198
+          },
+          "label": {
+            "x": 50,
+            "y": 558,
+            "width": 1436,
+            "height": 34
+          }
+        },
+        {
+          "branch": "else",
+          "box": {
+            "x": 50,
+            "y": 766,
+            "width": 1436,
+            "height": 216
+          },
+          "label": {
+            "x": 50,
+            "y": 766,
+            "width": 1436,
+            "height": 34
+          }
+        }
+      ]
+    },
+    {
+      "ref": "market-loop",
+      "box": {
+        "x": 20,
+        "y": 336,
+        "width": 1496,
+        "height": 772
+      },
+      "header": {
+        "x": 28,
+        "y": 344,
+        "width": 1480,
+        "height": 88
+      },
+      "regions": [
+        {
+          "branch": "body",
+          "box": {
+            "x": 32,
+            "y": 440,
+            "width": 1472,
+            "height": 654
+          },
+          "label": {
+            "x": 32,
+            "y": 440,
+            "width": 1472,
+            "height": 34
+          }
+        }
+      ]
+    }
+  ]
+}

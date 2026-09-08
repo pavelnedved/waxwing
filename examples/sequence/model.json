@@ -212,5 +212,27 @@
         }
       ]
     }
-  ]
+  ],
+  "entry": {
+    "point": {
+      "status": "established",
+      "value": {
+        "participantRef": "checkout",
+        "itemRef": "submit"
+      },
+      "basis": {
+        "sourceRefs": [
+          "fixture"
+        ],
+        "explanation": "The fictional evidence explicitly defines this item as the entry to the scoped workflow."
+      }
+    },
+    "trigger": {
+      "status": "unknown",
+      "reason": "The fixture does not establish what launches this scoped workflow. No user action, scheduler, or upstream caller is inferred.",
+      "sourceRefs": [
+        "fixture"
+      ]
+    }
+  }
 }

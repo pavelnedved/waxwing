@@ -1,0 +1,399 @@
+{
+  "schemaVersion": "0.2-sequence-draft",
+  "diagramType": "sequence",
+  "describes": "behavior",
+  "id": "market-collection",
+  "title": "Collect a quote for each market",
+  "scope": {
+    "timeframe": "current",
+    "environment": "Fictional market-data collector",
+    "snapshot": "Fixture v1",
+    "coverage": "partial",
+    "question": "How does each market choose live or historical data before saving its quote?",
+    "includes": [
+      "Sequential iteration over configured markets.",
+      "A binary market-open condition, two alternative request/reply pairs, and saving the selected quote."
+    ],
+    "excludes": [
+      "Concurrency, failure handling, retries, elapsed time, and the actual set or number of markets."
+    ],
+    "abstraction": "Current interaction behavior with a conditional inside a collection loop, not a recorded execution."
+  },
+  "sources": [
+    {
+      "id": "fixture",
+      "kind": "fixture",
+      "locator": "evidence.md",
+      "description": "Fictional market-data collection rules."
+    }
+  ],
+  "participants": [
+    {
+      "id": "collector",
+      "label": "Market Collector",
+      "meaning": {
+        "status": "established",
+        "value": "Coordinates one market at a time.",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    },
+    {
+      "id": "historical",
+      "label": "Historical Data",
+      "meaning": {
+        "status": "established",
+        "value": "Supplies the closing quote for a closed market.",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    },
+    {
+      "id": "live",
+      "label": "Live Data",
+      "meaning": {
+        "status": "established",
+        "value": "Supplies a live quote for an open market.",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    },
+    {
+      "id": "storage",
+      "label": "Quote Storage",
+      "meaning": {
+        "status": "established",
+        "value": "Receives the selected quote for this market.",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    }
+  ],
+  "steps": [
+    {
+      "id": "load-markets",
+      "label": "Load configured markets",
+      "kind": "event",
+      "from": "collector",
+      "to": "collector",
+      "assertion": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    },
+    {
+      "id": "request-live",
+      "label": "Request live quote for market",
+      "kind": "message",
+      "from": "collector",
+      "to": "live",
+      "assertion": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    },
+    {
+      "id": "reply-live",
+      "label": "Live quote",
+      "kind": "reply",
+      "from": "live",
+      "to": "collector",
+      "assertion": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      },
+      "replyTo": "request-live"
+    },
+    {
+      "id": "request-close",
+      "label": "Request closing quote for market",
+      "kind": "message",
+      "from": "collector",
+      "to": "historical",
+      "assertion": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    },
+    {
+      "id": "reply-close",
+      "label": "Closing quote",
+      "kind": "reply",
+      "from": "historical",
+      "to": "collector",
+      "assertion": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      },
+      "replyTo": "request-close"
+    },
+    {
+      "id": "save-quote",
+      "label": "Save selected quote for market",
+      "kind": "message",
+      "from": "collector",
+      "to": "storage",
+      "assertion": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    },
+    {
+      "id": "complete",
+      "label": "Collection pass complete",
+      "kind": "event",
+      "from": "collector",
+      "to": "collector",
+      "assertion": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    }
+  ],
+  "blocks": [
+    {
+      "id": "market-loop",
+      "label": "Configured markets",
+      "kind": "loop",
+      "assertion": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      },
+      "collection": {
+        "status": "established",
+        "value": "configured markets",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      },
+      "item": "market",
+      "execution": {
+        "status": "established",
+        "value": "sequential",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      },
+      "iterationOrder": {
+        "status": "unknown",
+        "reason": "The fixture establishes one-at-a-time processing, but not which market is visited first.",
+        "sourceRefs": [
+          "fixture"
+        ]
+      },
+      "body": {
+        "status": "established",
+        "value": [
+          "quote-route",
+          "save-quote"
+        ],
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    },
+    {
+      "id": "quote-route",
+      "label": "Select the quote source",
+      "kind": "if",
+      "assertion": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      },
+      "condition": {
+        "status": "established",
+        "value": "market.isOpen is true",
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      },
+      "then": {
+        "status": "established",
+        "value": [
+          "request-live",
+          "reply-live"
+        ],
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      },
+      "else": {
+        "status": "established",
+        "value": [
+          "request-close",
+          "reply-close"
+        ],
+        "basis": {
+          "sourceRefs": [
+            "fixture"
+          ],
+          "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+        }
+      }
+    }
+  ],
+  "order": {
+    "status": "established",
+    "value": [
+      "load-markets",
+      "market-loop",
+      "complete"
+    ],
+    "basis": {
+      "sourceRefs": [
+        "fixture"
+      ],
+      "explanation": "Explicitly stipulated by this fictional current-behavior example, not observed production execution."
+    }
+  },
+  "notes": [
+    {
+      "id": "iteration-count",
+      "subjectRefs": [
+        "market-loop"
+      ],
+      "topic": "behavior",
+      "statement": "How many times does the body run?",
+      "answer": {
+        "status": "unknown",
+        "reason": "The configured collection varies. The body runs once per item and zero times for an empty collection; no concrete count is supplied.",
+        "sourceRefs": [
+          "fixture"
+        ]
+      }
+    }
+  ],
+  "documents": [
+    {
+      "id": "reading-markets",
+      "title": "Reading the loop and conditional",
+      "format": "markdown",
+      "file": "reading.md",
+      "attachments": [
+        {
+          "kind": "graph",
+          "ref": "market-collection"
+        },
+        {
+          "kind": "block",
+          "ref": "market-loop"
+        },
+        {
+          "kind": "block",
+          "ref": "quote-route"
+        },
+        {
+          "kind": "edge",
+          "ref": "save-quote"
+        }
+      ]
+    }
+  ],
+  "entry": {
+    "point": {
+      "status": "established",
+      "value": {
+        "participantRef": "collector",
+        "itemRef": "load-markets"
+      },
+      "basis": {
+        "sourceRefs": [
+          "fixture"
+        ],
+        "explanation": "The fictional evidence explicitly defines this item as the entry to the scoped workflow."
+      }
+    },
+    "trigger": {
+      "status": "unknown",
+      "reason": "The fixture does not establish what launches this scoped workflow. No user action, scheduler, or upstream caller is inferred.",
+      "sourceRefs": [
+        "fixture"
+      ]
+    }
+  }
+}

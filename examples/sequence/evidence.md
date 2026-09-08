@@ -4,6 +4,9 @@ This is an invented current-system scenario, not a production trace or a report
 about a real organization. The participants are Checkout (the caller), Orders
 (the order service), and Payments (the payment service).
 
+The scoped workflow starts with Checkout's first order request. What launches
+that workflow is not stipulated; no upstream user action or caller is inferred.
+
 For this one scenario, the following order is stipulated:
 
 1. Checkout sends an order request to Orders.

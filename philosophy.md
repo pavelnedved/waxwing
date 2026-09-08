@@ -176,6 +176,17 @@ Whenever a visual convention carries meaning, that meaning belongs in the
 source. In a sequence diagram, vertical position communicates order: the layout
 must follow an explicit claim and must not choose an unknown or disputed order.
 
+Runtime alternatives and knowledge uncertainty are different. We can know what
+both branches of a condition do without claiming both execute. Repetition and
+branch membership must be explicit source meaning; displaying alternative paths
+must not turn them into consecutive events or manufacture an observed trace.
+
+Position may communicate a declared meaning. If a participant's placement is
+intended to identify a workflow entry, that entry must exist as a scoped,
+qualified claim before layout. The upstream trigger is a separate assertion.
+Neither deterministic coordinates nor an attractive composition justify a
+meaning that the source never established.
+
 ## The test
 
 Remove all absolute positions. Introduce a system change. Give the remaining
