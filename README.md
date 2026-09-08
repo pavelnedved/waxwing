@@ -23,7 +23,11 @@ Open [the generated HTML](examples/order-processing/generated/diagram.html)
 directly in a browser; it needs no server or account. Click a node, edge, group,
 or open question to inspect its claims and sources. Use **100%** for readable
 text and scroll to pan, or **Fit** for an overview. The viewer includes dark
-and light themes and downloads for JSON 1, JSON 2, and SVG.
+and light themes and downloads for JSON 1, JSON 2, and SVG. Use **Highlight** to
+inspect direct relationships, operation types, and recorded uncertainty;
+**Readability** reports potential visual ambiguity. The **Style** selector offers
+Standard, Engineering, and Editorial skins. See the [viewer rules](docs/viewer.md)
+for exact warning thresholds, highlight behavior, and styling boundaries.
 
 Start with the [fictional example](examples/order-processing/README.md), its
 [JSON 1](examples/order-processing/model.json), or its
@@ -74,6 +78,12 @@ detailed edges. Documents work at every level. The [subgraph rules](docs/subgrap
 cover identity, scope, mappings, references, grouping, and current limits.
 
 ## Explicit entry and exit points
+
+To construct JSON 1 from code, existing documents, and human clarification,
+start with the [ingestion prompt workflow](prompts/ingestion/README.md). It
+provides a copyable kickoff and staged instructions for an agent with source
+access. It uses the existing schema and validator; there is no built-in crawler
+or `ingest` CLI command yet.
 
 ```text
 Your own producer
@@ -148,8 +158,9 @@ has not edited an exported SVG's visible markup.
 ## MVP boundaries
 
 - Current implementation only; no future-state topology.
-- No repository/document ingestion yet. The future ingestion workflow will use
-  source investigation and a checklist, with human input for intent and context.
+- Source ingestion is currently an [agent prompt workflow](prompts/ingestion/README.md),
+  with investigation, a checklist, and human clarification. An automated ingestion
+  service and real-system evaluation are not implemented yet.
 - No visual editing, automatic factual repair, or live infrastructure discovery.
 - Subgraph mappings preserve boundary operations; arbitrary internal workflow
   correspondence and recursive graph-file loading are not implemented.
@@ -165,8 +176,11 @@ npm test
 
 - [Philosophy](philosophy.md): semantic reconstruction, honesty, and portability.
 - [JSON 1](docs/json-1.md): the current model contract and review decisions.
+- [Ingestion prompts](prompts/ingestion/README.md): construct JSON 1 from sources,
+  with explicit qualifications and an evidence review.
 - [JSON 2](docs/json-2.md): geometry, preservation, and recovery.
 - [Modules](docs/modules.md): import paths, CLI, and extension boundaries.
+- [Viewer](docs/viewer.md): advisory warnings, semantic highlighting, and skins.
 - [Design](design.md): broader direction and deferred work.
 - [Third-party dependencies](THIRD_PARTY_NOTICES.md).
 - [Verification and browser limitations](docs/verification.md).

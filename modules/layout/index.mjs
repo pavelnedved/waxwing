@@ -6,6 +6,7 @@ import { validateModel } from '../model/index.mjs';
 import { validateLayout } from './validate.mjs';
 import { digest, fail, frameMemberships, visibleGroups, wrap, edgeLines, units } from '../shared/model.mjs';
 
+export { inspectReadability } from './readability.mjs';
 export { validateLayout } from './validate.mjs';
 const elkVersion = JSON.parse(fs.readFileSync(createRequire(import.meta.url).resolve('elkjs/package.json'), 'utf8')).version;
 const box = (item, x = 0, y = 0) => ({ x: item.x + x, y: item.y + y, width: item.width, height: item.height });

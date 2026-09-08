@@ -78,7 +78,10 @@ frame because there is no established assignment.
   another edge's label.
 
 The validator is read-only and rejects a failed candidate rather than silently
-editing system meaning. It does not prove perceptual quality, detect every
+editing system meaning. Valid results also include advisory readability
+`warnings`, separate from errors and from the JSON 2 payload. See the
+[viewer reference](viewer.md) for exact thresholds and viewport assumptions.
+The checks do not prove perceptual quality, detect every
 ambiguous edge crossing or shared corridor, or verify the truth of provenance.
 Visible group-title clearance and actual browser font metrics still need visual
 review. Arbitrary large or dense graphs are not guaranteed to lay out cleanly.

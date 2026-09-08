@@ -23,3 +23,13 @@
 .ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
 .ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
 .ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+
+/* Skins share all text metrics and geometry. Category and qualification cues remain. */
+.ww-svg[data-skin="engineering"] { --canvas:#f0f6fa; --surface:#fff; --ink:#102e48; --muted:#526d83; --line:#55748b; --border:#bbcdda; --frame:#e5eff6; --accent:#155f9b; }
+.ww-svg[data-skin="engineering"][data-theme="dark"] { --canvas:#0e1c2a; --surface:#162b3d; --ink:#e1eff9; --muted:#a3bed0; --line:#88aabd; --border:#39566c; --frame:#122535; --accent:#7cc9fc; }
+.ww-svg[data-skin="engineering"] .node-box { rx:3px; }
+.ww-svg[data-skin="editorial"] { --canvas:#f5f0e7; --surface:#fffdf8; --ink:#302e29; --muted:#71695c; --line:#92816c; --border:#d4c8b7; --frame:#ece4d8; --accent:#87533b; }
+.ww-svg[data-skin="editorial"][data-theme="dark"] { --canvas:#201d19; --surface:#2e2923; --ink:#f2e9dd; --muted:#c5b6a0; --line:#b9a386; --border:#5e5141; --frame:#28231e; --accent:#efb38d; }
+.ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }

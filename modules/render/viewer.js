@@ -20,6 +20,9 @@
   const inspector = document.getElementById('inspector');
   const content = document.getElementById('inspector-content');
   let previousFocus;
+  let selectedRef = null;
+  let currentBoundary = null;
+  const highlightMode = document.getElementById('highlight-mode');
   let zoom = 1;
   let fitted = true;
   const name = (ref) => {
@@ -119,7 +122,9 @@
       const boundary = graph.expands.boundaries.find((item) => item.relationshipRef === ref);
       if (!boundary) continue;
       const section = el('section', undefined, 'attached-documents');
-      section.append(el('h3', 'Detailed correspondence'), graphLink(graph), claim(boundary.detail)); content.append(section);
+      const mappingLink = el('a', `Highlight correspondence in ${graph.title} →`, 'document-link');
+      mappingLink.href = `#graph=${graph.id}&boundary=${ref}`;
+      section.append(el('h3', 'Detailed correspondence'), mappingLink, claim(boundary.detail)); content.append(section);
     }
     if (ref === '__model') {
       content.append(field('graph', activeGraph));
@@ -162,11 +167,13 @@
     inspector.hidden = false;
     inspector.scrollTop = 0;
     document.querySelectorAll('[data-ref]').forEach((element) => element.classList.toggle('selected', element.dataset.ref === ref));
+    selectedRef = ref; refreshHighlights();
     document.getElementById('close-inspector').focus();
   }
 
   function hideInspector() {
     inspector.hidden = true;
+    selectedRef = null; refreshHighlights();
     document.querySelectorAll('[data-ref]').forEach((element) => element.classList.remove('selected'));
     if (previousFocus?.isConnected) previousFocus.focus();
   }
@@ -254,14 +261,14 @@
     const hash = location.hash.slice(1);
     if (hash === 'documents') { documentScreen(); return; }
     const params = new URLSearchParams(hash), keys = [...params.keys()];
-    if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'heading', 'graph', 'node', 'edge', 'record'].includes(key))) { unavailable('This link uses an unsupported or ambiguous target.'); return; }
+    if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'heading', 'graph', 'node', 'edge', 'record', 'boundary'].includes(key))) { unavailable('This link uses an unsupported or ambiguous target.'); return; }
     if (params.has('document')) {
       if (keys.some((key) => !['document', 'heading'].includes(key))) { unavailable('This link names conflicting destinations.'); return; }
       const doc = documents.find((item) => item.id === params.get('document'));
       if (!doc) { unavailable('The requested document is not included in this export.'); return; }
       documentScreen(doc, params.has('heading') ? params.get('heading') : undefined); return;
     }
-    if (params.has('heading') || ['node', 'edge', 'record'].filter((key) => params.has(key)).length > 1 || (params.has('graph') && !graphs.some((graph) => graph.id === params.get('graph')))) { unavailable('The requested graph or record is not available.'); return; }
+    if (params.has('heading') || ['node', 'edge', 'record', 'boundary'].filter((key) => params.has(key)).length > 1 || (params.has('graph') && !graphs.some((graph) => graph.id === params.get('graph')))) { unavailable('The requested graph or record is not available.'); return; }
     const requestedKind = ['node', 'edge'].find((kind) => params.has(kind));
     let graphRef = params.get('graph') ?? root;
     if (requestedKind) {
@@ -275,8 +282,14 @@
     const wasReading = !reader.hidden;
     reader.hidden = true; diagramMain.hidden = false;
     if (wasReading) { window.scrollTo(0, 0); if (fitted) fit(); }
+    currentBoundary = null;
     switchGraph(graphRef);
     document.title = `${activeGraph.title} · Waxwing`;
+    if (params.has('boundary')) {
+      const ref = params.get('boundary');
+      if (!activeGraph.expands?.boundaries.some((item) => item.relationshipRef === ref)) { unavailable('This correspondence is not recorded in the requested graph.'); return; }
+      currentBoundary = ref; highlightMode.value = 'selection'; hideInspector(); refreshHighlights(); return;
+    }
     const key = ['node', 'edge', 'record'].find((key) => params.has(key));
     if (!key) { hideInspector(); return; }
     const ref = params.get(key), entry = index.get(ref);
@@ -312,6 +325,7 @@
       viewport.replaceChildren(document.getElementById(`ww-graph-${ref}`).content.cloneNode(true));
       svg = viewport.querySelector('svg'); svg.prepend(sourceMetadata.cloneNode(true));
       svg.dataset.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+      svg.dataset.skin = document.body.dataset.skin;
       fitted = true; fit(); window.scrollTo(0, 0);
     }
     document.getElementById('graph-title').textContent = activeGraph.title;
@@ -340,7 +354,8 @@
         const row = el('div', undefined, 'boundary-row');
         const link = el('a', name(boundary.relationshipRef), 'document-link');
         link.href = targetHash({ kind: 'edge', ref: boundary.relationshipRef, graphRef: expansion.graphRef });
-        row.append(link, claim(boundary.detail));
+        const highlight = el('a', 'Highlight correspondence', 'source-ref'); highlight.href = `#graph=${ref}&boundary=${boundary.relationshipRef}`;
+        row.append(link, highlight, claim(boundary.detail));
         const claims = boundary.detail.status === 'unknown' ? [] : boundary.detail.status === 'disputed' ? boundary.detail.alternatives : [boundary.detail];
         for (const candidate of claims) for (const edge of candidate.value) {
           const detail = el('a', `Inspect ${name(edge)} ↗`, 'source-ref'); detail.href = targetHash({ kind: 'edge', ref: edge, graphRef: ref }); row.append(detail);
@@ -352,6 +367,8 @@
     documentBack.href = `#graph=${ref}`; documentBack.textContent = `← ${activeGraph.title}`;
     document.getElementById('perspective-label').textContent = drawing.layout.groupingPerspectiveRef ? `Grouping: ${name(drawing.layout.groupingPerspectiveRef)}` : 'No grouping perspective selected';
     refreshKnowledge();
+    refreshHighlights();
+    refreshReadability();
   }
   function refreshKnowledge() {
     const open = [];
@@ -376,6 +393,55 @@
     document.getElementById('knowledge-count').textContent = `${open.filter((item) => item.status === 'unknown').length} unknown · ${open.filter((item) => item.status === 'disputed').length} disputed`;
   }
 
+  function refreshHighlights() {
+    const result = selectHighlights(model, activeGraph, { mode: highlightMode.value, ref: selectedRef, boundaryRef: currentBoundary });
+    const refs = new Set(result.refs);
+    svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('highlight-match', refs.has(item.dataset.ref)));
+    const details = document.getElementById('highlight-details'); details.replaceChildren();
+    const summary = document.getElementById('highlight-summary');
+    const count = new Set([...svg.querySelectorAll('.highlight-match')].map((item) => item.dataset.ref)).size;
+    summary.textContent = `${count} visible ${count === 1 ? 'record' : 'records'} highlighted. Other records remain visible.`;
+    if (highlightMode.value === 'selection' && !selectedRef && !currentBoundary) summary.textContent = 'Select a record to highlight its direct relationships. No execution order is implied.';
+    if (result.boundary) {
+      const detail = result.boundary.detail;
+      details.append(el('strong', `Correspondence: ${name(currentBoundary)}`));
+      details.append(el('p', detail.status === 'unknown' ? 'Unknown internal correspondence. Only recorded external context is highlighted; no internal edge is invented.' : detail.status === 'disputed' ? 'All recorded alternatives are highlighted. No winner is selected.' : 'Highlighted edges are the recorded correspondence, not an inferred execution path.'));
+      details.append(claim(detail));
+      if (activeGraph.expands.meaning.status !== 'established') details.append(el('p', 'The meaning of this expansion is also qualified.'), claim(activeGraph.expands.meaning));
+      const parent = el('a', 'Inspect overview relationship ↗', 'document-link');
+      parent.href = targetHash({ kind: 'edge', ref: currentBoundary, graphRef: activeGraph.expands.graphRef }); details.append(parent);
+    }
+    for (const finding of result.findings) {
+      const link = el('a', `${name(finding.ref)} · ${finding.reason}`, 'document-link');
+      link.href = finding.kind === 'boundary' ? `#graph=${finding.graphRef ?? activeGraph.id}&boundary=${finding.ref}` : finding.kind === 'record' ? `#graph=${activeGraph.id}&record=${finding.ref}` : targetHash({ kind: finding.kind, ref: finding.ref, graphRef: activeGraph.id });
+      details.append(link);
+    }
+    if (['unknown', 'disputed', 'qualified'].includes(highlightMode.value) && !result.findings.length) details.append(el('p', 'No matching recorded claims in this graph. This does not establish completeness or certainty.'));
+  }
+  highlightMode.addEventListener('change', () => {
+    if (currentBoundary) { currentBoundary = null; navigate(`#graph=${activeGraph.id}`); }
+    else refreshHighlights();
+  });
+  document.getElementById('highlight-clear').addEventListener('click', () => {
+    highlightMode.value = 'selection'; currentBoundary = null; selectedRef = null; navigate(`#graph=${activeGraph.id}`);
+  });
+  function refreshReadability() {
+    if (!viewport.clientWidth || !viewport.clientHeight) return;
+    const warnings = inspectReadability(drawing, activeGraph.id, { width: viewport.clientWidth, height: viewport.clientHeight });
+    document.getElementById('readability-summary').textContent = `Readability · ${warnings.length} ${warnings.length === 1 ? 'warning' : 'warnings'}`;
+    const list = document.getElementById('readability-list'); list.replaceChildren();
+    if (!warnings.length) list.append(el('p', 'No issues detected by these advisory checks.'));
+    for (const warning of warnings) {
+      const row = el('div', undefined, 'readability-row'); row.append(el('p', warning.message));
+      for (const ref of warning.refs) { const button = el('button', name(ref), 'source-ref'); button.addEventListener('click', () => show(ref)); row.append(button); }
+      if (warning.code === 'readability/small-text') row.append(el('p', `Estimated smallest node text: ${warning.measurement.projectedTextPx.toFixed(1)}px at Fit; 10px at 100%.`, 'purpose'));
+      list.append(row);
+    }
+  }
+  document.getElementById('skin').addEventListener('change', (event) => {
+    document.body.dataset.skin = event.target.value; svg.dataset.skin = event.target.value;
+  });
+
   function applyZoom() {
     svg.style.width = `${drawing.canvas.width * zoom}px`;
     svg.style.height = `${drawing.canvas.height * zoom}px`;
@@ -389,7 +455,7 @@
   document.getElementById('zoom-read').addEventListener('click', () => { fitted = false; zoom = 1; applyZoom(); });
   document.getElementById('zoom-in').addEventListener('click', () => changeZoom(1.25));
   document.getElementById('zoom-out').addEventListener('click', () => changeZoom(.8));
-  new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); }).observe(viewport);
+  new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); refreshReadability(); }).observe(viewport);
   fit();
 
   document.getElementById('theme').addEventListener('click', () => {
@@ -408,9 +474,7 @@
   document.getElementById('source-download').addEventListener('click', () => download(JSON.stringify(model, null, 2) + '\n', `${model.id}.model.json`, 'application/json'));
   document.getElementById('layout-download').addEventListener('click', () => download(JSON.stringify(layout, null, 2) + '\n', `${model.id}.layout.json`, 'application/json'));
   document.getElementById('svg-download').addEventListener('click', () => {
-    const clean = svg.cloneNode(true);
-    clean.removeAttribute('style');
-    clean.querySelectorAll('.selected').forEach((element) => element.classList.remove('selected'));
+    const clean = cleanViewerSVG(svg);
     download('<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clean), `${activeGraph.id}.svg`, 'image/svg+xml');
   });
   applyRoute();

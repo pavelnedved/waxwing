@@ -40,6 +40,7 @@ const json2 = await layoutModel(json1, {
   direction: 'RIGHT',
 });
 const result = validateLayout(json2, { expectedModel: json1 });
+// Valid results include advisory warnings; these do not change result.ok.
 ```
 
 The grouping reference is an ID from your own model; it is not a built-in
@@ -59,6 +60,7 @@ import { renderSVG, renderHTML } from 'waxwing/render';
 
 const svg = renderSVG(json2);
 const html = renderHTML(json2);
+const editorial = renderHTML(json2, { skin: 'editorial' });
 ```
 
 Accepts compatible JSON 2 produced by any implementation. The renderer invokes
@@ -69,6 +71,11 @@ To build your own renderer, consume `nodes[].box`, `groups[].box`, and
 `edges[].points`/`label`, resolving `ref` against `json2.model`. All system meaning
 is available there. Preserve that source payload and its qualifications if your
 exports claim Waxwing's recoverability guarantee.
+
+The [viewer reference](viewer.md) documents skins, `selectHighlights` from
+`waxwing/render`, and `inspectReadability` from `waxwing/layout`. These helpers
+operate independently of the HTML controls; their results do not alter source
+facts or geometry.
 
 ## Artifacts
 

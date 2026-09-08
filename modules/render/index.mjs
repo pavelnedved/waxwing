@@ -1,19 +1,22 @@
 import fs from 'node:fs';
+import { inspectReadability } from '../layout/readability.mjs';
+import { selectHighlights, cleanViewerSVG } from './highlights.mjs';
 import { graphsOf, rootGraph } from '../graphs/index.mjs';
 import { assertLayout } from './artifacts.mjs';
 import { exists, knowledgeText, existenceText, alerts, wrap, edgeLines, canonical } from '../shared/model.mjs';
 import { renderDocument } from '../documents/markdown.mjs';
 
+export { selectHighlights } from './highlights.mjs';
 export { extractLayout, recoverModel, recoverArtifact } from './artifacts.mjs';
 const asset = (name) => fs.readFileSync(new URL(name, import.meta.url), 'utf8');
 const svgCSS = asset('diagram.css');
 const pageCSS = asset('viewer.css');
-const pageJS = asset('viewer.js');
+const pageJS = `const inspectReadability = ${inspectReadability.toString()};\nconst selectHighlights = ${selectHighlights.toString()};\nconst cleanViewerSVG = ${cleanViewerSVG.toString()};\n${asset('viewer.js')}`;
 export const escapeXML = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;');
 const n = (value) => Number(value.toFixed(3));
 const attrs = (ref, label) => `class="record" data-ref="${escapeXML(ref)}" tabindex="0" role="button" aria-label="Inspect ${escapeXML(label)}"`;
 
-function svgMarkup(source, graphRef = rootGraph(source.model), embed = true) {
+function svgMarkup(source, graphRef = rootGraph(source.model), embed = true, skin = 'standard') {
   const model = source.model;
   const graph = graphsOf(model).find((item) => item.id === graphRef);
   if (!graph) throw new Error(`Unknown graph "${graphRef}".`);
@@ -54,9 +57,9 @@ function svgMarkup(source, graphRef = rootGraph(source.model), embed = true) {
     return `<g ${attrs(edge.ref, relation.label)}><rect class="edge-label-bg" x="${n(box.x)}" y="${n(box.y)}" width="${n(box.width)}" height="${n(box.height)}" rx="5"/>${lines.map((line, index) => `<text class="edge-label${index >= regularLines ? ' edge-note' : ''}" text-anchor="middle" x="${n(box.x + box.width / 2)}" y="${n(box.y + 18 + index * 18)}">${escapeXML(line)}</text>`).join('')}</g>`;
   }).join('');
   const payload = embed ? Buffer.from(canonical(source), 'utf8').toString('base64') : '';
-  return `<svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-graph-ref="${escapeXML(graphRef)}" data-theme="light" viewBox="0 0 ${n(layout.canvas.width)} ${n(layout.canvas.height)}" width="${n(layout.canvas.width)}" height="${n(layout.canvas.height)}" role="group" aria-labelledby="ww-title ww-description">
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-skin="${skin}" data-graph-ref="${escapeXML(graphRef)}" data-theme="light" viewBox="0 0 ${n(layout.canvas.width)} ${n(layout.canvas.height)}" width="${n(layout.canvas.width)}" height="${n(layout.canvas.height)}" role="group" aria-labelledby="ww-title ww-description">
     <title id="ww-title">${escapeXML(graph.title)}</title><desc id="ww-description">${escapeXML(graph.scope.abstraction)} Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
-    ${embed ? `<metadata id="waxwing-source" data-encoding="base64">${payload}</metadata>` : ''}
+${embed ? `    <metadata id="waxwing-source" data-encoding="base64">${payload}</metadata>` : ''}
     <style>${svgCSS}</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     ${frames}${edges}${nodes}${labels}
   </svg>`;
@@ -64,20 +67,28 @@ function svgMarkup(source, graphRef = rootGraph(source.model), embed = true) {
 
 export function renderSVG(layout, options = {}) {
   assertLayout(layout);
-  if (Object.keys(options).some((key) => key !== 'graphRef')) throw new Error('Unknown SVG render option.');
+  if (Object.keys(options).some((key) => !['graphRef', 'skin'].includes(key))) throw new Error('Unknown SVG render option.');
   const graphRef = options.graphRef ?? rootGraph(layout.model);
-  return `<?xml version="1.0" encoding="UTF-8"?>\n${svgMarkup(layout, graphRef)}\n`;
+  const skin = checkedSkin(options.skin);
+  return `<?xml version="1.0" encoding="UTF-8"?>\n${svgMarkup(layout, graphRef, true, skin)}\n`;
 }
 
-export function renderHTML(layout) {
+function checkedSkin(value = 'standard') {
+  if (!['standard', 'engineering', 'editorial'].includes(value)) throw new Error('Skin must be standard, engineering, or editorial.');
+  return value;
+}
+
+export function renderHTML(layout, options = {}) {
   assertLayout(layout);
+  if (Object.keys(options).some((key) => key !== 'skin')) throw new Error('Unknown HTML render option.');
+  const skin = checkedSkin(options.skin);
   const model = layout.model;
   const documents = model.documents ?? [];
   const graph = graphsOf(model).find((item) => item.id === rootGraph(model));
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeXML(model.title)} · Waxwing</title><style>${pageCSS}</style></head>
-<body>
-  <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions">${documents.length ? `<a class="header-link" href="#documents">Documents <span>${documents.length}</span></a>` : ''}<button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
+<body data-skin="${skin}">
+  <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions">${documents.length ? `<a class="header-link" href="#documents">Documents <span>${documents.length}</span></a>` : ''}<label class="skin-control">Style <select id="skin" aria-label="Visual style">${['standard', 'engineering', 'editorial'].map((value) => `<option value="${value}"${value === skin ? ' selected' : ''}>${value[0].toUpperCase() + value.slice(1)}</option>`).join('')}</select></label><button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
   <main id="diagram-main">
     <nav id="graph-breadcrumb" aria-label="Graph hierarchy"></nav>
     <div class="eyebrow"><span class="live-dot"></span> CURRENT IMPLEMENTATION <span class="sep">/</span> PARTIAL MODEL</div>
@@ -87,9 +98,12 @@ export function renderHTML(layout) {
     <div class="scope-line" id="graph-scope"></div>
     <section class="map-panel" aria-label="Architecture diagram">
       <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
-      <div id="map-viewport" tabindex="0" aria-label="Diagram canvas. Use zoom controls; scroll to pan.">${svgMarkup(layout)}</div>
+      <div class="highlight-toolbar"><label for="highlight-mode">Highlight</label><select id="highlight-mode"><option value="selection">Selection and direct relationships</option><option value="unknown">Unknown claims</option><option value="disputed">Disputed claims</option><option value="qualified">All qualified claims</option><option value="context">External context</option><option value="calls">Calls</option><option value="reads">Reads</option><option value="writes">Writes</option><option value="publishes">Publishes</option><option value="consumes">Consumes</option></select><button id="highlight-clear">Clear highlights</button><span id="highlight-summary" role="status"></span></div>
+      <div id="highlight-details" aria-live="polite"></div>
+      <div id="map-viewport" tabindex="0" aria-label="Diagram canvas. Use zoom controls; scroll to pan.">${svgMarkup(layout, graph.id, true, skin)}</div>
       <div class="map-caption"><span>Arrows describe operations: actor → resource.</span><span>Position does not imply execution order. Select any element to inspect it.</span></div>
     </section>
+    <details id="readability"><summary id="readability-summary">Readability warnings</summary><p>Advisory geometry checks, separate from architectural truth. Fit estimates use this canvas area. No warnings does not prove visual quality.</p><div id="readability-list"></div></details>
     <section id="graph-connections" aria-label="Connections between graph levels"></section>
     <section class="knowledge-section" aria-labelledby="knowledge-heading"><div class="section-heading"><h2 id="knowledge-heading">What remains open</h2><span id="knowledge-count"></span></div><div id="knowledge-list"></div></section>
     <footer><span>Full source travels with this artifact. Qualifications remain intact.</span><span>Waxwing · experimental MVP</span></footer>
@@ -98,8 +112,8 @@ export function renderHTML(layout) {
     <div class="document-breadcrumb"><a href="#">← Graph</a><span>/</span><a href="#documents">Documents</a></div>
     <div class="document-workspace"><nav id="document-nav" aria-label="Included documents"></nav><section id="document-content" aria-live="polite"></section></div>
   </main>
-  ${documents.map((doc) => `<template id="ww-document-${escapeXML(doc.id)}"><article class="markdown-body">${renderDocument(doc, model.graphs ? model : model.id)}</article></template>`).join('')}
-  ${(model.graphs ?? []).map((item) => `<template id="ww-graph-${escapeXML(item.id)}">${svgMarkup(layout, item.id, false)}</template>`).join('')}
+${documents.map((doc) => `<template id="ww-document-${escapeXML(doc.id)}"><article class="markdown-body">${renderDocument(doc, model.graphs ? model : model.id)}</article></template>`).join('')}
+${(model.graphs ?? []).map((item) => `<template id="ww-graph-${escapeXML(item.id)}">${svgMarkup(layout, item.id, false, skin)}</template>`).join('')}
   <aside id="inspector" hidden aria-label="Model inspector"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside>
   <script>${pageJS}</script>
 </body></html>\n`;

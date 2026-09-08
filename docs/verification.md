@@ -106,3 +106,36 @@ to a file. The current preview is `http://127.0.0.1:4180/diagram.html`.
 Direct `file://` opening and browser-triggered download events remain unverified
 under the earlier environment limitations. They were not retried or bypassed.
 CLI export and complete source recovery are verified independently.
+
+## Readability, highlighting, and skins, 2026-09-08
+
+The full suite passes 103 tests. New coverage checks shared corridors, proper
+crossings versus endpoint contacts, border runs, near-label clearance, viewport
+text estimates, advisory warnings that leave validation successful, direct-only
+relationship selection, graph scope, unknown and disputed correspondence,
+qualified memberships/notes, and unchanged source/geometry across all three
+skins. All three current demos were regenerated; historical experiment outputs
+remain unchanged.
+
+Browser checks on the regenerated subgraph example verified:
+
+- Selecting Order Worker highlights only direct incident edges and endpoints.
+- Consumes highlights the worker-to-queue operation without reversing it.
+- Unknown mode in the overview links to the child's unresolved payment mapping;
+  the child highlights only Payment Provider and states that no internal edge
+  is invented.
+- Disputed correspondence highlights both recorded repair alternatives and
+  displays the dispute without choosing a winner.
+- Correspondence survives reload, Back, and Forward. Clear removes highlights.
+- Engineering and Editorial were visually inspected in light and dark themes;
+  Engineering's selected style also persisted across graph navigation.
+- The Readability panel reports the Fit estimate (6.1px in the checked viewport)
+  and suggests full-size reading. Qualification dashes and text remain visible
+  during highlighting.
+- No browser console errors were captured in the successful test tab.
+
+Generated viewer JavaScript passes syntax checking. Automated source recovery
+checks pass for every skin. Browser-triggered downloads and direct `file://`
+opening remain unverified under the earlier environment limitations; no bypass
+was attempted. The SVG download cleanup is implemented, but its browser download
+event is not claimed as verified.
