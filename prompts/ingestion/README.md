@@ -12,6 +12,7 @@ Choose the diagram by the question it should answer:
 | Question | Workflow |
 |---|---|
 | What components exist, where are their boundaries, and what depends on what? | [Architecture](workflow.md) |
+| How does one recorded path repeatedly visit components in an architecture model? | [Architecture with explicit workflow](architecture-workflows.md) |
 | What interactions occur in one scenario, or repeat/branch in scoped current behavior? | [Sequence](sequence.md) |
 
 These are different concerns with separate JSON 1 contracts. Select one useful
@@ -24,7 +25,7 @@ the bracketed values:
 
 ```text
 Construct Waxwing JSON 1 using the workflow at:
-  [absolute path to waxwing]/prompts/ingestion/[workflow.md or sequence.md]
+  [absolute path to waxwing]/prompts/ingestion/[workflow.md, architecture-workflows.md, or sequence.md]
 
 Waxwing checkout: [absolute path]
 Diagram type: [architecture or sequence]

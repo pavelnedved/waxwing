@@ -122,3 +122,21 @@ while removing temporary selection/highlight classes and viewport sizing.
 JSON exports preserve the source independently of presentation choices.
 See [verification](verification.md) for automated coverage and browser export
 limitations.
+
+## Architecture workflow view
+
+Models with explicit architecture workflows gain a **View** selector for each
+parent graph. Connectivity keeps its existing selection/uncertainty filters and
+grouping frames. A workflow opens at 100% for scrolling; Fit gives an overview.
+Repeated component IDs are visible, selecting one highlights all its appearances,
+and its inspector lists each participation. Step details show occurrence evidence,
+operation references or reply references. **Workflow entry & order** opens the
+source claims, including the separately qualified trigger.
+
+Workflow labels carry occurrence qualification; grouping appears as direct
+membership labels in the selected perspective. The current architecture filter
+toolbar is available in Connectivity. The document reader, skins, theme,
+Back/Forward, deep links, and full source recovery work across both views.
+SVG download uses the current view. Wide paths can trigger readability warnings;
+see [workflow rules](architecture-workflows.md) and
+[warning signs](layout-warning-signs.md).

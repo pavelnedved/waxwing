@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { validateWorkflows } from '../workflow/validate.mjs';
 import { validateSequenceLayout } from '../sequence/layout.mjs';
 import { inspectReadability } from './readability.mjs';
 import { projectGraph } from '../graphs/index.mjs';
@@ -31,6 +32,7 @@ export function validateLayout(document, { expectedModel } = {}) {
   if (digest(document.model) !== document.modelDigest) add('source/digest', '/modelDigest', 'The embedded model does not match its recorded digest.');
   if (expectedModel && canonical(document.model) !== canonical(expectedModel)) add('source/changed', '/model', 'JSON 2 changed the supplied JSON 1.');
   if (document.graphs) {
+    diagnostics.push(...validateWorkflows(document));
     const seen = new Set();
     document.graphs.forEach((geometry, i) => {
       const path = `/graphs/${i}`;
@@ -44,7 +46,8 @@ export function validateLayout(document, { expectedModel } = {}) {
       diagnostics.push(...result.diagnostics.map((item) => ({ ...item, path: path + item.path })));
     });
     for (const graph of document.model.graphs) if (!seen.has(graph.id)) add('layout/coverage', '/graphs', `Missing graph "${graph.id}".`);
-    return { ok: diagnostics.length === 0, diagnostics, summary: modelResult.summary, warnings: diagnostics.length ? [] : (document.graphs ? document.graphs.flatMap((graph) => inspectReadability(graph, graph.ref)) : inspectReadability(document, document.model.id)) };
+    const views = [...document.graphs, ...(document.workflows ?? []).map((w) => ({ ...w, groups: [], edges: w.edges.map((e) => ({ ...e, from: e.fromAppearanceRef, to: e.toAppearanceRef })) }))];
+    return { ok: diagnostics.length === 0, diagnostics, summary: modelResult.summary, warnings: diagnostics.length ? [] : views.flatMap((view) => inspectReadability(view, view.ref)) };
   }
   const perspective = document.layout.groupingPerspectiveRef;
   if (perspective !== null && !document.model.perspectives.some((item) => item.id === perspective)) add('layout/perspective', '/layout/groupingPerspectiveRef', 'Grouping must name a model perspective.');

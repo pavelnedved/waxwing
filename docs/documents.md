@@ -239,3 +239,13 @@ generic SVG image viewer does not provide the HTML document-reading interface.
 The recovery operation returns the complete resolved JSON 1, including the
 original Markdown strings and asset bytes, without reconstructing them from
 rendered text or opening any input paths.
+
+## Architecture workflow targets
+
+Architecture `0.5-draft` additionally supports `workflow` and `step` document
+targets, and `workflowRef` on node/step targets. Markdown can use
+`#workflow=checkout-run`, `#workflow=checkout-run&node=orchestrator`, or
+`#workflow=checkout-run&step=stock-result`. A global step ID also supports
+`#step=stock-result`; its workflow owner is unambiguous. Do not author links to
+presentation appearance IDs. Earlier versions retain their existing vocabulary.
+See the [complete linking rules](architecture-workflows.md#documents-and-navigation).

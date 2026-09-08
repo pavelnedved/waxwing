@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { workflowSVG } from '../workflow/render.mjs';
 import { renderSequenceSVG, renderSequenceHTML } from '../sequence/render.mjs';
 import { inspectReadability } from '../layout/readability.mjs';
 import { selectHighlights, cleanViewerSVG } from './highlights.mjs';
@@ -69,10 +70,11 @@ ${embed ? `    <metadata id="waxwing-source" data-encoding="base64">${payload}</
 export function renderSVG(layout, options = {}) {
   if (layout?.diagramType === 'sequence') return renderSequenceSVG(layout, options);
   assertLayout(layout);
-  if (Object.keys(options).some((key) => !['graphRef', 'skin'].includes(key))) throw new Error('Unknown SVG render option.');
+  if (Object.keys(options).some((key) => !['graphRef', 'workflowRef', 'skin'].includes(key))) throw new Error('Unknown SVG render option.');
+  if (options.workflowRef !== undefined && options.graphRef !== undefined) throw new Error('Choose either graphRef or workflowRef.');
   const graphRef = options.graphRef ?? rootGraph(layout.model);
   const skin = checkedSkin(options.skin);
-  return `<?xml version="1.0" encoding="UTF-8"?>\n${svgMarkup(layout, graphRef, true, skin)}\n`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n${options.workflowRef !== undefined ? workflowSVG(layout, options.workflowRef, true, skin) : svgMarkup(layout, graphRef, true, skin)}\n`;
 }
 
 function checkedSkin(value = 'standard') {
@@ -99,6 +101,7 @@ export function renderHTML(layout, options = {}) {
     <p class="purpose" id="graph-question">${escapeXML(graph.scope.question)}</p>
     <p class="purpose" id="graph-abstraction">${escapeXML(graph.scope.abstraction)}</p>
     <div class="scope-line" id="graph-scope"></div>
+    <div id="workflow-controls" hidden><label>View <select id="diagram-view" aria-label="Diagram view"></select></label><button id="workflow-details" hidden>Workflow entry & order ↗</button></div>
     <section class="map-panel" aria-label="Architecture diagram">
       <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
       <div class="highlight-toolbar"><label for="highlight-mode">Highlight</label><select id="highlight-mode"><option value="selection">Selection and direct relationships</option><option value="unknown">Unknown claims</option><option value="disputed">Disputed claims</option><option value="qualified">All qualified claims</option><option value="context">External context</option><option value="calls">Calls</option><option value="reads">Reads</option><option value="writes">Writes</option><option value="publishes">Publishes</option><option value="consumes">Consumes</option></select><button id="highlight-clear">Clear highlights</button><span id="highlight-summary" role="status"></span></div>
@@ -117,6 +120,7 @@ export function renderHTML(layout, options = {}) {
   </main>
 ${documents.map((doc) => `<template id="ww-document-${escapeXML(doc.id)}"><article class="markdown-body">${renderDocument(doc, model.graphs ? model : model.id)}</article></template>`).join('')}
 ${(model.graphs ?? []).map((item) => `<template id="ww-graph-${escapeXML(item.id)}">${svgMarkup(layout, item.id, false, skin)}</template>`).join('')}
+${(model.workflows ?? []).map((item) => `<template id="ww-workflow-${escapeXML(item.id)}">${workflowSVG(layout, item.id, false, skin)}</template>`).join('')}
   <aside id="inspector" hidden aria-label="Model inspector"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside>
   <script>${pageJS}</script>
 </body></html>\n`;

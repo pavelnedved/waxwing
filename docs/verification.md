@@ -244,3 +244,47 @@ were captured. Both sequence demos were regenerated with explicit scoped entry.
 Documentation links and viewer script syntax were checked. The earlier
 limitations on browser-triggered downloads and direct `file://` verification
 remain; they were not bypassed.
+
+## Architecture workflows and repeated appearances
+
+The full suite passes **174 tests**, including **22 workflow tests**. Coverage
+includes canonical identity across repeated participation and multiple workflows;
+repeat invocations of one operation; message-to-operation direction; prior-message
+reply validation; local events; source evidence, entry and scope checks;
+unknown/disputed ordering and occurrence blockers; discontinuity without invented
+handoffs; source and geometry storage-order independence; RIGHT/DOWN layout;
+custom appearance IDs; coverage, route, text, order and collision tampering;
+grouping labels; document/reference version gates; all skins; source digest and
+expected-model checks; and CLI recovery after inputs disappear. Failed layout
+leaves previous output intact. The existing renderer-without-ELK test still passes.
+
+The fictional example is [orchestration](../examples/orchestration/README.md).
+Its reproduction commands and canvas/viewport measurements are recorded there.
+Connectivity has five canonical components and four operations; the workflow
+has seven appearances and six steps. This establishes preserved source and
+explicit visual progression, not improved human comprehension. No LLM comparison
+was run.
+
+Browser checks on the generated HTML verified:
+
+- Switching between connectivity and workflow; the latter opens at 100%, with
+  scrolling and Fit available. The narrow preview's Fit view is too small to
+  read; the advisory warning and larger path width are retained as a tradeoff.
+- Selecting repeated Orchestrator appearances opens the shared source record,
+  identifies the selected participation, lists the other participations, and
+  exposes the attached Markdown. Node selection uses the canonical ID.
+- Entry/order inspection shows structured entry references, occurrence/order
+  evidence and the independently unknown trigger.
+- Markdown links to the workflow, component and reply, and a reply's link to its
+  original request. Browser Back/Forward and reload preserve navigation.
+- Standard/light and Engineering/dark, the document reader, readable size and
+  Fit overview. No browser console errors were captured.
+
+The original architecture demo was also reloaded in the browser: selecting Order
+Processing and opening its subgraph still works, with no captured console errors.
+All shipped demos were regenerated with the current renderer. Documentation file
+links and viewer script syntax were checked. Browser-triggered downloads and
+opening via `file://` retain their earlier unverified status; no bypass was
+attempted. The workflow contract explicitly limits the first presentation to
+continuous linear scenarios, with grouping labels instead of workflow frames.
+The separate sequence behavior renderer retains loops and conditionals.

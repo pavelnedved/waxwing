@@ -15,7 +15,8 @@
     "demo:documents": "node bin/waxwing.mjs build examples/documented-orders/model.json examples/documented-orders/generated --group system-structure",
     "demo:subgraphs": "node bin/waxwing.mjs build examples/subgraphs/model.json examples/subgraphs/generated",
     "demo:sequence": "node bin/waxwing.mjs build examples/sequence/model.json examples/sequence/generated",
-    "demo:sequence:markets": "node bin/waxwing.mjs build examples/sequence-markets/model.json examples/sequence-markets/generated"
+    "demo:sequence:markets": "node bin/waxwing.mjs build examples/sequence-markets/model.json examples/sequence-markets/generated",
+    "demo:workflow": "node bin/waxwing.mjs build examples/orchestration/model.json examples/orchestration/generated"
   },
   "dependencies": {
     "ajv": "8.17.1",
@@ -29,7 +30,8 @@
     "./artifacts": "./modules/render/artifacts.mjs",
     "./documents": "./modules/documents/index.mjs",
     "./graphs": "./modules/graphs/index.mjs",
-    "./sequence": "./modules/sequence/index.mjs"
+    "./sequence": "./modules/sequence/index.mjs",
+    "./workflow": "./modules/workflow/index.mjs"
   },
   "bin": {
     "waxwing": "./bin/waxwing.mjs"

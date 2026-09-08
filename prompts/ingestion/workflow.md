@@ -4,6 +4,8 @@ This workflow builds architecture diagrams: components, boundaries, and
 dependencies. For interactions ordered within one scenario, use the
 [sequence workflow](sequence.md) instead. Choose by the user's question; do not
 infer a sequence from dependency arrows or automatically generate both types.
+For an architecture model that also needs a recorded path through repeated
+components, use the [architecture workflow extension](architecture-workflows.md).
 
 Your task is to investigate the supplied sources and construct an explicitly
 scoped, partial model of current implementation. The model must be useful to

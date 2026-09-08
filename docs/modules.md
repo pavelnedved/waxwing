@@ -163,3 +163,30 @@ the root graph. `renderSVG(json2, { graphRef })` selects another graph while
 retaining the complete source. The CLI equivalent is
 `waxwing render layout.json detail.svg --graph graph-id`.
 See [subgraphs](subgraphs.md) for model selection, mappings, and version rules.
+
+## Architecture workflows
+
+`waxwing/workflow` exposes `workflowsOf(model, graphRef?)`,
+`workflowParticipants(workflow)`, `workflowDiagnostics(model)` and
+`workflowDrawingDiagnostics(model, workflow)`. These inspection helpers expect
+a structurally valid architecture model and do not load ELK. Use `validateModel`
+for untrusted JSON 1; it includes workflow semantic validation.
+
+Use the existing `layoutModel(model, options)` for complete JSON 2, including
+connectivity and workflow geometry. `validateLayout` checks both. Render a
+standalone workflow SVG with:
+
+```js
+renderSVG(layout, { workflowRef: 'checkout-run', skin: 'standard' });
+```
+
+`graphRef` and `workflowRef` are mutually exclusive. `renderHTML(layout)` includes
+all graphs, workflows and documents. Equivalent CLI selection:
+
+```sh
+node bin/waxwing.mjs render /tmp/layout.json /tmp/workflow.svg --workflow checkout-run
+```
+
+Module separation remains intact: render/validation do not import ELK, and
+artifact recovery retains the complete architecture source, including every
+workflow and document. See the [contract](architecture-workflows.md).

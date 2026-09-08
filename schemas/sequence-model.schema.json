@@ -109,7 +109,7 @@
       "$ref": "system-model.schema.json#/properties/notes"
     },
     "documents": {
-      "$ref": "system-model.schema.json#/properties/documents"
+      "$ref": "system-model.schema.json#/$defs/legacyDocuments"
     },
     "entry": {
       "$ref": "sequence-entry.schema.json"

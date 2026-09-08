@@ -88,6 +88,28 @@ distinguish internals from external context, and record how parent edges map to
 detailed edges. Documents work at every level. The [subgraph rules](docs/subgraphs.md)
 cover identity, scope, mappings, references, grouping, and current limits.
 
+## Follow repeated participation through architecture
+
+```sh
+npm run demo:workflow
+```
+
+Open [the orchestration demo](examples/orchestration/generated/diagram.html).
+Use **View** to switch from connectivity to the explicit checkout workflow:
+Checkout → Orchestrator → Stock → Orchestrator → Pricing → Orchestrator → Payment.
+The three Orchestrator appearances share **one canonical component**. Select one
+for its participation and evidence; the attached Markdown links both views and
+a reply. **Workflow entry & order** shows the scoped start and unknown trigger.
+
+This uses JSON 1 `0.5-draft` and JSON 2 `0.4-draft`. Deterministic code derives
+appearances from explicit source interactions; ELK places them. Replies refer
+to their requests without inventing reverse dependencies. The first version
+supports one continuous linear scenario, with readable 100% zoom and scrolling.
+The wider path is a tradeoff; **Fit** is an overview, not always readable text.
+See the [workflow contract](docs/architecture-workflows.md),
+[reproduction and measurements](examples/orchestration/README.md), and
+[layout warning signs](docs/layout-warning-signs.md).
+
 ## Try a basic sequence diagram
 
 ```sh
@@ -164,6 +186,7 @@ Your own producer
 | `waxwing/layout` | Generate and validate JSON 2; ELK supplies automatic geometry. |
 | `waxwing/render` | Render a valid JSON 2 without running the layout engine. |
 | `waxwing/artifacts` | Extract embedded JSON 2 and recover JSON 1. |
+| `waxwing/workflow` | Inspect architecture workflow scope, participation, and drawing blockers without loading ELK. |
 | `waxwing/sequence` | Independently validate, lay out, and render a sequence scenario or structured behavior. |
 
 These are subpath exports of one local npm package. They can be imported
@@ -186,7 +209,8 @@ node bin/waxwing.mjs recover /tmp/diagram.html /tmp/recovered-model.json
 Layout defaults to a flat diagram with no grouping. `--group` explicitly selects
 a named model perspective; only established memberships in established groups
 become enclosing frames. Other claims remain available in the inspector and
-embedded model. `--direction RIGHT|DOWN` changes placement, not relationships.
+embedded model. `--direction RIGHT|DOWN` changes placement, not relationships. Workflow views
+follow their explicit source order in that reading direction.
 
 ## What is preserved
 
@@ -231,6 +255,8 @@ npm test
 - [JSON 2](docs/json-2.md): geometry, preservation, and recovery.
 - [Modules](docs/modules.md): import paths, CLI, and extension boundaries.
 - [Viewer](docs/viewer.md): advisory warnings, semantic highlighting, and skins.
+- [Architecture workflows](docs/architecture-workflows.md): repeated participation with canonical identity.
+- [Layout warning signs](docs/layout-warning-signs.md): patterns to investigate, without an automatic tool switch.
 - [Sequence diagrams](docs/sequence.md): basic scenarios, explicit ordering, and current limits.
 - [Design](design.md): broader direction and deferred work.
 - [Third-party dependencies](THIRD_PARTY_NOTICES.md).

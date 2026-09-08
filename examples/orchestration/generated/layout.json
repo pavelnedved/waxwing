@@ -1,0 +1,955 @@
+{
+  "schemaVersion": "0.4-draft",
+  "model": {
+    "schemaVersion": "0.5-draft",
+    "id": "checkout-system",
+    "title": "One orchestrator, repeated participation",
+    "scope": {
+      "timeframe": "current",
+      "environment": "Fictional checkout service",
+      "snapshot": "Synthetic run v1",
+      "coverage": "partial",
+      "question": "How does checkout revisit one orchestrator while checking stock, pricing, and payment?",
+      "includes": [
+        "One recorded interaction path with explicit stock and pricing replies."
+      ],
+      "excludes": [
+        "Branches, retries, replicas, elapsed time, concurrency and unrecorded operations."
+      ],
+      "abstraction": "Services remain canonical components; the workflow expands their participation in one recorded scenario."
+    },
+    "sources": [
+      {
+        "id": "fictional-run",
+        "kind": "fixture",
+        "locator": "evidence.md",
+        "description": "An invented service registry and successful checkout run."
+      }
+    ],
+    "perspectives": [],
+    "entities": [
+      {
+        "id": "checkout",
+        "label": "Checkout",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Receives a submitted basket.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "omits": [
+            "Classes and deployment replicas."
+          ],
+          "reason": "Show service responsibilities."
+        }
+      },
+      {
+        "id": "orchestrator",
+        "label": "Orchestrator",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Coordinates stock, pricing and payment.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "omits": [
+            "Classes and deployment replicas."
+          ],
+          "reason": "Show service responsibilities."
+        }
+      },
+      {
+        "id": "stock",
+        "label": "Stock",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Checks stock availability.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "omits": [
+            "Classes and deployment replicas."
+          ],
+          "reason": "Show service responsibilities."
+        }
+      },
+      {
+        "id": "pricing",
+        "label": "Pricing",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Calculates the charge.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "omits": [
+            "Classes and deployment replicas."
+          ],
+          "reason": "Show service responsibilities."
+        }
+      },
+      {
+        "id": "payment",
+        "label": "Payment",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "category": {
+          "status": "established",
+          "value": "service",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "abstraction": {
+          "represents": {
+            "status": "established",
+            "value": "Accepts the final charge request.",
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "omits": [
+            "Classes and deployment replicas."
+          ],
+          "reason": "Show service responsibilities."
+        }
+      }
+    ],
+    "groups": [],
+    "memberships": [],
+    "relationships": [
+      {
+        "id": "checkout-orchestrator",
+        "from": "checkout",
+        "to": "orchestrator",
+        "label": "Submit basket",
+        "kind": "calls",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        }
+      },
+      {
+        "id": "orchestrator-stock",
+        "from": "orchestrator",
+        "to": "stock",
+        "label": "Check stock",
+        "kind": "calls",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        }
+      },
+      {
+        "id": "orchestrator-pricing",
+        "from": "orchestrator",
+        "to": "pricing",
+        "label": "Calculate charge",
+        "kind": "calls",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        }
+      },
+      {
+        "id": "orchestrator-payment",
+        "from": "orchestrator",
+        "to": "payment",
+        "label": "Charge basket",
+        "kind": "calls",
+        "existence": {
+          "status": "established",
+          "value": true,
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        }
+      }
+    ],
+    "notes": [],
+    "rootGraphRef": "services",
+    "graphs": [
+      {
+        "id": "services",
+        "title": "Checkout connectivity",
+        "scope": {
+          "timeframe": "current",
+          "environment": "Fictional checkout service",
+          "snapshot": "Synthetic run v1",
+          "coverage": "partial",
+          "question": "Which services invoke which operations?",
+          "includes": [
+            "One recorded interaction path with explicit stock and pricing replies."
+          ],
+          "excludes": [
+            "Branches, retries, replicas, elapsed time, concurrency and unrecorded operations."
+          ],
+          "abstraction": "One box per service. Relationships express actor-to-resource operations, without execution order."
+        },
+        "entityRefs": [
+          "checkout",
+          "orchestrator",
+          "stock",
+          "pricing",
+          "payment"
+        ],
+        "contextRefs": [],
+        "relationshipRefs": [
+          "checkout-orchestrator",
+          "orchestrator-stock",
+          "orchestrator-pricing",
+          "orchestrator-payment"
+        ],
+        "membershipRefs": []
+      }
+    ],
+    "workflows": [
+      {
+        "id": "checkout-run",
+        "title": "Checkout through the orchestrator",
+        "graphRef": "services",
+        "scope": {
+          "timeframe": "current",
+          "environment": "Fictional checkout service",
+          "snapshot": "Synthetic run v1",
+          "coverage": "partial",
+          "question": "How does checkout revisit one orchestrator while checking stock, pricing, and payment?",
+          "includes": [
+            "One recorded interaction path with explicit stock and pricing replies."
+          ],
+          "excludes": [
+            "Branches, retries, replicas, elapsed time, concurrency and unrecorded operations."
+          ],
+          "abstraction": "Services remain canonical components; the workflow expands their participation in one recorded scenario."
+        },
+        "steps": [
+          {
+            "id": "submit",
+            "label": "Submit basket",
+            "kind": "message",
+            "from": "checkout",
+            "to": "orchestrator",
+            "occurrence": {
+              "status": "established",
+              "value": true,
+              "basis": {
+                "sourceRefs": [
+                  "fictional-run"
+                ],
+                "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+              }
+            },
+            "relationshipRef": "checkout-orchestrator"
+          },
+          {
+            "id": "check-stock",
+            "label": "Check stock",
+            "kind": "message",
+            "from": "orchestrator",
+            "to": "stock",
+            "occurrence": {
+              "status": "established",
+              "value": true,
+              "basis": {
+                "sourceRefs": [
+                  "fictional-run"
+                ],
+                "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+              }
+            },
+            "relationshipRef": "orchestrator-stock"
+          },
+          {
+            "id": "stock-result",
+            "label": "Stock available",
+            "kind": "reply",
+            "from": "stock",
+            "to": "orchestrator",
+            "occurrence": {
+              "status": "established",
+              "value": true,
+              "basis": {
+                "sourceRefs": [
+                  "fictional-run"
+                ],
+                "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+              }
+            },
+            "replyTo": "check-stock"
+          },
+          {
+            "id": "calculate-charge",
+            "label": "Calculate charge",
+            "kind": "message",
+            "from": "orchestrator",
+            "to": "pricing",
+            "occurrence": {
+              "status": "established",
+              "value": true,
+              "basis": {
+                "sourceRefs": [
+                  "fictional-run"
+                ],
+                "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+              }
+            },
+            "relationshipRef": "orchestrator-pricing"
+          },
+          {
+            "id": "charge-result",
+            "label": "Charge calculated",
+            "kind": "reply",
+            "from": "pricing",
+            "to": "orchestrator",
+            "occurrence": {
+              "status": "established",
+              "value": true,
+              "basis": {
+                "sourceRefs": [
+                  "fictional-run"
+                ],
+                "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+              }
+            },
+            "replyTo": "calculate-charge"
+          },
+          {
+            "id": "charge-payment",
+            "label": "Charge basket",
+            "kind": "message",
+            "from": "orchestrator",
+            "to": "payment",
+            "occurrence": {
+              "status": "established",
+              "value": true,
+              "basis": {
+                "sourceRefs": [
+                  "fictional-run"
+                ],
+                "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+              }
+            },
+            "relationshipRef": "orchestrator-payment"
+          }
+        ],
+        "order": {
+          "status": "established",
+          "value": [
+            "submit",
+            "check-stock",
+            "stock-result",
+            "calculate-charge",
+            "charge-result",
+            "charge-payment"
+          ],
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "entry": {
+          "point": {
+            "status": "established",
+            "value": {
+              "participantRef": "checkout",
+              "itemRef": "submit"
+            },
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "trigger": {
+            "status": "unknown",
+            "reason": "The fixture begins with submission; its upstream user action is not recorded."
+          }
+        }
+      }
+    ],
+    "documents": [
+      {
+        "id": "reading-workflow",
+        "title": "Reading repeated participation",
+        "format": "markdown",
+        "attachments": [
+          {
+            "kind": "graph",
+            "ref": "services"
+          },
+          {
+            "kind": "workflow",
+            "ref": "checkout-run"
+          },
+          {
+            "kind": "node",
+            "ref": "orchestrator"
+          },
+          {
+            "kind": "step",
+            "ref": "stock-result",
+            "workflowRef": "checkout-run"
+          }
+        ],
+        "markdown": "# Reading repeated participation\n\nThe [connectivity view](#graph=services) has one box per service. It answers which services invoke which operations. It does not record the order of those operations.\n\nThe [checkout workflow](#workflow=checkout-run) answers a different question: where does this one recorded interaction path go next?\n\n[Orchestrator](#workflow=checkout-run&node=orchestrator) appears three times. Each appearance refers to the **same service**, not a replica, separate deployment, or new owner. Select one to inspect its participation and the shared source record.\n\nThe [stock result](#workflow=checkout-run&step=stock-result) is a reply to the stock request. It creates no new Stock → Orchestrator architecture dependency.\n\n## Limits of this recording\n\nThe upstream trigger is explicitly unknown. The run stops after the payment request; no payment success or final response is implied. Neither the spacing nor a message arrow establishes elapsed time or blocking.\n",
+        "links": [
+          {
+            "href": "#graph=services",
+            "target": {
+              "kind": "graph",
+              "ref": "services"
+            }
+          },
+          {
+            "href": "#workflow=checkout-run",
+            "target": {
+              "kind": "workflow",
+              "ref": "checkout-run"
+            }
+          },
+          {
+            "href": "#workflow=checkout-run&node=orchestrator",
+            "target": {
+              "kind": "node",
+              "ref": "orchestrator",
+              "workflowRef": "checkout-run"
+            }
+          },
+          {
+            "href": "#workflow=checkout-run&step=stock-result",
+            "target": {
+              "kind": "step",
+              "ref": "stock-result",
+              "workflowRef": "checkout-run"
+            }
+          }
+        ],
+        "assets": []
+      }
+    ]
+  },
+  "modelDigest": "65d9907a334b065b16bad1528be0e9a35b65f5a2ebd466f1fbaa88ea1f3674eb",
+  "graphs": [
+    {
+      "ref": "services",
+      "layout": {
+        "engine": "elk-layered@0.12.0",
+        "direction": "RIGHT",
+        "groupingPerspectiveRef": null
+      },
+      "canvas": {
+        "width": 1448.8,
+        "height": 604
+      },
+      "nodes": [
+        {
+          "ref": "checkout",
+          "box": {
+            "x": 36,
+            "y": 67,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "orchestrator",
+          "box": {
+            "x": 597.6,
+            "y": 67,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "payment",
+          "box": {
+            "x": 1180.8,
+            "y": 240,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "pricing",
+          "box": {
+            "x": 1180.8,
+            "y": 444,
+            "width": 232,
+            "height": 124
+          }
+        },
+        {
+          "ref": "stock",
+          "box": {
+            "x": 1180.8,
+            "y": 36,
+            "width": 232,
+            "height": 124
+          }
+        }
+      ],
+      "groups": [],
+      "edges": [
+        {
+          "ref": "checkout-orchestrator",
+          "from": "checkout",
+          "to": "orchestrator",
+          "points": [
+            {
+              "x": 268,
+              "y": 129
+            },
+            {
+              "x": 597.6,
+              "y": 129
+            }
+          ],
+          "label": {
+            "x": 378,
+            "y": 146,
+            "width": 109.60000000000001,
+            "height": 30
+          }
+        },
+        {
+          "ref": "orchestrator-payment",
+          "from": "orchestrator",
+          "to": "payment",
+          "points": [
+            {
+              "x": 829.6,
+              "y": 129
+            },
+            {
+              "x": 874.6,
+              "y": 129
+            },
+            {
+              "x": 874.6,
+              "y": 302
+            },
+            {
+              "x": 1180.8,
+              "y": 302
+            }
+          ],
+          "label": {
+            "x": 950.4,
+            "y": 319,
+            "width": 109.60000000000001,
+            "height": 30
+          }
+        },
+        {
+          "ref": "orchestrator-pricing",
+          "from": "orchestrator",
+          "to": "pricing",
+          "points": [
+            {
+              "x": 829.6,
+              "y": 160
+            },
+            {
+              "x": 864.6,
+              "y": 160
+            },
+            {
+              "x": 864.6,
+              "y": 506
+            },
+            {
+              "x": 1180.8,
+              "y": 506
+            }
+          ],
+          "label": {
+            "x": 939.6,
+            "y": 523,
+            "width": 131.2,
+            "height": 30
+          }
+        },
+        {
+          "ref": "orchestrator-stock",
+          "from": "orchestrator",
+          "to": "stock",
+          "points": [
+            {
+              "x": 829.6,
+              "y": 98
+            },
+            {
+              "x": 1180.8,
+              "y": 98
+            }
+          ],
+          "label": {
+            "x": 957.6,
+            "y": 115,
+            "width": 95.2,
+            "height": 30
+          }
+        }
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "ref": "checkout-run",
+      "layout": {
+        "engine": "elk-layered@0.12.0",
+        "direction": "RIGHT",
+        "groupingPerspectiveRef": null
+      },
+      "canvas": {
+        "width": 4056,
+        "height": 308
+      },
+      "appearances": [
+        {
+          "id": "appearance-0",
+          "entityRef": "checkout",
+          "afterStepRef": null,
+          "box": {
+            "x": 36,
+            "y": 96,
+            "width": 252,
+            "height": 148
+          }
+        },
+        {
+          "id": "appearance-1",
+          "entityRef": "orchestrator",
+          "afterStepRef": "submit",
+          "box": {
+            "x": 659.2,
+            "y": 96,
+            "width": 252,
+            "height": 148
+          }
+        },
+        {
+          "id": "appearance-2",
+          "entityRef": "stock",
+          "afterStepRef": "check-stock",
+          "box": {
+            "x": 1282.4,
+            "y": 96,
+            "width": 252,
+            "height": 148
+          }
+        },
+        {
+          "id": "appearance-3",
+          "entityRef": "orchestrator",
+          "afterStepRef": "stock-result",
+          "box": {
+            "x": 1905.6000000000001,
+            "y": 96,
+            "width": 252,
+            "height": 148
+          }
+        },
+        {
+          "id": "appearance-4",
+          "entityRef": "pricing",
+          "afterStepRef": "calculate-charge",
+          "box": {
+            "x": 2528.8,
+            "y": 96,
+            "width": 252,
+            "height": 148
+          }
+        },
+        {
+          "id": "appearance-5",
+          "entityRef": "orchestrator",
+          "afterStepRef": "charge-result",
+          "box": {
+            "x": 3144.8,
+            "y": 96,
+            "width": 252,
+            "height": 148
+          }
+        },
+        {
+          "id": "appearance-6",
+          "entityRef": "payment",
+          "afterStepRef": "charge-payment",
+          "box": {
+            "x": 3768,
+            "y": 96,
+            "width": 252,
+            "height": 148
+          }
+        }
+      ],
+      "edges": [
+        {
+          "ref": "submit",
+          "fromAppearanceRef": "appearance-0",
+          "toAppearanceRef": "appearance-1",
+          "points": [
+            {
+              "x": 288,
+              "y": 170
+            },
+            {
+              "x": 659.2,
+              "y": 170
+            }
+          ],
+          "label": {
+            "x": 388,
+            "y": 187,
+            "width": 171.20000000000002,
+            "height": 48
+          }
+        },
+        {
+          "ref": "check-stock",
+          "fromAppearanceRef": "appearance-1",
+          "toAppearanceRef": "appearance-2",
+          "points": [
+            {
+              "x": 911.2,
+              "y": 170
+            },
+            {
+              "x": 1282.4,
+              "y": 170
+            }
+          ],
+          "label": {
+            "x": 1011.2,
+            "y": 187,
+            "width": 171.20000000000002,
+            "height": 48
+          }
+        },
+        {
+          "ref": "stock-result",
+          "fromAppearanceRef": "appearance-2",
+          "toAppearanceRef": "appearance-3",
+          "points": [
+            {
+              "x": 1534.4,
+              "y": 170
+            },
+            {
+              "x": 1905.6000000000001,
+              "y": 170
+            }
+          ],
+          "label": {
+            "x": 1634.4,
+            "y": 187,
+            "width": 171.20000000000002,
+            "height": 66
+          }
+        },
+        {
+          "ref": "calculate-charge",
+          "fromAppearanceRef": "appearance-3",
+          "toAppearanceRef": "appearance-4",
+          "points": [
+            {
+              "x": 2157.6000000000004,
+              "y": 170
+            },
+            {
+              "x": 2528.8,
+              "y": 170
+            }
+          ],
+          "label": {
+            "x": 2257.6000000000004,
+            "y": 187,
+            "width": 171.20000000000002,
+            "height": 48
+          }
+        },
+        {
+          "ref": "charge-result",
+          "fromAppearanceRef": "appearance-4",
+          "toAppearanceRef": "appearance-5",
+          "points": [
+            {
+              "x": 2780.8,
+              "y": 170
+            },
+            {
+              "x": 3144.8,
+              "y": 170
+            }
+          ],
+          "label": {
+            "x": 2880.8,
+            "y": 187,
+            "width": 164,
+            "height": 84
+          }
+        },
+        {
+          "ref": "charge-payment",
+          "fromAppearanceRef": "appearance-5",
+          "toAppearanceRef": "appearance-6",
+          "points": [
+            {
+              "x": 3396.8,
+              "y": 170
+            },
+            {
+              "x": 3768,
+              "y": 170
+            }
+          ],
+          "label": {
+            "x": 3496.8,
+            "y": 187,
+            "width": 171.20000000000002,
+            "height": 48
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -139,3 +139,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 #readability p { font-size:12px; }
 .readability-row { padding:8px 0; border-top:1px solid var(--border); }
 @media(max-width:700px) { .map-toolbar, .map-toolbar>div { flex-wrap:wrap; gap:8px; }.highlight-toolbar select { min-width:0; width:100%; } }
+
+#workflow-controls { display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin:18px 0; }
+#workflow-controls[hidden], .highlight-toolbar[hidden] { display:none; }
+#workflow-controls select { max-width:min(80vw, 560px); font:inherit; padding:8px; }

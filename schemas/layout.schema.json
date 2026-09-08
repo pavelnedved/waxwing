@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Waxwing JSON 2 \u2014 drafts 0.1, 0.2, and 0.3",
+  "title": "Waxwing JSON 2 — drafts 0.1 through 0.4",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -13,7 +13,8 @@
       "enum": [
         "0.1-draft",
         "0.2-draft",
-        "0.3-draft"
+        "0.3-draft",
+        "0.4-draft"
       ]
     },
     "model": {
@@ -144,6 +145,135 @@
       "minItems": 1,
       "items": {
         "$ref": "#/$defs/graphLayout"
+      }
+    },
+    "workflows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ref",
+          "layout",
+          "canvas",
+          "appearances",
+          "edges"
+        ],
+        "properties": {
+          "ref": {
+            "$ref": "system-model.schema.json#/$defs/id"
+          },
+          "layout": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "engine",
+              "direction",
+              "groupingPerspectiveRef"
+            ],
+            "properties": {
+              "engine": {
+                "type": "string",
+                "minLength": 1
+              },
+              "direction": {
+                "enum": [
+                  "RIGHT",
+                  "DOWN"
+                ]
+              },
+              "groupingPerspectiveRef": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "canvas": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "width",
+              "height"
+            ],
+            "properties": {
+              "width": {
+                "$ref": "#/$defs/size"
+              },
+              "height": {
+                "$ref": "#/$defs/size"
+              }
+            }
+          },
+          "appearances": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "entityRef",
+                "afterStepRef",
+                "box"
+              ],
+              "properties": {
+                "id": {
+                  "$ref": "system-model.schema.json#/$defs/id"
+                },
+                "entityRef": {
+                  "$ref": "system-model.schema.json#/$defs/id"
+                },
+                "afterStepRef": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "box": {
+                  "$ref": "#/$defs/box"
+                }
+              }
+            }
+          },
+          "edges": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "ref",
+                "fromAppearanceRef",
+                "toAppearanceRef",
+                "points",
+                "label"
+              ],
+              "properties": {
+                "ref": {
+                  "$ref": "system-model.schema.json#/$defs/id"
+                },
+                "fromAppearanceRef": {
+                  "$ref": "system-model.schema.json#/$defs/id"
+                },
+                "toAppearanceRef": {
+                  "$ref": "system-model.schema.json#/$defs/id"
+                },
+                "points": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "$ref": "#/$defs/point"
+                  }
+                },
+                "label": {
+                  "$ref": "#/$defs/box"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -359,7 +489,8 @@
           "canvas": true,
           "nodes": true,
           "groups": true,
-          "edges": true
+          "edges": true,
+          "workflows": false
         },
         "required": [
           "layout",
@@ -396,7 +527,8 @@
           "canvas": true,
           "nodes": true,
           "groups": true,
-          "edges": true
+          "edges": true,
+          "workflows": false
         },
         "required": [
           "layout",
@@ -433,10 +565,46 @@
           "nodes": false,
           "groups": false,
           "edges": false,
-          "graphs": true
+          "graphs": true,
+          "workflows": false
         },
         "required": [
           "graphs"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "const": "0.4-draft"
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "model": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "const": "0.5-draft"
+              }
+            }
+          },
+          "layout": false,
+          "canvas": false,
+          "nodes": false,
+          "groups": false,
+          "edges": false,
+          "graphs": true,
+          "workflows": true
+        },
+        "required": [
+          "graphs",
+          "workflows"
         ]
       }
     }

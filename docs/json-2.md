@@ -124,3 +124,14 @@ Source recovery verifies the embedded specification, not every pixel or XML
 element of an externally edited SVG/HTML file. A recomputed digest also cannot
 prove authenticity. Compare against an independently trusted JSON 1 through
 `expectedModel` when that distinction matters.
+
+## Architecture workflow geometry (`0.4-draft`)
+
+For architecture source `0.5-draft`, JSON 2 retains complete JSON 1 and the existing
+`graphs` connectivity geometry, plus one `workflows` presentation per source
+workflow. Appearances map a canonical `entityRef` to an explicit participation
+slot (`afterStepRef`); step edges connect exact appearance IDs. Multiple visual
+boxes never create new source components. See the
+[workflow geometry and validation rules](architecture-workflows.md#json-2-participation-before-coordinates).
+The renderer accepts independently authored compatible geometry; it does not
+run ELK. SVG export may select a workflow; HTML contains all included views.

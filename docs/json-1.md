@@ -280,3 +280,12 @@ never recorded. The MVP embeds the complete JSON 1 inside JSON 2 and embeds that
 and HTML. The HTML inspector exposes records, claims, and sources, with JSON
 downloads for complete inspection. Recovery is implemented without interpreting
 SVG coordinates; see the [module entry points](modules.md).
+
+## Architecture workflows (`0.5-draft`)
+
+The [workflow contract](architecture-workflows.md) extends graph-based architecture
+with explicit, qualified interactions, order, and scoped entry. Canonical
+components and operations remain in their registries. A repeated visit is a
+step participation, not another entity. JSON 1 still contains no coordinates.
+The `workflows` array is required in this version and may be empty. Earlier
+versions do not accept workflow fields or workflow/step document targets.

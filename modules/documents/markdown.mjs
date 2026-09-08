@@ -48,6 +48,12 @@ export function parseMarkdown(source) {
 export function targetURL(target, graphId) {
   const params = new URLSearchParams();
   if (target.kind === 'document') params.set('document', target.ref);
+  else if (target.kind === 'workflow') params.set('workflow', target.ref);
+  else if (target.workflowRef || target.kind === 'step') {
+    const workflowRef = target.workflowRef ?? graphId.workflows?.find((w) => w.steps.some((s) => s.id === target.ref))?.id;
+    if (workflowRef) params.set('workflow', workflowRef);
+    params.set(target.kind, target.ref);
+  }
   else {
     if (target.kind === 'graph') params.set('graph', target.ref);
     else if (target.graphRef || typeof graphId === 'string') params.set('graph', target.graphRef ?? graphId);
@@ -63,7 +69,12 @@ export function fragmentTarget(href, documentId, graphId) {
   if (!fragment.includes('=')) return { kind: 'document', ref: documentId, ...(fragment ? { heading: decodeURIComponent(fragment) } : {}) };
   const params = new URLSearchParams(fragment);
   const keys = [...params.keys()];
-  if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'graph', 'node', 'edge', 'block', 'heading'].includes(key))) throw new Error(`Invalid internal link "${href}".`);
+  if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'graph', 'node', 'edge', 'block', 'heading', 'workflow', 'step'].includes(key))) throw new Error(`Invalid internal link "${href}".`);
+  if (params.has('workflow') || params.has('step')) {
+    if (['document','graph','edge','block','heading'].some((key) => params.has(key)) || (params.has('node') && params.has('step'))) throw new Error(`Ambiguous workflow link "${href}".`);
+    if (params.has('step') || params.has('node')) return { kind: params.has('step') ? 'step' : 'node', ref: params.get(params.has('step') ? 'step' : 'node'), ...(params.has('workflow') ? { workflowRef: params.get('workflow') } : {}) };
+    return { kind: 'workflow', ref: params.get('workflow') };
+  }
   if (params.has('document')) {
     if (['graph', 'node', 'edge', 'block'].some((key) => params.has(key))) throw new Error(`Ambiguous internal link "${href}".`);
     return { kind: 'document', ref: params.get('document'), ...(params.has('heading') ? { heading: params.get('heading') } : {}) };
@@ -94,8 +105,13 @@ export function documentDiagnostics(model) {
       value.kind === 'node' ? model.entities.some((item) => item.id === value.ref) :
       value.kind === 'edge' ? model.relationships.some((item) => item.id === value.ref) :
       value.kind === 'block' ? model.diagramType === 'sequence' && model.schemaVersion === '0.2-sequence-draft' && model.blocks.some((item) => item.id === value.ref) :
+      value.kind === 'workflow' ? model.workflows?.some((w) => w.id === value.ref) :
+      value.kind === 'step' ? model.workflows?.some((w) => w.steps.some((s) => s.id === value.ref)) :
       value.kind === 'document' && !attachment && docs.has(value.ref);
-    if (value.graphRef !== undefined) {
+    if (value.workflowRef !== undefined) {
+      const workflow = model.workflows?.find((w) => w.id === value.workflowRef);
+      if (value.graphRef !== undefined || !workflow || !['node','step'].includes(value.kind) || !(value.kind === 'node' ? workflow.steps.some((s) => [s.from,s.to].includes(value.ref)) : workflow.steps.some((s) => s.id === value.ref))) add(path, 'workflowRef must name a workflow showing the target component or step.');
+    } else if (value.graphRef !== undefined) {
       const graph = graphsOf(model).find((item) => item.id === value.graphRef);
       if (!model.graphs || !['node', 'edge'].includes(value.kind) || !graph ||
         !(value.kind === 'node' ? graphNodes(graph) : graph.relationshipRefs).includes(value.ref)) add(path, 'graphRef must name a graph showing the target node or edge.');

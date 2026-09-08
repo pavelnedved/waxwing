@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { layoutWorkflow } from '../workflow/layout.mjs';
 import { layoutSequence } from '../sequence/layout.mjs';
 import { projectGraph } from '../graphs/index.mjs';
 import { createRequire } from 'node:module';
@@ -28,7 +29,9 @@ export async function layoutModel(input, options = {}) {
       const { layout, canvas, nodes, groups, edges } = await layoutModel(projectGraph(input, graph.id), options);
       graphs.push({ ref: graph.id, layout, canvas, nodes, groups, edges });
     }
-    const output = { schemaVersion: '0.3-draft', model: structuredClone(input), modelDigest: digest(input), graphs };
+    const workflows = [];
+    for (const workflow of [...(input.workflows ?? [])].sort((a,b) => a.id.localeCompare(b.id))) workflows.push(await layoutWorkflow(input, workflow, { direction, groupingPerspectiveRef }, `elk-layered@${elkVersion}`));
+    const output = { schemaVersion: input.schemaVersion === '0.5-draft' ? '0.4-draft' : '0.3-draft', model: structuredClone(input), modelDigest: digest(input), graphs, ...(input.workflows ? { workflows } : {}) };
     const verified = validateLayout(output, { expectedModel: input });
     if (!verified.ok) fail('Generated graph layouts failed validation.', verified.diagnostics);
     return output;

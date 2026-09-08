@@ -53,3 +53,13 @@ tradeoffs including readability, dimensions, reproducibility, cost, and latency.
 An LLM or hybrid proposal should demonstrate a useful improvement against a
 conventional-code baseline on the same input. Preserve this run as historical
 evidence instead of overwriting its conclusion with a later experiment.
+
+## Architecture workflow extension
+
+The deterministic baseline now accepts explicit architecture workflow semantics
+and derives repeated appearances before ELK placement. This is an opt-in source
+extension, not inference from dependency arrows. Connectivity remains available.
+The [fictional orchestration demo](../../examples/orchestration/README.md) records
+the resulting path and width tradeoff. [Warning signs](../layout-warning-signs.md)
+describe patterns to investigate without prescribing an LLM migration. The
+original pipeline experiment and its measurements remain unchanged.

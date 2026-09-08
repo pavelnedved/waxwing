@@ -9,7 +9,7 @@ const usage = `Waxwing — experimental modular diagram tool
   waxwing prepare <model.json> <resolved-model.json>
   waxwing layout <model.json> <layout.json> [--group perspective-id] [--direction RIGHT|DOWN]
   waxwing check-layout <layout.json>
-  waxwing render <layout.json> <output.svg|output.html> [--graph graph-id]
+  waxwing render <layout.json> <output.svg|output.html> [--graph graph-id | --workflow workflow-id]
   waxwing recover <layout.json|diagram.svg|diagram.html> <model.json>
   waxwing build <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
 
@@ -78,12 +78,12 @@ try {
       console.log(JSON.stringify({ ok: true, outputs: paths }, null, 2));
     }
   } else if (command === 'render') {
-    if (args.length !== 2 && !(args.length === 4 && args[2] === '--graph')) throw new Error('render requires JSON 2 and an SVG or HTML output path, optionally --graph for SVG.');
+    if (args.length !== 2 && !(args.length === 4 && ['--graph', '--workflow'].includes(args[2]))) throw new Error('render requires JSON 2 and an SVG or HTML output path, optionally --graph or --workflow for SVG.');
     const { renderSVG, renderHTML } = await import('../modules/render/index.mjs');
     const renderer = { '.svg': renderSVG, '.html': renderHTML }[path.extname(args[1]).toLowerCase()];
     if (!renderer) throw new Error('Output extension must be .svg or .html.');
-    if (args.length === 4 && path.extname(args[1]).toLowerCase() !== '.svg') throw new Error('--graph selects a standalone SVG; HTML always includes all graphs.');
-    const content = renderer(readJSON(args[0]), args.length === 4 ? { graphRef: args[3] } : undefined);
+    if (args.length === 4 && path.extname(args[1]).toLowerCase() !== '.svg') throw new Error('--graph/--workflow select a standalone SVG; HTML includes all views.');
+    const content = renderer(readJSON(args[0]), args.length === 4 ? { [args[2] === '--workflow' ? 'workflowRef' : 'graphRef']: args[3] } : undefined);
     console.log(JSON.stringify({ ok: true, output: write(args[1], content, [args[0]]) }));
   } else if (command === 'recover') {
     if (args.length !== 2) throw new Error('recover requires an artifact and a JSON 1 output path.');

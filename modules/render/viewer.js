@@ -8,12 +8,16 @@
     entityRefs: model.entities.map((item) => item.id), contextRefs: [],
     relationshipRefs: model.relationships.map((item) => item.id), membershipRefs: model.memberships.map((item) => item.id) }];
   const root = model.rootGraphRef ?? model.id;
+  const workflows = model.workflows ?? [];
+  let activeWorkflow = null;
+  let activeAppearance = null;
   let activeGraph = graphs.find((item) => item.id === root);
   let drawing = layout.graphs?.find((item) => item.ref === root) ?? layout;
   const graphNodes = (graph) => [...graph.entityRefs, ...graph.contextRefs];
   const locations = (kind, ref) => graphs.filter((graph) => (kind === 'node' ? graphNodes(graph) : graph.relationshipRefs).includes(ref));
-  const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'graphs'];
+  const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'graphs', 'workflows'];
   const index = new Map(collections.flatMap((collection) => (model[collection] ?? []).map((record) => [record.id, { record, collection }])));
+  for (const workflow of workflows) for (const step of workflow.steps) index.set(step.id, { record: step, collection: 'steps', workflowRef: workflow.id });
   let svg = document.querySelector('.ww-svg');
   const sourceMetadata = document.getElementById('waxwing-source').cloneNode(true);
   const viewport = document.getElementById('map-viewport');
@@ -55,7 +59,7 @@
       }
       if (!value.length) container.append(el('div', 'None recorded', 'detail-value'));
     } else if (value && typeof value === 'object') container.append(objectFields(value));
-    else if ((key.endsWith('Ref') || ['from', 'to'].includes(key)) && index.has(value)) {
+    else if ((key.endsWith('Ref') || ['from', 'to', 'replyTo'].includes(key)) && index.has(value)) {
       const button = el('button', name(value), 'source-ref');
       button.addEventListener('click', () => show(value));
       container.append(button);
@@ -76,7 +80,8 @@
   function claim(value) {
     const container = el('div', undefined, 'claim');
     container.append(el('span', value.status, `status-pill ${value.status}`));
-    if (Object.hasOwn(value, 'value')) container.append(el('div', Array.isArray(value.value) ? value.value.map(name).join(' + ') : typeof value.value === 'string' && index.has(value.value) ? name(value.value) : String(value.value), 'detail-value'));
+    if (value.value && typeof value.value === 'object' && !Array.isArray(value.value)) container.append(objectFields(value.value));
+    else if (Object.hasOwn(value, 'value')) container.append(el('div', Array.isArray(value.value) ? value.value.map(name).join(' + ') : typeof value.value === 'string' && index.has(value.value) ? name(value.value) : String(value.value), 'detail-value'));
     if (value.reason) container.append(el('div', value.reason, 'detail-value'));
     if (value.basis) {
       container.append(el('div', value.basis.explanation, 'claim-basis'));
@@ -103,7 +108,7 @@
     if (!record) return;
     content.append(el('h2', ref === '__model' ? 'Model & scope' : name(ref)));
     content.append(el('div', ref === '__model' ? `${model.schemaVersion} · ${model.id}` : ref, 'record-id'));
-    const attached = documents.filter((doc) => doc.attachments.some((target) => ref === '__model' ? target.kind === 'graph' && target.ref === activeGraph.id : target.ref === ref && ['node', 'edge'].includes(target.kind) && (!target.graphRef || target.graphRef === activeGraph.id)));
+    const attached = documents.filter((doc) => doc.attachments.some((target) => ref === '__model' ? target.kind === 'graph' && target.ref === activeGraph.id : target.ref === ref && ['node', 'edge', 'workflow', 'step'].includes(target.kind) && (!target.graphRef || target.graphRef === activeGraph.id) && (!target.workflowRef || target.workflowRef === activeWorkflow?.id)));
     if (attached.length) {
       const section = el('section', undefined, 'attached-documents');
       section.append(el('h3', 'Documents'));
@@ -126,14 +131,25 @@
       mappingLink.href = `#graph=${graph.id}&boundary=${ref}`;
       section.append(el('h3', 'Detailed correspondence'), mappingLink, claim(boundary.detail)); content.append(section);
     }
+    if (activeWorkflow && index.get(ref)?.collection === 'entities') {
+      const section = el('section', undefined, 'attached-documents');
+      section.append(el('h3', 'Participation in this workflow'), el('p', 'Every appearance below refers to this same canonical component.'));
+      if (activeAppearance?.entityRef === ref) section.append(field('selectedParticipation', { appearanceId: activeAppearance.id, entityRef: ref, afterStepRef: activeAppearance.afterStepRef ?? 'First recorded actor' }));
+      for (const a of drawing.appearances.filter((a) => a.entityRef === ref)) {
+        const link = el('a', a.afterStepRef ? `After ${name(a.afterStepRef)} →` : 'First recorded actor →', 'document-link');
+        link.href = `#workflow=${activeWorkflow.id}&node=${ref}&appearance=${a.id}`; section.append(link);
+      }
+      content.append(section);
+    }
     if (ref === '__model') {
+      if (activeWorkflow) content.append(field('workflow', activeWorkflow));
       content.append(field('graph', activeGraph));
       content.append(field('modelScope', model.scope));
       content.append(field('perspectives', model.perspectives));
       content.append(field('sources', model.sources));
       const catalog = el('section', undefined, 'detail-section');
       catalog.append(el('h3', 'All model records'));
-      for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes', 'documents']) {
+      for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'workflows']) {
         const row = el('div', undefined, 'detail-field');
         row.append(el('span', collection, 'detail-key'));
         for (const item of model[collection] ?? []) {
@@ -179,6 +195,11 @@
   }
   function targetHash(target) {
     const params = new URLSearchParams();
+    if (target.kind === 'workflow') return `#workflow=${encodeURIComponent(target.ref)}`;
+    if (target.workflowRef || target.kind === 'step') {
+      const owner = target.workflowRef ?? index.get(target.ref)?.workflowRef;
+      return `#workflow=${encodeURIComponent(owner)}&${target.kind}=${encodeURIComponent(target.ref)}`;
+    }
     if (target.kind === 'document') params.set('document', target.ref);
     else {
       if (target.kind === 'graph') params.set('graph', target.ref);
@@ -198,10 +219,15 @@
   }
   function show(ref) {
     const collection = index.get(ref)?.collection;
-    const kind = { documents: 'document', entities: 'node', relationships: 'edge', graphs: 'graph' }[collection];
+    if (collection === 'workflows') { navigate(`#workflow=${ref}&record=${ref}`); return; }
+    if (activeWorkflow && (ref === '__model' || (collection !== 'relationships' && collection !== 'graphs' && collection !== 'documents' && collection !== 'workflows' && collection !== 'steps'))) {
+      const key = collection === 'entities' && drawing.appearances.some((a) => a.entityRef === ref) ? 'node' : 'record';
+      navigate(`#workflow=${activeWorkflow.id}&${key}=${encodeURIComponent(ref)}`); return;
+    }
+    const kind = { documents: 'document', entities: 'node', relationships: 'edge', graphs: 'graph', workflows: 'workflow', steps: 'step' }[collection];
     navigate(kind ? targetHash({ kind, ref }) : `#graph=${activeGraph.id}&record=${encodeURIComponent(ref)}`);
   }
-  function close() { navigate(`#graph=${activeGraph.id}`); }
+  function close() { navigate(activeWorkflow ? `#workflow=${activeWorkflow.id}` : `#graph=${activeGraph.id}`); }
   const reader = document.getElementById('document-reader');
   const documentContent = document.getElementById('document-content');
   const diagramMain = document.getElementById('diagram-main');
@@ -261,13 +287,15 @@
     const hash = location.hash.slice(1);
     if (hash === 'documents') { documentScreen(); return; }
     const params = new URLSearchParams(hash), keys = [...params.keys()];
-    if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'heading', 'graph', 'node', 'edge', 'record', 'boundary'].includes(key))) { unavailable('This link uses an unsupported or ambiguous target.'); return; }
+    if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'heading', 'graph', 'node', 'edge', 'record', 'boundary', 'workflow', 'step', 'appearance'].includes(key))) { unavailable('This link uses an unsupported or ambiguous target.'); return; }
     if (params.has('document')) {
       if (keys.some((key) => !['document', 'heading'].includes(key))) { unavailable('This link names conflicting destinations.'); return; }
       const doc = documents.find((item) => item.id === params.get('document'));
       if (!doc) { unavailable('The requested document is not included in this export.'); return; }
       documentScreen(doc, params.has('heading') ? params.get('heading') : undefined); return;
     }
+    if (params.has('workflow') || params.has('step')) { workflowRoute(params); return; }
+    if (params.has('appearance')) { unavailable('An appearance needs a workflow target.'); return; }
     if (params.has('heading') || ['node', 'edge', 'record', 'boundary'].filter((key) => params.has(key)).length > 1 || (params.has('graph') && !graphs.some((graph) => graph.id === params.get('graph')))) { unavailable('The requested graph or record is not available.'); return; }
     const requestedKind = ['node', 'edge'].find((kind) => params.has(kind));
     let graphRef = params.get('graph') ?? root;
@@ -301,12 +329,17 @@
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !inspector.hidden) close(); });
   document.getElementById('model-details').addEventListener('click', () => show('__model'));
   document.querySelector('.brand').addEventListener('click', (event) => { event.preventDefault(); navigate(`#graph=${root}`); fit(); });
-  viewport.addEventListener('click', (event) => { const record = event.target.closest('[data-ref]'); if (record) show(record.dataset.ref); });
+  viewport.addEventListener('click', (event) => { const record = event.target.closest('[data-ref]'); if (record) inspectVisual(record); });
   viewport.addEventListener('keydown', (event) => {
     if (!['Enter', ' '].includes(event.key)) return;
     const record = event.target.closest('[data-ref]');
-    if (record) { event.preventDefault(); show(record.dataset.ref); }
+    if (record) { event.preventDefault(); inspectVisual(record); }
   });
+
+  function inspectVisual(record) {
+    if (activeWorkflow && record.dataset.appearance) navigate(`#workflow=${activeWorkflow.id}&node=${record.dataset.ref}&appearance=${record.dataset.appearance}`);
+    else show(record.dataset.ref);
+  }
 
   function graphChoice(kind, ref, candidates) {
     hideInspector(); diagramMain.hidden = true; reader.hidden = false;
@@ -319,7 +352,8 @@
     const link = el('a', text, 'document-link'); link.href = `#graph=${graph.id}`; return link;
   }
   function switchGraph(ref) {
-    if (activeGraph.id !== ref) {
+    if (activeGraph.id !== ref || activeWorkflow) {
+      activeWorkflow = null; activeAppearance = null;
       activeGraph = graphs.find((graph) => graph.id === ref);
       drawing = layout.graphs.find((item) => item.ref === ref);
       viewport.replaceChildren(document.getElementById(`ww-graph-${ref}`).content.cloneNode(true));
@@ -328,6 +362,10 @@
       svg.dataset.skin = document.body.dataset.skin;
       fitted = true; fit(); window.scrollTo(0, 0);
     }
+    document.querySelector('.highlight-toolbar').hidden = false;
+    document.getElementById('workflow-details').hidden = true;
+    document.querySelector('.map-caption').replaceChildren(el('span', 'Arrows describe operations: actor → resource.'), el('span', 'Position does not imply execution order. Select any element to inspect it.'));
+    updateViewChoices();
     document.getElementById('graph-title').textContent = activeGraph.title;
     document.getElementById('graph-question').textContent = activeGraph.scope.question;
     document.getElementById('graph-abstraction').textContent = activeGraph.scope.abstraction;
@@ -370,6 +408,57 @@
     refreshHighlights();
     refreshReadability();
   }
+  const viewSelect = document.getElementById('diagram-view');
+  viewSelect.addEventListener('change', () => navigate(viewSelect.value ? `#workflow=${viewSelect.value}` : `#graph=${activeGraph.id}`));
+  document.getElementById('workflow-details').addEventListener('click', () => navigate(`#workflow=${activeWorkflow.id}&record=${activeWorkflow.id}`));
+  function updateViewChoices() {
+    const choices = workflows.filter((w) => w.graphRef === activeGraph.id);
+    document.getElementById('workflow-controls').hidden = !choices.length;
+    viewSelect.replaceChildren();
+    const connectivity = el('option', 'Connectivity — one box per component'); connectivity.value = ''; viewSelect.append(connectivity);
+    for (const w of choices) { const option = el('option', `Workflow — ${w.title}`); option.value = w.id; viewSelect.append(option); }
+    viewSelect.value = activeWorkflow?.id ?? '';
+  }
+  function workflowRoute(params) {
+    const keys = [...params.keys()];
+    if (keys.some((k) => !['workflow', 'node', 'step', 'record', 'appearance'].includes(k)) || ['node','step','record'].filter((k) => params.has(k)).length > 1) { unavailable('Conflicting workflow destinations.'); return; }
+    const owner = params.get('workflow') ?? index.get(params.get('step'))?.workflowRef;
+    const workflow = workflows.find((w) => w.id === owner);
+    if (!workflow) { unavailable('This workflow is not included.'); return; }
+    const geometry = layout.workflows.find((w) => w.ref === owner);
+    const key = ['node','step','record'].find((k) => params.has(k)), ref = key && params.get(key);
+    if ((key === 'node' && !geometry.appearances.some((a) => a.entityRef === ref)) || (key === 'step' && !workflow.steps.some((s) => s.id === ref)) || (key === 'record' && ref !== '__model' && (!index.has(ref) || index.get(ref).collection === 'documents'))) { unavailable('This record is not available in the workflow.'); return; }
+    const appearance = params.has('appearance') ? geometry.appearances.find((a) => a.id === params.get('appearance') && a.entityRef === ref) : null;
+    if (params.has('appearance') && (key !== 'node' || !appearance)) { unavailable('This appearance does not represent the requested component.'); return; }
+    reader.hidden = true; diagramMain.hidden = false;
+    if (activeWorkflow?.id !== owner) {
+      switchGraph(workflow.graphRef);
+      activeWorkflow = workflow; drawing = geometry; currentBoundary = null;
+      viewport.replaceChildren(document.getElementById(`ww-workflow-${owner}`).content.cloneNode(true));
+      svg = viewport.querySelector('svg'); svg.prepend(sourceMetadata.cloneNode(true));
+      svg.dataset.theme = document.body.classList.contains('dark') ? 'dark' : 'light'; svg.dataset.skin = document.body.dataset.skin;
+      fitted = false; zoom = 1; applyZoom(); viewport.scrollTo(0, 0);
+    }
+    activeAppearance = appearance;
+    updateViewChoices();
+    document.getElementById('workflow-details').hidden = false;
+    document.querySelector('.highlight-toolbar').hidden = true;
+    document.getElementById('graph-title').textContent = workflow.title;
+    document.getElementById('graph-question').textContent = workflow.scope.question;
+    document.getElementById('graph-abstraction').textContent = workflow.scope.abstraction;
+    document.getElementById('graph-scope').replaceChildren(...[workflow.scope.environment, workflow.scope.snapshot, `${new Set(drawing.appearances.map((a) => a.entityRef)).size} components · ${drawing.appearances.length} appearances · ${workflow.steps.length} steps`].map((t) => el('span',t)));
+    const direction = drawing.layout.direction === 'RIGHT' ? 'Left → right' : 'Top → bottom';
+    document.getElementById('perspective-label').textContent = `${direction} · Order ${workflow.order.status} · Entry ${workflow.entry.point.status} · Trigger ${workflow.entry.trigger.status}`;
+    document.querySelector('.map-caption').replaceChildren(el('span', 'Same component ID = same component. Selecting it highlights all its appearances.'), el('span', 'Solid: message/event · Dashed: reply · Membership labels retain the selected perspective; frames remain in Connectivity.'));
+    const documentBack = document.querySelector('.document-breadcrumb a'); documentBack.href = `#workflow=${owner}`; documentBack.textContent = `← ${workflow.title}`;
+    document.title = `${workflow.title} · Waxwing`;
+    refreshKnowledge(); refreshReadability();
+    if (ref) displayRecord(ref); else hideInspector();
+    if (appearance) {
+      const b = appearance.box;
+      viewport.scrollTo({ left: Math.max(0, b.x * zoom - viewport.clientWidth / 3), top: Math.max(0, b.y * zoom - viewport.clientHeight / 3) });
+    }
+  }
   function refreshKnowledge() {
     const open = [];
     function collect(value, owner, path) {
@@ -377,11 +466,16 @@
       if (['unknown', 'disputed'].includes(value.status)) open.push({ owner, path, ...value });
       for (const [key, child] of Object.entries(value)) collect(child, owner, path ? `${path}.${key}` : key);
     }
-    const visible = new Set([...graphNodes(activeGraph), ...activeGraph.relationshipRefs, ...activeGraph.membershipRefs, ...drawing.groups.map((group) => group.ref)]);
+    const visible = new Set([...graphNodes(activeGraph), ...activeGraph.relationshipRefs, ...activeGraph.membershipRefs, ...(drawing.groups ?? []).map((group) => group.ref)]);
+    if (activeWorkflow) { visible.add(activeWorkflow.id); activeWorkflow.steps.forEach((step) => visible.add(step.id)); }
     for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes']) {
       for (const record of model[collection]) if (visible.has(record.id) || record.subjectRefs?.some((ref) => visible.has(ref))) collect(record, record, '');
     }
     if (activeGraph.expands) collect(activeGraph.expands, activeGraph, 'expands');
+    if (activeWorkflow) {
+      const { steps, ...record } = activeWorkflow; collect(record, activeWorkflow, '');
+      for (const step of steps) collect(step, step, '');
+    }
     const list = document.getElementById('knowledge-list'); list.replaceChildren();
     for (const item of open.sort((a, b) => (a.status === 'disputed' ? 0 : 1) - (b.status === 'disputed' ? 0 : 1))) {
       const button = el('button', undefined, 'knowledge-row');
@@ -394,6 +488,11 @@
   }
 
   function refreshHighlights() {
+    if (activeWorkflow) {
+      document.getElementById('highlight-details').replaceChildren();
+      svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('highlight-match', item.dataset.ref === selectedRef));
+      return;
+    }
     const result = selectHighlights(model, activeGraph, { mode: highlightMode.value, ref: selectedRef, boundaryRef: currentBoundary });
     const refs = new Set(result.refs);
     svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('highlight-match', refs.has(item.dataset.ref)));
@@ -427,7 +526,8 @@
   });
   function refreshReadability() {
     if (!viewport.clientWidth || !viewport.clientHeight) return;
-    const warnings = inspectReadability(drawing, activeGraph.id, { width: viewport.clientWidth, height: viewport.clientHeight });
+    const measured = activeWorkflow ? { ...drawing, groups: [], edges: drawing.edges.map((e) => ({ ...e, from: e.fromAppearanceRef, to: e.toAppearanceRef })) } : drawing;
+    const warnings = inspectReadability(measured, activeWorkflow?.id ?? activeGraph.id, { width: viewport.clientWidth, height: viewport.clientHeight });
     document.getElementById('readability-summary').textContent = `Readability · ${warnings.length} ${warnings.length === 1 ? 'warning' : 'warnings'}`;
     const list = document.getElementById('readability-list'); list.replaceChildren();
     if (!warnings.length) list.append(el('p', 'No issues detected by these advisory checks.'));
@@ -475,7 +575,7 @@
   document.getElementById('layout-download').addEventListener('click', () => download(JSON.stringify(layout, null, 2) + '\n', `${model.id}.layout.json`, 'application/json'));
   document.getElementById('svg-download').addEventListener('click', () => {
     const clean = cleanViewerSVG(svg);
-    download('<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clean), `${activeGraph.id}.svg`, 'image/svg+xml');
+    download('<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clean), `${activeWorkflow?.id ?? activeGraph.id}.svg`, 'image/svg+xml');
   });
   applyRoute();
 })();

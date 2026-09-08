@@ -3,10 +3,11 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { validateSequenceModel } from '../sequence/model.mjs';
 import { graphDiagnostics } from '../graphs/index.mjs';
 import { documentDiagnostics } from '../documents/markdown.mjs';
+import { workflowDiagnostics } from '../workflow/model.mjs';
 
 const schema = JSON.parse(fs.readFileSync(new URL('../../schemas/system-model.schema.json', import.meta.url), 'utf8'));
 const validateShape = new Ajv2020({ strict: true, allErrors: true, allowUnionTypes: true }).compile(schema);
-const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'graphs'];
+const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'graphs', 'workflows'];
 const escapePointer = (value) => value.replaceAll('~', '~0').replaceAll('/', '~1');
 
 function walk(value, path, visit) {
@@ -48,6 +49,11 @@ export function validateModel(model) {
       if (entries.has(item.id)) add('identity/duplicate', `${path}/id`, `ID "${item.id}" already occurs at ${entries.get(item.id).path}.`);
       else entries.set(item.id, { item, collection, path });
     });
+  }
+  for (const [i, workflow] of (model.workflows ?? []).entries()) for (const [j, item] of workflow.steps.entries()) {
+    const path = `/workflows/${i}/steps/${j}`;
+    if (entries.has(item.id)) add('identity/duplicate', `${path}/id`, 'Workflow step IDs must be globally unique.');
+    else entries.set(item.id, { item, collection: 'steps', path });
   }
 
   function reference(id, allowed, path) {
@@ -130,12 +136,12 @@ export function validateModel(model) {
   }
 
   model.notes.forEach((note, index) => {
-    note.subjectRefs.forEach((id, subjectIndex) => reference(id, ['entities', 'groups', 'memberships', 'relationships'], `/notes/${index}/subjectRefs/${subjectIndex}`));
+    note.subjectRefs.forEach((id, subjectIndex) => reference(id, ['entities', 'groups', 'memberships', 'relationships', ...(model.workflows ? ['workflows', 'steps'] : [])], `/notes/${index}/subjectRefs/${subjectIndex}`));
   });
 
-  if (['0.3-draft', '0.4-draft'].includes(model.schemaVersion)) {
+  if (['0.3-draft', '0.4-draft', '0.5-draft'].includes(model.schemaVersion)) {
     if (entries.has(model.id)) add('identity/duplicate', '/id', 'The graph ID must differ from every record ID.');
-    diagnostics.push(...graphDiagnostics(model), ...documentDiagnostics(model));
+    diagnostics.push(...graphDiagnostics(model), ...workflowDiagnostics(model), ...documentDiagnostics(model));
   }
 
   return {
@@ -148,6 +154,7 @@ export function validateModel(model) {
       unknown: unresolved.filter((item) => item.status === 'unknown').length,
       disputed: unresolved.filter((item) => item.status === 'disputed').length,
       ...(model.graphs ? { graphs: model.graphs.length } : {}),
+      ...(model.workflows ? { workflows: model.workflows.length } : {}),
       ...(model.documents ? { documents: model.documents.length } : {}),
     },
     unresolved,
