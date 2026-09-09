@@ -55,6 +55,16 @@ instance of the first warning sign, not a reason to declare a winner.
 The earlier [pipeline reading experiment](../experiments/pipeline-reading/README.md)
 records a related ordering/width tradeoff and remains unchanged historical evidence.
 
+## Current observation: architecture reading anchors
+
+The [anchor comparison](../experiments/reading-anchor/README.md) keeps a chosen
+component at the leading edge using native ELK constraints. Its four fixtures
+preserve all source claims, arrows and grouping. Foregrounding Fulfillment in
+a grouped view increases height from 507 to 920; a shared-hub view becomes
+narrower but taller. Thus placement succeeds while compactness competes with
+the reading preference. This is a recorded warning-sign instance, not evidence
+yet of repeated tuning failures or an advantage for LLM composition.
+
 ## When investigating a warning
 
 Save the exact JSON 1, package versions, layout options, generation command,

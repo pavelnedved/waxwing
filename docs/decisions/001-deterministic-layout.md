@@ -63,3 +63,13 @@ The [fictional orchestration demo](../../examples/orchestration/README.md) recor
 the resulting path and width tradeoff. [Warning signs](../layout-warning-signs.md)
 describe patterns to investigate without prescribing an LLM migration. The
 original pipeline experiment and its measurements remain unchanged.
+
+## Opt-in architecture reading anchors
+
+Generation now accepts an explicit per-view reading anchor as a layout option.
+Native ELK first-layer constraints foreground it while retaining the same source,
+grouping and operation arrows. Prose remains non-executable. Unanchored views
+keep the original policy; workflow and sequence entry semantics are unchanged.
+The [anchor contract](../reading-anchors.md) and
+[comparison](../../experiments/reading-anchor/README.md) document the rule and
+compactness tradeoffs. No LLM composition stage has been added.

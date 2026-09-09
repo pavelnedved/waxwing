@@ -33,3 +33,5 @@
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }

@@ -6,6 +6,7 @@ body.dark { color-scheme:dark; --bg:#101a25; --surface:#182737; --ink:#e6eef5; -
 button,a { -webkit-tap-highlight-color:transparent; }
 button { color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 13px; cursor:pointer; font:inherit; font-size:12px; }
 button:hover { border-color:var(--accent); }
+button:disabled { opacity:.45; cursor:default; border-color:var(--border); }
 button:focus-visible,a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 .masthead { height:72px; padding:0 38px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:16px; background:var(--surface); }
 .brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink); font-size:12px; font-weight:750; letter-spacing:2px; }
@@ -45,6 +46,14 @@ h2 { font-size:16px; letter-spacing:-.2px; margin:0; font-weight:620; }
 footer { border-top:1px solid var(--border); margin-top:25px; padding-top:16px; display:flex; justify-content:space-between; color:var(--muted); font-size:10px; }
 #inspector { position:fixed; z-index:10; top:0; bottom:0; right:0; width:min(480px,100vw); background:var(--surface); box-shadow:-16px 0 55px #071c3625; border-left:1px solid var(--border); overflow-y:auto; }
 #inspector[hidden] { display:none; }
+/* Reserve the inspector's column so it never covers the reading area. */
+@media(min-width:901px) {
+  body:has(#inspector:not([hidden])) { padding-right:min(480px,38vw); }
+  #inspector { width:min(480px,38vw); }
+}
+@media(max-width:900px) {
+  #inspector { position:relative; width:100%; max-height:60vh; border-left:0; border-top:1px solid var(--border); box-shadow:none; }
+}
 .inspector-header { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; background:var(--surface); padding:18px 24px; border-bottom:1px solid var(--border); font-size:10px; letter-spacing:1.8px; color:var(--muted); }
 .inspector-header button { font-size:20px; line-height:20px; padding:4px 9px; }
 #inspector-content { padding:23px; }
@@ -144,6 +153,17 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 #workflow-controls { display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin:18px 0; }
 #workflow-controls[hidden], .highlight-toolbar[hidden] { display:none; }
 #workflow-controls select { max-width:min(80vw, 560px); font:inherit; padding:8px; }
+
+.sequence-entry-summary { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px; margin:0 0 20px; padding:18px 20px; border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; background:var(--surface); }
+.sequence-entry-copy { min-width:0; flex:1 1 240px; overflow-wrap:anywhere; }
+.sequence-entry-copy h2 { font-size:18px; }
+.sequence-entry-copy p { margin:6px 0 0; }
+.sequence-entry-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+#sequence-start { background:var(--accent); color:var(--surface); border-color:var(--accent); font-weight:600; }
+.reading-anchor { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin:0 0 20px; padding:14px 18px; border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; background:var(--surface); }
+.reading-anchor>div { min-width:0; flex:1 1 220px; overflow-wrap:anywhere; }
+.reading-anchor strong { font-size:16px; }
+.reading-anchor p { margin:4px 0 0; font-size:12px; color:var(--muted); }
 </style></head>
 <body data-skin="standard">
   <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions"><a class="header-link" href="#documents">Documents <span>1</span></a><label class="skin-control">Style <select id="skin" aria-label="Visual style"><option value="standard" selected>Standard</option><option value="engineering">Engineering</option><option value="editorial">Editorial</option></select></label><button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
@@ -154,6 +174,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
     <p class="purpose" id="graph-question">Which services invoke which operations?</p>
     <p class="purpose" id="graph-abstraction">One box per service. Relationships express actor-to-resource operations, without execution order.</p>
     <div class="scope-line" id="graph-scope"></div>
+    <div id="reading-anchor" class="reading-anchor" hidden><div><span class="detail-key">Start reading here</span><strong id="reading-anchor-name"></strong><p>Reading preference for this view. Arrows retain their operation direction.</p></div><button id="reading-anchor-go">Go to starting node</button></div>
     <div id="workflow-controls" hidden><label>View <select id="diagram-view" aria-label="Diagram view"></select></label><button id="workflow-details" hidden>Workflow entry & order ↗</button></div>
     <section class="map-panel" aria-label="Architecture diagram">
       <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
@@ -197,6 +218,8 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
 </style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     <g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><g class=""><path class="edge-hit" d="M268,129 L597.6,129"/><path class="edge-line" d="M268,129 L597.6,129" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><g class=""><path class="edge-hit" d="M829.6,129 L874.6,129 L874.6,302 L1180.8,302"/><path class="edge-line" d="M829.6,129 L874.6,129 L874.6,302 L1180.8,302" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><g class=""><path class="edge-hit" d="M829.6,160 L864.6,160 L864.6,506 L1180.8,506"/><path class="edge-line" d="M829.6,160 L864.6,160 L864.6,506 L1180.8,506" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><g class=""><path class="edge-hit" d="M829.6,98 L1180.8,98"/><path class="edge-line" d="M829.6,98 L1180.8,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
       <rect class="node-box" x="36" y="67" width="232" height="124" rx="12"/>
@@ -205,6 +228,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="54" y="119">Checkout</text>
       <text class="node-status" x="54" y="142">established · present</text>
       <text class="node-link" x="54" y="173">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="orchestrator" tabindex="0" role="button" aria-label="Inspect Orchestrator"><g class="category-service">
       <rect class="node-box" x="597.6" y="67" width="232" height="124" rx="12"/>
       <rect class="accent" x="615.6" y="86" width="6" height="6" rx="2"/>
@@ -212,6 +236,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="615.6" y="119">Orchestrator</text>
       <text class="node-status" x="615.6" y="142">established · present</text>
       <text class="node-link" x="615.6" y="173">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="payment" tabindex="0" role="button" aria-label="Inspect Payment"><g class="category-service">
       <rect class="node-box" x="1180.8" y="240" width="232" height="124" rx="12"/>
       <rect class="accent" x="1198.8" y="259" width="6" height="6" rx="2"/>
@@ -219,6 +244,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="1198.8" y="292">Payment</text>
       <text class="node-status" x="1198.8" y="315">established · present</text>
       <text class="node-link" x="1198.8" y="346">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="pricing" tabindex="0" role="button" aria-label="Inspect Pricing"><g class="category-service">
       <rect class="node-box" x="1180.8" y="444" width="232" height="124" rx="12"/>
       <rect class="accent" x="1198.8" y="463" width="6" height="6" rx="2"/>
@@ -226,6 +252,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="1198.8" y="496">Pricing</text>
       <text class="node-status" x="1198.8" y="519">established · present</text>
       <text class="node-link" x="1198.8" y="550">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="stock" tabindex="0" role="button" aria-label="Inspect Stock"><g class="category-service">
       <rect class="node-box" x="1180.8" y="36" width="232" height="124" rx="12"/>
       <rect class="accent" x="1198.8" y="55" width="6" height="6" rx="2"/>
@@ -233,6 +260,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="1198.8" y="88">Stock</text>
       <text class="node-status" x="1198.8" y="111">established · present</text>
       <text class="node-link" x="1198.8" y="142">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><rect class="edge-label-bg" x="378" y="146" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="432.8" y="164">Submit basket</text></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><rect class="edge-label-bg" x="950.4" y="319" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1005.2" y="337">Charge basket</text></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><rect class="edge-label-bg" x="939.6" y="523" width="131.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1005.2" y="541">Calculate charge</text></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><rect class="edge-label-bg" x="957.6" y="115" width="95.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1005.2" y="133">Check stock</text></g>
   </svg></div>
       <div class="map-caption"><span>Arrows describe operations: actor → resource.</span><span>Position does not imply execution order. Select any element to inspect it.</span></div>
@@ -255,7 +283,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 <p>The upstream trigger is explicitly unknown. The run stops after the payment request; no payment success or final response is implied. Neither the spacing nor a message arrow establishes elapsed time or blocking.</p>
 </article></template>
 <template id="ww-graph-services"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-skin="standard" data-graph-ref="services" data-theme="light" viewBox="0 0 1448.8 604" width="1448.8" height="604" role="group" aria-labelledby="ww-title ww-description">
-    <title id="ww-title">Checkout connectivity</title><desc id="ww-description">One box per service. Relationships express actor-to-resource operations, without execution order. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+    <title id="ww-title">Checkout connectivity</title><desc id="ww-description">One box per service. Relationships express actor-to-resource operations, without execution order. Operation arrows point from actor to resource. Unknowns and disputes are retained in the export source and the HTML details viewer.</desc>
 
     <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
 .ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
@@ -292,6 +320,8 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
 </style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     <g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><g class=""><path class="edge-hit" d="M268,129 L597.6,129"/><path class="edge-line" d="M268,129 L597.6,129" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><g class=""><path class="edge-hit" d="M829.6,129 L874.6,129 L874.6,302 L1180.8,302"/><path class="edge-line" d="M829.6,129 L874.6,129 L874.6,302 L1180.8,302" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><g class=""><path class="edge-hit" d="M829.6,160 L864.6,160 L864.6,506 L1180.8,506"/><path class="edge-line" d="M829.6,160 L864.6,160 L864.6,506 L1180.8,506" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><g class=""><path class="edge-hit" d="M829.6,98 L1180.8,98"/><path class="edge-line" d="M829.6,98 L1180.8,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
       <rect class="node-box" x="36" y="67" width="232" height="124" rx="12"/>
@@ -300,6 +330,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="54" y="119">Checkout</text>
       <text class="node-status" x="54" y="142">established · present</text>
       <text class="node-link" x="54" y="173">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="orchestrator" tabindex="0" role="button" aria-label="Inspect Orchestrator"><g class="category-service">
       <rect class="node-box" x="597.6" y="67" width="232" height="124" rx="12"/>
       <rect class="accent" x="615.6" y="86" width="6" height="6" rx="2"/>
@@ -307,6 +338,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="615.6" y="119">Orchestrator</text>
       <text class="node-status" x="615.6" y="142">established · present</text>
       <text class="node-link" x="615.6" y="173">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="payment" tabindex="0" role="button" aria-label="Inspect Payment"><g class="category-service">
       <rect class="node-box" x="1180.8" y="240" width="232" height="124" rx="12"/>
       <rect class="accent" x="1198.8" y="259" width="6" height="6" rx="2"/>
@@ -314,6 +346,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="1198.8" y="292">Payment</text>
       <text class="node-status" x="1198.8" y="315">established · present</text>
       <text class="node-link" x="1198.8" y="346">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="pricing" tabindex="0" role="button" aria-label="Inspect Pricing"><g class="category-service">
       <rect class="node-box" x="1180.8" y="444" width="232" height="124" rx="12"/>
       <rect class="accent" x="1198.8" y="463" width="6" height="6" rx="2"/>
@@ -321,6 +354,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="1198.8" y="496">Pricing</text>
       <text class="node-status" x="1198.8" y="519">established · present</text>
       <text class="node-link" x="1198.8" y="550">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="stock" tabindex="0" role="button" aria-label="Inspect Stock"><g class="category-service">
       <rect class="node-box" x="1180.8" y="36" width="232" height="124" rx="12"/>
       <rect class="accent" x="1198.8" y="55" width="6" height="6" rx="2"/>
@@ -328,6 +362,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="1198.8" y="88">Stock</text>
       <text class="node-status" x="1198.8" y="111">established · present</text>
       <text class="node-link" x="1198.8" y="142">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><rect class="edge-label-bg" x="378" y="146" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="432.8" y="164">Submit basket</text></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><rect class="edge-label-bg" x="950.4" y="319" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1005.2" y="337">Charge basket</text></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><rect class="edge-label-bg" x="939.6" y="523" width="131.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1005.2" y="541">Calculate charge</text></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><rect class="edge-label-bg" x="957.6" y="115" width="95.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1005.2" y="133">Check stock</text></g>
   </svg></template>
 <template id="ww-workflow-checkout-run"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg workflow-svg" data-workflow-ref="checkout-run" data-graph-ref="services" data-skin="standard" data-theme="light" width="4056" height="308" viewBox="0 0 4056 308" role="group" aria-labelledby="ww-title ww-description"><title id="ww-title">Checkout through the orchestrator</title><desc id="ww-description">Services remain canonical components; the workflow expands their participation in one recorded scenario. Repeated appearances share one canonical component. Steps follow explicit order; replies do not create architecture dependencies.</desc><style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
@@ -365,6 +400,8 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
 </style><defs><marker id="ww-workflow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs><text class="edge-label" x="36" y="26">Left → right · Order: established · Entry: established · Trigger: unknown</text><text class="edge-label" x="36" y="48">Repeated boxes share one component ID. Solid: message/event · Dashed: reply.</text><text class="edge-label" x="36" y="70">Partial scenario · Spacing ≠ duration · Message ≠ blocking</text><g class="record" data-ref="submit" tabindex="0" role="button" aria-label="Inspect Submit basket"><path class="edge-hit" d="M288,170 L659.2,170"/><path class="edge-line" d="M288,170 L659.2,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="388" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="398" y="205">1. Submit basket</text><text class="edge-label" x="398" y="223">message · established</text></g><g class="record" data-ref="check-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><path class="edge-hit" d="M911.2,170 L1282.4,170"/><path class="edge-line" d="M911.2,170 L1282.4,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="1011.2" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="1021.2" y="205">2. Check stock</text><text class="edge-label" x="1021.2" y="223">message · established</text></g><g class="record" data-ref="stock-result" tabindex="0" role="button" aria-label="Inspect Stock available"><path class="edge-hit" d="M1534.4,170 L1905.6000000000001,170"/><path class="edge-line" d="M1534.4,170 L1905.6000000000001,170" stroke-dasharray="7 5" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="1634.4" y="187" width="171.20000000000002" height="66" rx="8"/><text class="edge-label" x="1644.4" y="205">3. Stock available</text><text class="edge-label" x="1644.4" y="223">reply · established</text><text class="edge-label" x="1644.4" y="241">Reply to: check-stock</text></g><g class="record" data-ref="calculate-charge" tabindex="0" role="button" aria-label="Inspect Calculate charge"><path class="edge-hit" d="M2157.6000000000004,170 L2528.8,170"/><path class="edge-line" d="M2157.6000000000004,170 L2528.8,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="2257.6000000000004" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="2267.6000000000004" y="205">4. Calculate charge</text><text class="edge-label" x="2267.6000000000004" y="223">message · established</text></g><g class="record" data-ref="charge-result" tabindex="0" role="button" aria-label="Inspect Charge calculated"><path class="edge-hit" d="M2780.8,170 L3144.8,170"/><path class="edge-line" d="M2780.8,170 L3144.8,170" stroke-dasharray="7 5" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="2880.8" y="187" width="164" height="84" rx="8"/><text class="edge-label" x="2890.8" y="205">5. Charge calculated</text><text class="edge-label" x="2890.8" y="223">reply · established</text><text class="edge-label" x="2890.8" y="241">Reply to:</text><text class="edge-label" x="2890.8" y="259">calculate-charge</text></g><g class="record" data-ref="charge-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><path class="edge-hit" d="M3396.8,170 L3768,170"/><path class="edge-line" d="M3396.8,170 L3768,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="3496.8" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="3506.8" y="205">6. Charge basket</text><text class="edge-label" x="3506.8" y="223">message · established</text></g><g class="record" data-ref="checkout" data-appearance="appearance-0" tabindex="0" role="button" aria-label="Inspect Checkout Scoped entry · established"><rect class="node-box" x="36" y="96" width="252" height="148" rx="8"/><text class="node-category" x="54" y="120">Scoped entry · established</text><text class="node-title" x="54" y="146">Checkout</text><text class="node-status" x="54" y="174">established · present</text><text class="node-status" x="54" y="194">ID: checkout</text><text class="node-link" x="54" y="230">Inspect evidence ↗</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-1" tabindex="0" role="button" aria-label="Inspect Orchestrator After step 1"><rect class="node-box" x="659.2" y="96" width="252" height="148" rx="8"/><text class="node-category" x="677.2" y="120">After step 1</text><text class="node-title" x="677.2" y="146">Orchestrator</text><text class="node-status" x="677.2" y="174">established · present</text><text class="node-status" x="677.2" y="194">ID: orchestrator</text><text class="node-link" x="677.2" y="230">Same component · 3 appearances</text></g><g class="record" data-ref="stock" data-appearance="appearance-2" tabindex="0" role="button" aria-label="Inspect Stock After step 2"><rect class="node-box" x="1282.4" y="96" width="252" height="148" rx="8"/><text class="node-category" x="1300.4" y="120">After step 2</text><text class="node-title" x="1300.4" y="146">Stock</text><text class="node-status" x="1300.4" y="174">established · present</text><text class="node-status" x="1300.4" y="194">ID: stock</text><text class="node-link" x="1300.4" y="230">Inspect evidence ↗</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-3" tabindex="0" role="button" aria-label="Inspect Orchestrator After step 3"><rect class="node-box" x="1905.6000000000001" y="96" width="252" height="148" rx="8"/><text class="node-category" x="1923.6000000000001" y="120">After step 3</text><text class="node-title" x="1923.6000000000001" y="146">Orchestrator</text><text class="node-status" x="1923.6000000000001" y="174">established · present</text><text class="node-status" x="1923.6000000000001" y="194">ID: orchestrator</text><text class="node-link" x="1923.6000000000001" y="230">Same component · 3 appearances</text></g><g class="record" data-ref="pricing" data-appearance="appearance-4" tabindex="0" role="button" aria-label="Inspect Pricing After step 4"><rect class="node-box" x="2528.8" y="96" width="252" height="148" rx="8"/><text class="node-category" x="2546.8" y="120">After step 4</text><text class="node-title" x="2546.8" y="146">Pricing</text><text class="node-status" x="2546.8" y="174">established · present</text><text class="node-status" x="2546.8" y="194">ID: pricing</text><text class="node-link" x="2546.8" y="230">Inspect evidence ↗</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-5" tabindex="0" role="button" aria-label="Inspect Orchestrator After step 5"><rect class="node-box" x="3144.8" y="96" width="252" height="148" rx="8"/><text class="node-category" x="3162.8" y="120">After step 5</text><text class="node-title" x="3162.8" y="146">Orchestrator</text><text class="node-status" x="3162.8" y="174">established · present</text><text class="node-status" x="3162.8" y="194">ID: orchestrator</text><text class="node-link" x="3162.8" y="230">Same component · 3 appearances</text></g><g class="record" data-ref="payment" data-appearance="appearance-6" tabindex="0" role="button" aria-label="Inspect Payment After step 6"><rect class="node-box" x="3768" y="96" width="252" height="148" rx="8"/><text class="node-category" x="3786" y="120">After step 6</text><text class="node-title" x="3786" y="146">Payment</text><text class="node-status" x="3786" y="174">established · present</text><text class="node-status" x="3786" y="194">ID: payment</text><text class="node-link" x="3786" y="230">Inspect evidence ↗</text></g></svg></template>
   <aside id="inspector" hidden aria-label="Model inspector"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside>
   <script>const inspectReadability = function inspectReadability(drawing, graphRef, viewport = { width: 1200, height: 520 }) {
@@ -682,6 +719,14 @@ const cleanViewerSVG = function cleanViewerSVG(svg) {
     document.querySelectorAll('[data-ref]').forEach((element) => element.classList.toggle('selected', element.dataset.ref === ref));
     selectedRef = ref; refreshHighlights();
     document.getElementById('close-inspector').focus();
+    requestAnimationFrame(() => {
+      if (!inspector.hidden && window.matchMedia('(min-width:901px)').matches) {
+        const selected = previousFocus?.matches('.selected') ? previousFocus : viewport.querySelector('.selected');
+        selected?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      } else if (!inspector.hidden) {
+        inspector.scrollIntoView({ block: 'start' });
+      }
+    });
   }
 
   function hideInspector() {
@@ -860,6 +905,8 @@ const cleanViewerSVG = function cleanViewerSVG(svg) {
       fitted = true; fit(); window.scrollTo(0, 0);
     }
     document.querySelector('.highlight-toolbar').hidden = false;
+    document.getElementById('reading-anchor').hidden = !drawing.layout.readingAnchorRef;
+    document.getElementById('reading-anchor-name').textContent = drawing.layout.readingAnchorRef ? name(drawing.layout.readingAnchorRef) : '';
     document.getElementById('workflow-details').hidden = true;
     document.querySelector('.map-caption').replaceChildren(el('span', 'Arrows describe operations: actor → resource.'), el('span', 'Position does not imply execution order. Select any element to inspect it.'));
     updateViewChoices();
@@ -939,6 +986,7 @@ const cleanViewerSVG = function cleanViewerSVG(svg) {
     activeAppearance = appearance;
     updateViewChoices();
     document.getElementById('workflow-details').hidden = false;
+    document.getElementById('reading-anchor').hidden = true;
     document.querySelector('.highlight-toolbar').hidden = true;
     document.getElementById('graph-title').textContent = workflow.title;
     document.getElementById('graph-question').textContent = workflow.scope.question;
@@ -1045,13 +1093,30 @@ const cleanViewerSVG = function cleanViewerSVG(svg) {
     svg.style.marginLeft = `${Math.max(0, (viewport.clientWidth - drawing.canvas.width * zoom) / 2)}px`;
     svg.style.marginTop = `${Math.max(0, (viewport.clientHeight - drawing.canvas.height * zoom) / 2)}px`;
     document.getElementById('zoom-label').textContent = `${Math.round(zoom * 100)}%`;
+    document.getElementById('zoom-out').disabled = zoom <= .15;
+    document.getElementById('zoom-in').disabled = zoom >= 3;
   }
   function fit() { fitted = true; zoom = Math.min(viewport.clientWidth / drawing.canvas.width, viewport.clientHeight / drawing.canvas.height, 1.3); applyZoom(); viewport.scrollTo(0, 0); }
-  function changeZoom(factor) { fitted = false; zoom = Math.max(.15, Math.min(3, zoom * factor)); applyZoom(); }
+  function changeZoom(factor) {
+    const centerX = (viewport.scrollLeft + viewport.clientWidth / 2 - parseFloat(svg.style.marginLeft || 0)) / zoom;
+    const centerY = (viewport.scrollTop + viewport.clientHeight / 2 - parseFloat(svg.style.marginTop || 0)) / zoom;
+    fitted = false;
+    zoom = Math.max(.15, Math.min(3, zoom * factor));
+    applyZoom();
+    viewport.scrollTo(
+      centerX * zoom + parseFloat(svg.style.marginLeft) - viewport.clientWidth / 2,
+      centerY * zoom + parseFloat(svg.style.marginTop) - viewport.clientHeight / 2,
+    );
+  }
   document.getElementById('zoom-fit').addEventListener('click', fit);
-  document.getElementById('zoom-read').addEventListener('click', () => { fitted = false; zoom = 1; applyZoom(); });
+  document.getElementById('zoom-read').addEventListener('click', () => changeZoom(1 / zoom));
   document.getElementById('zoom-in').addEventListener('click', () => changeZoom(1.25));
   document.getElementById('zoom-out').addEventListener('click', () => changeZoom(.8));
+  document.getElementById('reading-anchor-go').addEventListener('click', () => {
+    const ref = drawing.layout.readingAnchorRef;
+    if (!ref || activeWorkflow) return;
+    changeZoom(1 / zoom); show(ref);
+  });
   new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); refreshReadability(); }).observe(viewport);
   fit();
 

@@ -8,6 +8,8 @@ import { validateLayout } from '../modules/layout/index.mjs';
 import { renderSVG, renderHTML } from '../modules/render/index.mjs';
 import { recoverArtifact } from '../modules/render/artifacts.mjs';
 import { digest } from '../modules/shared/model.mjs';
+import { sequenceEntryHTML } from '../modules/sequence/render.mjs';
+import { renderSite } from '../modules/site/index.mjs';
 
 const scenario = loadModel(new URL('../examples/sequence/model.json', import.meta.url)).model;
 const behavior = loadModel(new URL('../examples/sequence-markets/model.json', import.meta.url)).model;
@@ -163,4 +165,50 @@ test('entry text remains escaped and generated viewer script supports structured
   assert.doesNotMatch(html, /<img src=x|<script[^>]+src=/);
   for (const script of html.matchAll(/<script>([\s\S]*?)<\/script>/g)) new vm.Script(script[1]);
   assert.deepEqual(recoverArtifact(html), m);
+});
+
+test('sequence start names its participant and first step or block in both viewers', () => {
+  for (const m of [scenario, behavior, blockEntry()]) {
+    const layout = layoutSequence(m), before = structuredClone(layout);
+    const summary = sequenceEntryHTML(m, '#entry');
+    const actor = m.participants.find(p => p.id === m.entry.point.value.participantRef);
+    const item = [...m.steps, ...(m.blocks ?? [])].find(s => s.id === m.entry.point.value.itemRef);
+    assert.ok(summary.includes(`Starts with ${actor.label}`));
+    assert.ok(summary.includes(`${m.blocks?.includes(item) ? 'First block' : 'First step'}: ${item.label}`));
+    const site = renderSite(layout).get(`graphs/${m.id}.html`);
+    for (const html of [renderHTML(layout), site]) {
+      assert.match(html, /<button id="sequence-start">Go to start<\/button>/);
+      assert.equal((html.match(/<g[^>]+data-sequence-entry="participant"/g) ?? []).length, 1);
+      assert.equal((html.match(/<g[^>]+data-sequence-entry="item"/g) ?? []).length, 1);
+      assert.match(html, /Trigger: unknown/);
+    }
+    assert.deepEqual(layout, before);
+  }
+});
+
+test('unresolved and undeclared starts do not offer a navigation target or mark an actor', () => {
+  for (const status of ['unknown', 'disputed', 'omitted']) {
+    const m = blockEntry();
+    if (status === 'omitted') delete m.entry;
+    else if (status === 'unknown') m.entry.point = unknown();
+    else m.entry.point = { status, reason: 'Different accounts.', alternatives: [
+      known({participantRef:'storage',itemRef:'market-loop'}), known({participantRef:'collector',itemRef:'market-loop'}),
+    ] };
+    const summary = sequenceEntryHTML(m, '#entry');
+    assert.match(summary, new RegExp(`Starting point ${status === 'omitted' ? 'not declared' : status}`));
+    assert.doesNotMatch(summary, /id="sequence-start"/);
+    assert.doesNotMatch(renderSVG(layoutSequence(m)), /<g[^>]+data-sequence-entry=/);
+  }
+});
+
+test('start summary escapes labels and keeps reported and inferred qualifications', () => {
+  for (const status of ['reported', 'inferred']) {
+    const m = clone(); m.entry.point.status = status;
+    m.participants[0].label = '<img src=x onerror=alert(1)>';
+    m.steps[0].label = '<script>bad</script>';
+    const summary = sequenceEntryHTML(m, '#entry');
+    assert.match(summary, new RegExp(`Workflow entry: ${status}`));
+    assert.match(summary, /&lt;img/); assert.match(summary, /&lt;script/);
+    assert.doesNotMatch(summary, /<img|<script/);
+  }
 });

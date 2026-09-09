@@ -6,6 +6,7 @@ body.dark { color-scheme:dark; --bg:#101a25; --surface:#182737; --ink:#e6eef5; -
 button,a { -webkit-tap-highlight-color:transparent; }
 button { color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 13px; cursor:pointer; font:inherit; font-size:12px; }
 button:hover { border-color:var(--accent); }
+button:disabled { opacity:.45; cursor:default; border-color:var(--border); }
 button:focus-visible,a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
 .masthead { height:72px; padding:0 38px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:16px; background:var(--surface); }
 .brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink); font-size:12px; font-weight:750; letter-spacing:2px; }
@@ -45,6 +46,14 @@ h2 { font-size:16px; letter-spacing:-.2px; margin:0; font-weight:620; }
 footer { border-top:1px solid var(--border); margin-top:25px; padding-top:16px; display:flex; justify-content:space-between; color:var(--muted); font-size:10px; }
 #inspector { position:fixed; z-index:10; top:0; bottom:0; right:0; width:min(480px,100vw); background:var(--surface); box-shadow:-16px 0 55px #071c3625; border-left:1px solid var(--border); overflow-y:auto; }
 #inspector[hidden] { display:none; }
+/* Reserve the inspector's column so it never covers the reading area. */
+@media(min-width:901px) {
+  body:has(#inspector:not([hidden])) { padding-right:min(480px,38vw); }
+  #inspector { width:min(480px,38vw); }
+}
+@media(max-width:900px) {
+  #inspector { position:relative; width:100%; max-height:60vh; border-left:0; border-top:1px solid var(--border); box-shadow:none; }
+}
 .inspector-header { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; background:var(--surface); padding:18px 24px; border-bottom:1px solid var(--border); font-size:10px; letter-spacing:1.8px; color:var(--muted); }
 .inspector-header button { font-size:20px; line-height:20px; padding:4px 9px; }
 #inspector-content { padding:23px; }
@@ -144,6 +153,17 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 #workflow-controls { display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin:18px 0; }
 #workflow-controls[hidden], .highlight-toolbar[hidden] { display:none; }
 #workflow-controls select { max-width:min(80vw, 560px); font:inherit; padding:8px; }
+
+.sequence-entry-summary { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px; margin:0 0 20px; padding:18px 20px; border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; background:var(--surface); }
+.sequence-entry-copy { min-width:0; flex:1 1 240px; overflow-wrap:anywhere; }
+.sequence-entry-copy h2 { font-size:18px; }
+.sequence-entry-copy p { margin:6px 0 0; }
+.sequence-entry-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+#sequence-start { background:var(--accent); color:var(--surface); border-color:var(--accent); font-weight:600; }
+.reading-anchor { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin:0 0 20px; padding:14px 18px; border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; background:var(--surface); }
+.reading-anchor>div { min-width:0; flex:1 1 220px; overflow-wrap:anywhere; }
+.reading-anchor strong { font-size:16px; }
+.reading-anchor p { margin:4px 0 0; font-size:12px; color:var(--muted); }
 </style></head>
 <body data-skin="standard">
   <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions"><a class="header-link" href="#documents">Documents <span>1</span></a><label class="skin-control">Style <select id="skin" aria-label="Visual style"><option value="standard" selected>Standard</option><option value="engineering">Engineering</option><option value="editorial">Editorial</option></select></label><button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
@@ -154,6 +174,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
     <p class="purpose" id="graph-question">Who interacts with Order Processing?</p>
     <p class="purpose" id="graph-abstraction">Services and external callers; Order Processing is one box.</p>
     <div class="scope-line" id="graph-scope"></div>
+    <div id="reading-anchor" class="reading-anchor" hidden><div><span class="detail-key">Start reading here</span><strong id="reading-anchor-name"></strong><p>Reading preference for this view. Arrows retain their operation direction.</p></div><button id="reading-anchor-go">Go to starting node</button></div>
     <div id="workflow-controls" hidden><label>View <select id="diagram-view" aria-label="Diagram view"></select></label><button id="workflow-details" hidden>Workflow entry & order ↗</button></div>
     <section class="map-panel" aria-label="Architecture diagram">
       <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
@@ -197,6 +218,8 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
 </style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     <g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><g class=""><path class="edge-hit" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333"/><path class="edge-line" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><g class=""><path class="edge-hit" d="M268,98 L590.4,98"/><path class="edge-line" d="M268,98 L590.4,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><g class=""><path class="edge-hit" d="M822.4,118.667 L1159.2,118.667"/><path class="edge-line" d="M822.4,118.667 L1159.2,118.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
       <rect class="node-box" x="36" y="240" width="232" height="124" rx="12"/>
@@ -205,6 +228,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="54" y="292">Checkout</text>
       <text class="node-status" x="54" y="315">established · present</text>
       <text class="node-link" x="54" y="346">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="operations" tabindex="0" role="button" aria-label="Inspect Operations Console"><g class="category-actor">
       <rect class="node-box" x="36" y="36" width="232" height="124" rx="12"/>
       <rect class="accent" x="54" y="55" width="6" height="6" rx="2"/>
@@ -212,6 +236,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="54" y="88">Operations Console</text>
       <text class="node-status" x="54" y="111">established · present</text>
       <text class="node-link" x="54" y="142">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="orders" tabindex="0" role="button" aria-label="Inspect Order Processing"><g class="category-service">
       <rect class="node-box" x="590.4" y="56.667" width="232" height="124" rx="12"/>
       <rect class="accent" x="608.4" y="75.667" width="6" height="6" rx="2"/>
@@ -219,6 +244,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="608.4" y="108.667">Order Processing</text>
       <text class="node-status" x="608.4" y="131.667">established · present</text>
       <text class="node-link" x="608.4" y="162.667">Detailed graph available ↗</text>
+
     </g></g><g class="record" data-ref="payments" tabindex="0" role="button" aria-label="Inspect Payment Provider"><g class="category-service">
       <rect class="node-box" x="1159.2" y="56.667" width="232" height="124" rx="12"/>
       <rect class="accent" x="1177.2" y="75.667" width="6" height="6" rx="2"/>
@@ -226,6 +252,7 @@ select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
       <text class="node-title" x="1177.2" y="108.667">Payment Provider</text>
       <text class="node-status" x="1177.2" y="131.667">established · present</text>
       <text class="node-link" x="1177.2" y="162.667">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><rect class="edge-label-bg" x="378" y="319" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="337">Submit order</text></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><rect class="edge-label-bg" x="378" y="51" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="69">Repair order</text></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><rect class="edge-label-bg" x="932.4" y="135.667" width="116.8" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="990.8" y="153.667">Charge payment</text></g>
   </svg></div>
       <div class="map-caption"><span>Arrows describe operations: actor → resource.</span><span>Position does not imply execution order. Select any element to inspect it.</span></div>
@@ -254,7 +281,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
 <p>This Markdown document explains both graphs, the Order Processing node, and the overview repair edge. A document can explain any graph, node, or edge.</p>
 </article></template>
 <template id="ww-graph-overview"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-skin="standard" data-graph-ref="overview" data-theme="light" viewBox="0 0 1427.2 400" width="1427.2" height="400" role="group" aria-labelledby="ww-title ww-description">
-    <title id="ww-title">Order system overview</title><desc id="ww-description">Services and external callers; Order Processing is one box. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+    <title id="ww-title">Order system overview</title><desc id="ww-description">Services and external callers; Order Processing is one box. Operation arrows point from actor to resource. Unknowns and disputes are retained in the export source and the HTML details viewer.</desc>
 
     <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
 .ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
@@ -291,6 +318,8 @@ The graph is partial; it is not an inventory of everything inside the service.</
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
 </style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     <g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><g class=""><path class="edge-hit" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333"/><path class="edge-line" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><g class=""><path class="edge-hit" d="M268,98 L590.4,98"/><path class="edge-line" d="M268,98 L590.4,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><g class=""><path class="edge-hit" d="M822.4,118.667 L1159.2,118.667"/><path class="edge-line" d="M822.4,118.667 L1159.2,118.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
       <rect class="node-box" x="36" y="240" width="232" height="124" rx="12"/>
@@ -299,6 +328,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="54" y="292">Checkout</text>
       <text class="node-status" x="54" y="315">established · present</text>
       <text class="node-link" x="54" y="346">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="operations" tabindex="0" role="button" aria-label="Inspect Operations Console"><g class="category-actor">
       <rect class="node-box" x="36" y="36" width="232" height="124" rx="12"/>
       <rect class="accent" x="54" y="55" width="6" height="6" rx="2"/>
@@ -306,6 +336,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="54" y="88">Operations Console</text>
       <text class="node-status" x="54" y="111">established · present</text>
       <text class="node-link" x="54" y="142">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="orders" tabindex="0" role="button" aria-label="Inspect Order Processing"><g class="category-service">
       <rect class="node-box" x="590.4" y="56.667" width="232" height="124" rx="12"/>
       <rect class="accent" x="608.4" y="75.667" width="6" height="6" rx="2"/>
@@ -313,6 +344,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="608.4" y="108.667">Order Processing</text>
       <text class="node-status" x="608.4" y="131.667">established · present</text>
       <text class="node-link" x="608.4" y="162.667">Detailed graph available ↗</text>
+
     </g></g><g class="record" data-ref="payments" tabindex="0" role="button" aria-label="Inspect Payment Provider"><g class="category-service">
       <rect class="node-box" x="1159.2" y="56.667" width="232" height="124" rx="12"/>
       <rect class="accent" x="1177.2" y="75.667" width="6" height="6" rx="2"/>
@@ -320,9 +352,10 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="1177.2" y="108.667">Payment Provider</text>
       <text class="node-status" x="1177.2" y="131.667">established · present</text>
       <text class="node-link" x="1177.2" y="162.667">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><rect class="edge-label-bg" x="378" y="319" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="337">Submit order</text></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><rect class="edge-label-bg" x="378" y="51" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="69">Repair order</text></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><rect class="edge-label-bg" x="932.4" y="135.667" width="116.8" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="990.8" y="153.667">Charge payment</text></g>
   </svg></template><template id="ww-graph-order-internals"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-skin="standard" data-graph-ref="order-internals" data-theme="light" viewBox="0 0 1470.4 645.333" width="1470.4" height="645.333" role="group" aria-labelledby="ww-title ww-description">
-    <title id="ww-title">Inside Order Processing</title><desc id="ww-description">API, queue, worker, and storage; outside callers are context. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+    <title id="ww-title">Inside Order Processing</title><desc id="ww-description">API, queue, worker, and storage; outside callers are context. Operation arrows point from actor to resource. Unknowns and disputes are retained in the export source and the HTML details viewer.</desc>
 
     <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
 .ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
@@ -359,6 +392,8 @@ The graph is partial; it is not an inventory of everything inside the service.</
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
 </style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     <g class="record" data-ref="api-queue" tabindex="0" role="button" aria-label="Inspect Enqueue order"><g class=""><path class="edge-hit" d="M865.6,339.333 L1127.4,339.333 L1127.4,322.667 L1202.4,322.667"/><path class="edge-line" d="M865.6,339.333 L1127.4,339.333 L1127.4,322.667 L1202.4,322.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout-api" tabindex="0" role="button" aria-label="Inspect Submit order"><g class=""><path class="edge-hit" d="M268,547.333 L558.6,547.333 L558.6,360 L633.6,360"/><path class="edge-line" d="M268,547.333 L558.6,547.333 L558.6,360 L633.6,360" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="ops-api" tabindex="0" role="button" aria-label="Inspect Repair via API"><g class="qualified"><path class="edge-hit" d="M268,160 L303,160 L303,318.667 L633.6,318.667"/><path class="edge-line" d="M268,160 L303,160 L303,318.667 L633.6,318.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="ops-worker" tabindex="0" role="button" aria-label="Inspect Repair via worker"><g class="qualified"><path class="edge-hit" d="M268,118.667 L633.6,118.667"/><path class="edge-line" d="M268,118.667 L633.6,118.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="worker-db" tabindex="0" role="button" aria-label="Inspect Persist order"><g class=""><path class="edge-hit" d="M865.6,98 L1202.4,98"/><path class="edge-line" d="M865.6,98 L1202.4,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="worker-queue" tabindex="0" role="button" aria-label="Inspect Consume orders"><g class=""><path class="edge-hit" d="M865.6,139.333 L900.6,139.333 L900.6,281.333 L1202.4,281.333"/><path class="edge-line" d="M865.6,139.333 L900.6,139.333 L900.6,281.333 L1202.4,281.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
       <rect class="node-box" x="36" y="485.333" width="232" height="124" rx="12"/>
@@ -367,6 +402,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="54" y="537.333">Checkout</text>
       <text class="node-status" x="54" y="560.333">established · present</text>
       <text class="node-link" x="54" y="591.333">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="database" tabindex="0" role="button" aria-label="Inspect Order Database"><g class="category-datastore">
       <rect class="node-box" x="1202.4" y="36" width="232" height="124" rx="12"/>
       <rect class="accent" x="1220.4" y="55" width="6" height="6" rx="2"/>
@@ -374,6 +410,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="1220.4" y="88">Order Database</text>
       <text class="node-status" x="1220.4" y="111">established · present</text>
       <text class="node-link" x="1220.4" y="142">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="operations" tabindex="0" role="button" aria-label="Inspect Operations Console"><g class="category-actor">
       <rect class="node-box" x="36" y="77.333" width="232" height="124" rx="12"/>
       <rect class="accent" x="54" y="96.333" width="6" height="6" rx="2"/>
@@ -381,6 +418,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="54" y="129.333">Operations Console</text>
       <text class="node-status" x="54" y="152.333">established · present</text>
       <text class="node-link" x="54" y="183.333">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="order-api" tabindex="0" role="button" aria-label="Inspect Order API"><g class="category-service">
       <rect class="node-box" x="633.6" y="277.333" width="232" height="124" rx="12"/>
       <rect class="accent" x="651.6" y="296.333" width="6" height="6" rx="2"/>
@@ -388,6 +426,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="651.6" y="329.333">Order API</text>
       <text class="node-status" x="651.6" y="352.333">established · present</text>
       <text class="node-link" x="651.6" y="383.333">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="payments" tabindex="0" role="button" aria-label="Inspect Payment Provider"><g class="category-service">
       <rect class="node-box" x="36" y="281.333" width="232" height="124" rx="12"/>
       <rect class="accent" x="54" y="300.333" width="6" height="6" rx="2"/>
@@ -395,6 +434,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="54" y="333.333">Payment Provider</text>
       <text class="node-status" x="54" y="356.333">established · present</text>
       <text class="node-link" x="54" y="387.333">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="queue" tabindex="0" role="button" aria-label="Inspect Order Queue"><g class="category-queue">
       <rect class="node-box" x="1202.4" y="240" width="232" height="124" rx="12"/>
       <rect class="accent" x="1220.4" y="259" width="6" height="6" rx="2"/>
@@ -402,6 +442,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="1220.4" y="292">Order Queue</text>
       <text class="node-status" x="1220.4" y="315">established · present</text>
       <text class="node-link" x="1220.4" y="346">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="worker" tabindex="0" role="button" aria-label="Inspect Order Worker"><g class="category-service">
       <rect class="node-box" x="633.6" y="56.667" width="232" height="124" rx="12"/>
       <rect class="accent" x="651.6" y="75.667" width="6" height="6" rx="2"/>
@@ -409,6 +450,7 @@ The graph is partial; it is not an inventory of everything inside the service.</
       <text class="node-title" x="651.6" y="108.667">Order Worker</text>
       <text class="node-status" x="651.6" y="131.667">established · present</text>
       <text class="node-link" x="651.6" y="162.667">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="api-queue" tabindex="0" role="button" aria-label="Inspect Enqueue order"><rect class="edge-label-bg" x="979.2" y="356.333" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1034" y="374.333">Enqueue order</text></g><g class="record" data-ref="checkout-api" tabindex="0" role="button" aria-label="Inspect Submit order"><rect class="edge-label-bg" x="399.6" y="564.333" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="450.8" y="582.333">Submit order</text></g><g class="record" data-ref="ops-api" tabindex="0" role="button" aria-label="Inspect Repair via API"><rect class="edge-label-bg" x="378" y="335.667" width="145.6" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="450.8" y="353.667">Repair via API</text><text class="edge-label edge-note" text-anchor="middle" x="450.8" y="371.667">reported · present</text></g><g class="record" data-ref="ops-worker" tabindex="0" role="button" aria-label="Inspect Repair via worker"><rect class="edge-label-bg" x="378" y="135.667" width="145.6" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="450.8" y="153.667">Repair via worker</text><text class="edge-label edge-note" text-anchor="middle" x="450.8" y="171.667">reported · present</text></g><g class="record" data-ref="worker-db" tabindex="0" role="button" aria-label="Inspect Persist order"><rect class="edge-label-bg" x="979.2" y="115" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1034" y="133">Persist order</text></g><g class="record" data-ref="worker-queue" tabindex="0" role="button" aria-label="Inspect Consume orders"><rect class="edge-label-bg" x="975.6" y="298.333" width="116.8" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1034" y="316.333">Consume orders</text></g>
   </svg></template>
 
@@ -728,6 +770,14 @@ const cleanViewerSVG = function cleanViewerSVG(svg) {
     document.querySelectorAll('[data-ref]').forEach((element) => element.classList.toggle('selected', element.dataset.ref === ref));
     selectedRef = ref; refreshHighlights();
     document.getElementById('close-inspector').focus();
+    requestAnimationFrame(() => {
+      if (!inspector.hidden && window.matchMedia('(min-width:901px)').matches) {
+        const selected = previousFocus?.matches('.selected') ? previousFocus : viewport.querySelector('.selected');
+        selected?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      } else if (!inspector.hidden) {
+        inspector.scrollIntoView({ block: 'start' });
+      }
+    });
   }
 
   function hideInspector() {
@@ -906,6 +956,8 @@ const cleanViewerSVG = function cleanViewerSVG(svg) {
       fitted = true; fit(); window.scrollTo(0, 0);
     }
     document.querySelector('.highlight-toolbar').hidden = false;
+    document.getElementById('reading-anchor').hidden = !drawing.layout.readingAnchorRef;
+    document.getElementById('reading-anchor-name').textContent = drawing.layout.readingAnchorRef ? name(drawing.layout.readingAnchorRef) : '';
     document.getElementById('workflow-details').hidden = true;
     document.querySelector('.map-caption').replaceChildren(el('span', 'Arrows describe operations: actor → resource.'), el('span', 'Position does not imply execution order. Select any element to inspect it.'));
     updateViewChoices();
@@ -985,6 +1037,7 @@ const cleanViewerSVG = function cleanViewerSVG(svg) {
     activeAppearance = appearance;
     updateViewChoices();
     document.getElementById('workflow-details').hidden = false;
+    document.getElementById('reading-anchor').hidden = true;
     document.querySelector('.highlight-toolbar').hidden = true;
     document.getElementById('graph-title').textContent = workflow.title;
     document.getElementById('graph-question').textContent = workflow.scope.question;
@@ -1091,13 +1144,30 @@ const cleanViewerSVG = function cleanViewerSVG(svg) {
     svg.style.marginLeft = `${Math.max(0, (viewport.clientWidth - drawing.canvas.width * zoom) / 2)}px`;
     svg.style.marginTop = `${Math.max(0, (viewport.clientHeight - drawing.canvas.height * zoom) / 2)}px`;
     document.getElementById('zoom-label').textContent = `${Math.round(zoom * 100)}%`;
+    document.getElementById('zoom-out').disabled = zoom <= .15;
+    document.getElementById('zoom-in').disabled = zoom >= 3;
   }
   function fit() { fitted = true; zoom = Math.min(viewport.clientWidth / drawing.canvas.width, viewport.clientHeight / drawing.canvas.height, 1.3); applyZoom(); viewport.scrollTo(0, 0); }
-  function changeZoom(factor) { fitted = false; zoom = Math.max(.15, Math.min(3, zoom * factor)); applyZoom(); }
+  function changeZoom(factor) {
+    const centerX = (viewport.scrollLeft + viewport.clientWidth / 2 - parseFloat(svg.style.marginLeft || 0)) / zoom;
+    const centerY = (viewport.scrollTop + viewport.clientHeight / 2 - parseFloat(svg.style.marginTop || 0)) / zoom;
+    fitted = false;
+    zoom = Math.max(.15, Math.min(3, zoom * factor));
+    applyZoom();
+    viewport.scrollTo(
+      centerX * zoom + parseFloat(svg.style.marginLeft) - viewport.clientWidth / 2,
+      centerY * zoom + parseFloat(svg.style.marginTop) - viewport.clientHeight / 2,
+    );
+  }
   document.getElementById('zoom-fit').addEventListener('click', fit);
-  document.getElementById('zoom-read').addEventListener('click', () => { fitted = false; zoom = 1; applyZoom(); });
+  document.getElementById('zoom-read').addEventListener('click', () => changeZoom(1 / zoom));
   document.getElementById('zoom-in').addEventListener('click', () => changeZoom(1.25));
   document.getElementById('zoom-out').addEventListener('click', () => changeZoom(.8));
+  document.getElementById('reading-anchor-go').addEventListener('click', () => {
+    const ref = drawing.layout.readingAnchorRef;
+    if (!ref || activeWorkflow) return;
+    changeZoom(1 / zoom); show(ref);
+  });
   new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); refreshReadability(); }).observe(viewport);
   fit();
 

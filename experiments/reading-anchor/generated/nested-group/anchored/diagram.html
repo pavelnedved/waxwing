@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Order Processing: Current Submission Paths · Waxwing</title><style>:root { color-scheme:light; --bg:#f7f8fa; --surface:#fff; --ink:#17283a; --muted:#657588; --border:#dce3ea; --accent:#087d78; --soft:#edf3f3; --warning:#9c630d; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+body.dark { color-scheme:dark; --bg:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --border:#34495e; --accent:#5dd6c4; --soft:#1b3541; --warning:#f1c778; }
+button,a { -webkit-tap-highlight-color:transparent; }
+button { color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 13px; cursor:pointer; font:inherit; font-size:12px; }
+button:hover { border-color:var(--accent); }
+button:disabled { opacity:.45; cursor:default; border-color:var(--border); }
+button:focus-visible,a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.masthead { height:72px; padding:0 38px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:16px; background:var(--surface); }
+.brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink); font-size:12px; font-weight:750; letter-spacing:2px; }
+.brand-mark { background:var(--accent); color:var(--surface); width:29px; height:29px; text-align:center; border-radius:8px; font-size:22px; font-family:Georgia,serif; font-style:italic; line-height:26px; }
+.brand-note { border-left:1px solid var(--border); padding-left:16px; margin-left:6px; color:var(--muted); font-weight:500; font-size:10px; letter-spacing:1.4px; }
+.header-actions { display:flex; gap:8px; }
+main { max-width:1800px; margin:0 auto; padding:32px 38px 20px; }
+.eyebrow { display:flex; gap:9px; align-items:center; font-size:10px; font-weight:650; letter-spacing:1.6px; color:var(--muted); }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.sep { opacity:.5; padding:0 4px; }
+.title-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+h1 { font-size:clamp(21px,2.2vw,34px); font-weight:620; letter-spacing:-1px; margin:12px 0 8px; line-height:1.25; }
+.purpose { margin:0; color:var(--muted); max-width:900px; }
+.scope-line { display:flex; flex-wrap:wrap; gap:22px; margin:17px 0 24px; color:var(--muted); font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.map-panel { border:1px solid var(--border); background:var(--surface); border-radius:12px; overflow:hidden; }
+.map-toolbar { min-height:50px; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+.map-toolbar>div { display:flex; align-items:center; gap:14px; }
+.toolbar-label { font-size:10px; font-weight:700; letter-spacing:1.5px; color:var(--accent); }
+#perspective-label { color:var(--muted); font-size:12px; }
+.zoom-controls { gap:5px!important; }
+.zoom-controls button { padding:3px 10px; min-width:30px; }
+#zoom-label { color:var(--muted); font-size:11px; min-width:34px; }
+#map-viewport { width:100%; height:clamp(330px,43vw,520px); overflow:auto; background:var(--bg); display:block; position:relative; }
+#map-viewport svg { display:block; flex-shrink:0; max-width:none; }
+.map-caption { padding:12px 18px; display:flex; justify-content:space-between; gap:16px; color:var(--muted); font-size:11px; border-top:1px solid var(--border); }
+.knowledge-section { margin-top:25px; }
+.section-heading { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+h2 { font-size:16px; letter-spacing:-.2px; margin:0; font-weight:620; }
+#knowledge-count { color:var(--muted); font-size:12px; }
+#knowledge-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 26px; }
+.knowledge-row { display:flex; align-items:center; gap:13px; text-align:left; background:none; border:0; border-top:1px solid var(--border); border-radius:0; padding:13px 0; width:100%; font-size:12px; }
+.knowledge-row:hover .question { color:var(--accent); }
+.status-pill { display:inline-block; flex-shrink:0; font:10px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; border:1px solid var(--border); padding:2px 7px; border-radius:5px; color:var(--warning); text-transform:uppercase; letter-spacing:.4px; }
+.status-pill.disputed { color:#bd5262; }
+.question { flex:1; }
+.row-arrow { color:var(--muted); }
+footer { border-top:1px solid var(--border); margin-top:25px; padding-top:16px; display:flex; justify-content:space-between; color:var(--muted); font-size:10px; }
+#inspector { position:fixed; z-index:10; top:0; bottom:0; right:0; width:min(480px,100vw); background:var(--surface); box-shadow:-16px 0 55px #071c3625; border-left:1px solid var(--border); overflow-y:auto; }
+#inspector[hidden] { display:none; }
+/* Reserve the inspector's column so it never covers the reading area. */
+@media(min-width:901px) {
+  body:has(#inspector:not([hidden])) { padding-right:min(480px,38vw); }
+  #inspector { width:min(480px,38vw); }
+}
+@media(max-width:900px) {
+  #inspector { position:relative; width:100%; max-height:60vh; border-left:0; border-top:1px solid var(--border); box-shadow:none; }
+}
+.inspector-header { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; background:var(--surface); padding:18px 24px; border-bottom:1px solid var(--border); font-size:10px; letter-spacing:1.8px; color:var(--muted); }
+.inspector-header button { font-size:20px; line-height:20px; padding:4px 9px; }
+#inspector-content { padding:23px; }
+#inspector-content h2 { font-size:22px; margin-bottom:5px; overflow-wrap:anywhere; }
+.record-id { font:11px ui-monospace,monospace; color:var(--muted); margin-bottom:22px; }
+.detail-field { margin:16px 0; }
+.detail-key { display:block; color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+.detail-value { white-space:pre-wrap; overflow-wrap:anywhere; }
+.detail-section { border-top:1px solid var(--border); padding-top:14px; margin-top:22px; }
+.detail-section h3 { font-size:14px; margin:0 0 12px; }
+.claim { padding:12px; border:1px solid var(--border); border-radius:8px; margin:8px 0; background:var(--bg); }
+.claim .detail-value { margin-top:8px; }
+.claim-basis { color:var(--muted); font-size:12px; margin-top:10px; }
+.source-ref { display:inline-block; margin:6px 4px 0 0; padding:4px 7px; font-size:10px; }
+a.source-ref { color:var(--accent); text-underline-offset:3px; }
+.sub-record { margin:10px 0; padding:12px 0; border-bottom:1px solid var(--border); }
+.sub-record h4 { font-size:13px; margin:0 0 7px; }
+details { margin-top:22px; }
+summary { cursor:pointer; font-size:12px; color:var(--muted); }
+pre { font:11px/1.6 ui-monospace,monospace; white-space:pre-wrap; overflow-wrap:anywhere; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:7px; }
+@media(max-width:700px) { .masthead { height:auto; min-height:68px; padding:14px 18px; flex-wrap:wrap; }.brand-note { display:none; }main { padding:24px 18px; }.header-actions { flex-wrap:wrap; }.title-row { align-items:flex-start; }#knowledge-list { grid-template-columns:1fr; }.map-caption { flex-direction:column; gap:4px; }footer { flex-direction:column; gap:5px; }.scope-line { gap:12px; } }
+@media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; } }
+
+[hidden] { display:none!important; }
+.header-link { display:inline-flex; align-items:center; gap:8px; color:var(--ink); border:1px solid var(--border); border-radius:7px; padding:8px 13px; font-size:12px; text-decoration:none; }
+.header-link span { color:var(--accent); }
+.attached-documents { border:1px solid var(--border); border-radius:9px; padding:14px; background:var(--bg); margin:18px 0; }
+.attached-documents h3 { font-size:12px; margin:0 0 8px; color:var(--muted); }
+.document-link { display:block; color:var(--accent); font-size:13px; padding:5px 0; text-decoration:none; }
+#document-reader { max-width:1360px; padding-bottom:80px; }
+.document-breadcrumb { display:flex; gap:13px; align-items:center; margin:4px 0 32px; color:var(--muted); font-size:12px; }
+.document-breadcrumb a { color:var(--accent); text-decoration:none; }
+.document-workspace { display:grid; grid-template-columns:220px minmax(0,1fr); gap:48px; align-items:start; }
+#document-nav { position:sticky; top:24px; max-height:85vh; overflow:auto; padding-right:20px; border-right:1px solid var(--border); }
+.document-nav-link { display:block; margin:8px 0; padding:10px 12px; color:var(--muted); text-decoration:none; border-radius:7px; font-size:13px; overflow-wrap:anywhere; }
+.document-nav-link[aria-current=page] { color:var(--accent); background:var(--soft); font-weight:600; }
+#document-content { min-width:0; max-width:850px; }
+#document-content h1 { margin-top:12px; overflow-wrap:anywhere; }
+.document-attachments { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 28px; }
+.document-attachments a { text-decoration:none; border:1px solid var(--border); border-radius:6px; color:var(--accent); padding:5px 9px; font-size:11px; overflow-wrap:anywhere; }
+.document-card { display:block; margin-top:18px; border:1px solid var(--border); border-radius:10px; padding:20px; text-decoration:none; color:var(--ink); background:var(--surface); font-weight:600; }
+.document-card:hover { border-color:var(--accent); }
+.document-card span { display:block; margin-top:7px; color:var(--muted); font-size:12px; font-weight:400; }
+.markdown-body { line-height:1.8; font-size:15px; overflow-wrap:anywhere; }
+.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4 { line-height:1.35; margin:1.5em 0 .6em; scroll-margin-top:24px; }
+.markdown-body h2 { font-size:22px; border-top:1px solid var(--border); padding-top:22px; }
+.markdown-body h3 { font-size:18px; }
+.markdown-body a { color:var(--accent); text-underline-offset:3px; }
+.markdown-body p { margin:12px 0; }
+.markdown-body blockquote { border-left:3px solid var(--accent); margin:20px 0; padding:8px 20px; background:var(--soft); color:var(--muted); }
+.markdown-body table { display:block; max-width:100%; overflow:auto; border-collapse:collapse; font-size:13px; margin:20px 0; }
+.markdown-body th,.markdown-body td { border:1px solid var(--border); padding:10px 14px; text-align:left; }
+.markdown-body th { background:var(--soft); }
+.markdown-body code { font-size:.85em; background:var(--soft); padding:2px 5px; border-radius:4px; }
+.markdown-body pre { overflow:auto; white-space:pre; padding:18px; font-size:12px; }
+.markdown-body pre code { background:none; padding:0; font-size:inherit; }
+.markdown-body img { max-width:100%; height:auto; }
+.document-source { border-top:1px solid var(--border); padding-top:20px; margin-top:36px; }
+.document-source pre { max-height:420px; overflow:auto; }
+@media(max-width:800px) { .document-workspace { grid-template-columns:1fr; gap:24px; }#document-nav { position:static; max-height:none; padding:0 0 14px; border:0; border-bottom:1px solid var(--border); }.document-nav-link { display:inline-block; margin:4px 4px 0 0; }#document-content { max-width:100%; } }
+
+#graph-breadcrumb { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:18px; font-size:12px; }
+#graph-breadcrumb .document-link { display:inline; padding:0; }
+#graph-abstraction { font-size:12px; margin-top:8px; }
+#graph-connections { margin-top:22px; }
+#graph-connections:empty { display:none; }
+.graph-child { display:flex; gap:12px; align-items:center; margin:8px 0; }
+.boundary-row { border-top:1px solid var(--border); padding:14px 0; }
+.boundary-row>.claim { margin:8px 0; }
+
+/* Visual presets change chrome and palette; diagram text retains fixed metrics. */
+body[data-skin="engineering"] { --bg:#f0f6fa; --surface:#fff; --ink:#102e48; --muted:#526d83; --border:#bbcdda; --accent:#155f9b; --soft:#e5eff6; }
+body[data-skin="engineering"].dark { --bg:#0e1c2a; --surface:#162b3d; --ink:#e1eff9; --muted:#a3bed0; --border:#39566c; --accent:#7cc9fc; --soft:#122535; }
+body[data-skin="engineering"] .map-panel, body[data-skin="engineering"] .claim { border-radius:3px; }
+body[data-skin="engineering"] .eyebrow, body[data-skin="engineering"] .masthead { font-family:ui-monospace,monospace; }
+body[data-skin="editorial"] { --bg:#f5f0e7; --surface:#fffdf8; --ink:#302e29; --muted:#71695c; --border:#d4c8b7; --accent:#87533b; --soft:#ece4d8; }
+body[data-skin="editorial"].dark { --bg:#201d19; --surface:#2e2923; --ink:#f2e9dd; --muted:#c5b6a0; --border:#5e5141; --accent:#efb38d; --soft:#28231e; }
+body[data-skin="editorial"] h1, body[data-skin="editorial"] .markdown-body h2 { font-family:Georgia,"Times New Roman",serif; font-weight:500; letter-spacing:-.5px; }
+body[data-skin="editorial"] .map-panel { box-shadow:0 10px 28px #302e2909; border-radius:4px; }
+body[data-skin="editorial"] .eyebrow { letter-spacing:2px; }
+select { font:inherit; font-size:12px; color:var(--ink); background:var(--surface); padding:7px 9px; border:1px solid var(--border); border-radius:6px; max-width:100%; }
+select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.skin-control { display:inline-flex; align-items:center; gap:7px; color:var(--muted); font-size:11px; }
+.masthead { height:auto; min-height:72px; padding-top:12px; padding-bottom:12px; flex-wrap:wrap; }
+.header-actions { flex-wrap:wrap; }
+.highlight-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:12px 18px; border-bottom:1px solid var(--border); font-size:12px; }
+#highlight-summary { color:var(--muted); font-size:11px; flex-basis:100%; }
+#highlight-details { padding:0 18px; max-height:260px; overflow:auto; background:var(--surface); }
+#highlight-details:empty { display:none; }
+#highlight-details .claim { font-size:12px; }
+#highlight-details p { font-size:12px; }
+#readability { padding:12px 16px; border:1px solid var(--border); border-radius:8px; background:var(--surface); }
+#readability p { font-size:12px; }
+.readability-row { padding:8px 0; border-top:1px solid var(--border); }
+@media(max-width:700px) { .map-toolbar, .map-toolbar>div { flex-wrap:wrap; gap:8px; }.highlight-toolbar select { min-width:0; width:100%; } }
+
+#workflow-controls { display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin:18px 0; }
+#workflow-controls[hidden], .highlight-toolbar[hidden] { display:none; }
+#workflow-controls select { max-width:min(80vw, 560px); font:inherit; padding:8px; }
+
+.sequence-entry-summary { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px; margin:0 0 20px; padding:18px 20px; border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; background:var(--surface); }
+.sequence-entry-copy { min-width:0; flex:1 1 240px; overflow-wrap:anywhere; }
+.sequence-entry-copy h2 { font-size:18px; }
+.sequence-entry-copy p { margin:6px 0 0; }
+.sequence-entry-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+#sequence-start { background:var(--accent); color:var(--surface); border-color:var(--accent); font-weight:600; }
+.reading-anchor { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin:0 0 20px; padding:14px 18px; border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; background:var(--surface); }
+.reading-anchor>div { min-width:0; flex:1 1 220px; overflow-wrap:anywhere; }
+.reading-anchor strong { font-size:16px; }
+.reading-anchor p { margin:4px 0 0; font-size:12px; color:var(--muted); }
+</style></head>
+<body data-skin="standard">
+  <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions"><label class="skin-control">Style <select id="skin" aria-label="Visual style"><option value="standard" selected>Standard</option><option value="engineering">Engineering</option><option value="editorial">Editorial</option></select></label><button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
+  <main id="diagram-main">
+    <nav id="graph-breadcrumb" aria-label="Graph hierarchy"></nav>
+    <div class="eyebrow"><span class="live-dot"></span> CURRENT IMPLEMENTATION <span class="sep">/</span> PARTIAL MODEL</div>
+    <div class="title-row"><h1 id="graph-title">Order Processing: Current Submission Paths</h1><button id="model-details">Model details ↗</button></div>
+    <p class="purpose" id="graph-question">How can orders reach Fulfillment, and what do we actually know about the two routes?</p>
+    <p class="purpose" id="graph-abstraction">Deployed services and infrastructure resources; service internals are collapsed. Membership claims refer to these represented units.</p>
+    <div class="scope-line" id="graph-scope"></div>
+    <div id="reading-anchor" class="reading-anchor" hidden><div><span class="detail-key">Start reading here</span><strong id="reading-anchor-name"></strong><p>Reading preference for this view. Arrows retain their operation direction.</p></div><button id="reading-anchor-go">Go to starting node</button></div>
+    <div id="workflow-controls" hidden><label>View <select id="diagram-view" aria-label="Diagram view"></select></label><button id="workflow-details" hidden>Workflow entry & order ↗</button></div>
+    <section class="map-panel" aria-label="Architecture diagram">
+      <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
+      <div class="highlight-toolbar"><label for="highlight-mode">Highlight</label><select id="highlight-mode"><option value="selection">Selection and direct relationships</option><option value="unknown">Unknown claims</option><option value="disputed">Disputed claims</option><option value="qualified">All qualified claims</option><option value="context">External context</option><option value="calls">Calls</option><option value="reads">Reads</option><option value="writes">Writes</option><option value="publishes">Publishes</option><option value="consumes">Consumes</option></select><button id="highlight-clear">Clear highlights</button><span id="highlight-summary" role="status"></span></div>
+      <div id="highlight-details" aria-live="polite"></div>
+      <div id="map-viewport" tabindex="0" aria-label="Diagram canvas. Use zoom controls; scroll to pan."><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-skin="standard" data-graph-ref="order-processing" data-theme="light" viewBox="0 0 1553 605.667" width="1553" height="605.667" role="group" aria-labelledby="ww-title ww-description">
+    <title id="ww-title">Order Processing: Current Submission Paths</title><desc id="ww-description">Deployed services and infrastructure resources; service internals are collapsed. Membership claims refer to these represented units. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+    <metadata id="waxwing-source" data-encoding="base64">eyJjYW52YXMiOnsiaGVpZ2h0Ijo2MDUuNjY2NjY2NjY2NjY2Nywid2lkdGgiOjE1NTN9LCJlZGdlcyI6W3siZnJvbSI6Im9yZGVyLXdvcmtlciIsImxhYmVsIjp7ImhlaWdodCI6NDgsIndpZHRoIjoxMTYuOCwieCI6NDAzLjgsInkiOjI2NS42NjY2NjY2NjY2NjY3fSwicG9pbnRzIjpbeyJ4IjozMjgsInkiOjI2Mi42NjY2NjY2NjY2NjY3fSx7IngiOjU0MS40LCJ5IjoyNjIuNjY2NjY2NjY2NjY2N30seyJ4Ijo1NDEuNCwieSI6MjgzLjMzMzMzMzMzMzMzMzM3fSx7IngiOjU1MS40LCJ5IjoyODMuMzMzMzMzMzMzMzMzMzd9XSwicmVmIjoiY29uc3VtZS1vcmRlciIsInRvIjoib3JkZXItcXVldWUifSx7ImZyb20iOiJjaGVja291dC1hcGkiLCJsYWJlbCI6eyJoZWlnaHQiOjQ4LCJ3aWR0aCI6MTgxLjYsIngiOjkyOC40LCJ5Ijo0MjEuNjY2NjY2NjY2NjY2N30sInBvaW50cyI6W3sieCI6MzU4LCJ5Ijo0NDYuNjY2NjY2NjY2NjY2N30seyJ4IjozODMsInkiOjQ0Ni42NjY2NjY2NjY2NjY3fSx7IngiOjM4MywieSI6NDA0LjY2NjY2NjY2NjY2Njd9LHsieCI6MTE0NSwieSI6NDA0LjY2NjY2NjY2NjY2Njd9LHsieCI6MTE0NSwieSI6MjU0LjY2NjY2NjY2NjY2NjY5fSx7IngiOjEyNTUsInkiOjI1NC42NjY2NjY2NjY2NjY2Nn1dLCJyZWYiOiJkaXJlY3Qtc3VibWl0IiwidG8iOiJmdWxmaWxsbWVudCJ9LHsiZnJvbSI6ImNoZWNrb3V0LWFwaSIsImxhYmVsIjp7ImhlaWdodCI6NjYsIndpZHRoIjoxMzguNCwieCI6MzkzLCJ5IjozMjcuNjY2NjY2NjY2NjY2N30sInBvaW50cyI6W3sieCI6MzU4LCJ5Ijo0MTUuNjY2NjY2NjY2NjY2N30seyJ4IjozNzMsInkiOjQxNS42NjY2NjY2NjY2NjY3fSx7IngiOjM3MywieSI6MzI0LjY2NjY2NjY2NjY2Njd9LHsieCI6NTUxLjQsInkiOjMyNC42NjY2NjY2NjY2NjY3fV0sInJlZiI6ImVucXVldWUtb3JkZXIiLCJ0byI6Im9yZGVyLXF1ZXVlIn0seyJmcm9tIjoiY2hlY2tvdXQtYXBpIiwibGFiZWwiOnsiaGVpZ2h0IjozMCwid2lkdGgiOjEwOS42MDAwMDAwMDAwMDAwMSwieCI6NDA3LjQsInkiOjQ4MC42NjY2NjY2NjY2NjY3fSwicG9pbnRzIjpbeyJ4IjozNTgsInkiOjQ3Ny42NjY2NjY2NjY2NjY3fSx7IngiOjU1MS40LCJ5Ijo0NzcuNjY2NjY2NjY2NjY2N31dLCJyZWYiOiJwZXJzaXN0LW9yZGVyIiwidG8iOiJvcmRlcnMtZGIifSx7ImZyb20iOiJvcmRlci13b3JrZXIiLCJsYWJlbCI6eyJoZWlnaHQiOjQ4LCJ3aWR0aCI6MTM4LjQsIngiOjk1MCwieSI6MTQ4LjMzMzMzMzMzMzMzMzMxfSwicG9pbnRzIjpbeyJ4IjozMjgsInkiOjIxMy4zMzMzMzMzMzMzMzMzNH0seyJ4IjoxMjU1LCJ5IjoyMTMuMzMzMzMzMzMzMzMzMzF9XSwicmVmIjoid29ya2VyLXN1Ym1pdCIsInRvIjoiZnVsZmlsbG1lbnQifV0sImdyb3VwcyI6W3siYm94Ijp7ImhlaWdodCI6MjE4LCJ3aWR0aCI6MjkyLCJ4IjoxMjI1LCJ5IjoxMDguMDAwMDAwMDAwMDAwMDF9LCJyZWYiOiJmdWxmaWxsbWVudC1zeXN0ZW0ifSx7ImJveCI6eyJoZWlnaHQiOjI0Miwid2lkdGgiOjI5MiwieCI6NjYsInkiOjEwMH0sInJlZiI6Im5lc3RlZCJ9LHsiYm94Ijp7ImhlaWdodCI6NTMzLjY2NjY2NjY2NjY2NjcsIndpZHRoIjo3NzcuNCwieCI6MzYsInkiOjM2fSwicmVmIjoib3JkZXItc3lzdGVtIn1dLCJsYXlvdXQiOnsiZGlyZWN0aW9uIjoiUklHSFQiLCJlbmdpbmUiOiJlbGstbGF5ZXJlZEAwLjEyLjAiLCJncm91cGluZ1BlcnNwZWN0aXZlUmVmIjoic3lzdGVtLXN0cnVjdHVyZSIsInJlYWRpbmdBbmNob3JSZWYiOiJvcmRlci13b3JrZXIifSwibW9kZWwiOnsiZW50aXRpZXMiOlt7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkludGVybmFsIGZ1bmN0aW9ucyBhbmQgZW5kcG9pbnRzIl0sInJlYXNvbiI6IkV4cGxhaW4gc2VydmljZSBpbnRlcmFjdGlvbnMgd2l0aG91dCBleHBhbmRpbmcgaW50ZXJuYWwgaW1wbGVtZW50YXRpb24uIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZXNlIHJlc3BvbnNpYmlsaXRpZXMgYXJlIHN0aXB1bGF0ZWQgaW4gdGhlIGZpY3Rpb25hbCBpbnZlbnRvcnkuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6IlJlcXVlc3QgaGFuZGxpbmcsIG9yZGVyIHBlcnNpc3RlbmNlLCBhbmQgc3VibWlzc2lvbiBhZGFwdGVycy4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgaW52ZW50b3J5IHN1cHBsaWVzIHRoaXMgY2F0ZWdvcnkuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6InNlcnZpY2UifSwiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiTGlzdGVkIGFzIGRlcGxveWVkIGluIGZpeHR1cmUtMS4iLCJzb3VyY2VSZWZzIjpbInJ1bnRpbWUtaW52ZW50b3J5Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJjaGVja291dC1hcGkiLCJsYWJlbCI6IkNoZWNrb3V0IEFQSSJ9LHsiYWJzdHJhY3Rpb24iOnsib21pdHMiOlsiVGFibGVzLCBzY2hlbWEsIGFuZCB0cmFuc2FjdGlvbiBkZXRhaWxzIl0sInJlYXNvbiI6IkV4cGxhaW4gc2VydmljZSBpbnRlcmFjdGlvbnMgd2l0aG91dCBleHBhbmRpbmcgaW50ZXJuYWwgaW1wbGVtZW50YXRpb24uIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZXNlIHJlc3BvbnNpYmlsaXRpZXMgYXJlIHN0aXB1bGF0ZWQgaW4gdGhlIGZpY3Rpb25hbCBpbnZlbnRvcnkuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6IlN0b3JhZ2Ugb2Ygb3JkZXIgcmVjb3Jkcy4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgaW52ZW50b3J5IHN1cHBsaWVzIHRoaXMgY2F0ZWdvcnkuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6ImRhdGFzdG9yZSJ9LCJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJMaXN0ZWQgYXMgZGVwbG95ZWQgaW4gZml4dHVyZS0xLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJpZCI6Im9yZGVycy1kYiIsImxhYmVsIjoiT3JkZXJzIERCIn0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJCcm9rZXIgaW50ZXJuYWxzIGFuZCBjb25maWd1cmF0aW9uIl0sInJlYXNvbiI6IkV4cGxhaW4gc2VydmljZSBpbnRlcmFjdGlvbnMgd2l0aG91dCBleHBhbmRpbmcgaW50ZXJuYWwgaW1wbGVtZW50YXRpb24uIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZXNlIHJlc3BvbnNpYmlsaXRpZXMgYXJlIHN0aXB1bGF0ZWQgaW4gdGhlIGZpY3Rpb25hbCBpbnZlbnRvcnkuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6IlRyYW5zcG9ydCBvZiBvcmRlciBzdWJtaXNzaW9ucy4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgaW52ZW50b3J5IHN1cHBsaWVzIHRoaXMgY2F0ZWdvcnkuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6InF1ZXVlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6Ikxpc3RlZCBhcyBkZXBsb3llZCBpbiBmaXh0dXJlLTEuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImlkIjoib3JkZXItcXVldWUiLCJsYWJlbCI6Ik9yZGVyIFF1ZXVlIn0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJJbnRlcm5hbCBmdW5jdGlvbnMgYW5kIHJlcGxpY2EgY291bnQiXSwicmVhc29uIjoiRXhwbGFpbiBzZXJ2aWNlIGludGVyYWN0aW9ucyB3aXRob3V0IGV4cGFuZGluZyBpbnRlcm5hbCBpbXBsZW1lbnRhdGlvbi4iLCJyZXByZXNlbnRzIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlc2UgcmVzcG9uc2liaWxpdGllcyBhcmUgc3RpcHVsYXRlZCBpbiB0aGUgZmljdGlvbmFsIGludmVudG9yeS4iLCJzb3VyY2VSZWZzIjpbInJ1bnRpbWUtaW52ZW50b3J5Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiUXVldWUgY29uc3VtZXIgYW5kIGZ1bGZpbGxtZW50IGFkYXB0ZXIuIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGludmVudG9yeSBzdXBwbGllcyB0aGlzIGNhdGVnb3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6Ikxpc3RlZCBhcyBkZXBsb3llZCBpbiBmaXh0dXJlLTEuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImlkIjoib3JkZXItd29ya2VyIiwibGFiZWwiOiJPcmRlciBXb3JrZXIifSx7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkludGVybmFsIGZ1bGZpbGxtZW50IHdvcmtmbG93Il0sInJlYXNvbiI6IkV4cGxhaW4gc2VydmljZSBpbnRlcmFjdGlvbnMgd2l0aG91dCBleHBhbmRpbmcgaW50ZXJuYWwgaW1wbGVtZW50YXRpb24uIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZXNlIHJlc3BvbnNpYmlsaXRpZXMgYXJlIHN0aXB1bGF0ZWQgaW4gdGhlIGZpY3Rpb25hbCBpbnZlbnRvcnkuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6Ik9yZGVyIGFjY2VwdGFuY2UgYW5kIGRpc3BhdGNoIG9wZXJhdGlvbnMuIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGludmVudG9yeSBzdXBwbGllcyB0aGlzIGNhdGVnb3J5LiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1pbnZlbnRvcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6Ikxpc3RlZCBhcyBkZXBsb3llZCBpbiBmaXh0dXJlLTEuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWludmVudG9yeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImlkIjoiZnVsZmlsbG1lbnQiLCJsYWJlbCI6IkZ1bGZpbGxtZW50In1dLCJncm91cHMiOlt7ImlkIjoib3JkZXItc3lzdGVtIiwibGFiZWwiOiJPcmRlciBQcm9jZXNzaW5nIiwibWVhbmluZyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkEgc3lzdGVtIGdyb3VwaW5nOyBpdCBtYWtlcyBubyBzZWN1cml0eSBvciBvd25lcnNoaXAgY2xhaW0uIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJUaGUgY3VycmVudCBPcmRlciBQcm9jZXNzaW5nIHN5c3RlbSBib3VuZGFyeSBpbiB0aGUgZml4dHVyZSBzZXJ2aWNlIGNhdGFsb2cuIn0sInBlcnNwZWN0aXZlUmVmIjoic3lzdGVtLXN0cnVjdHVyZSJ9LHsiaWQiOiJmdWxmaWxsbWVudC1zeXN0ZW0iLCJsYWJlbCI6IkZ1bGZpbGxtZW50IFBsYXRmb3JtIiwibWVhbmluZyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4dGVybmFsIHJlbGF0aXZlIHRvIE9yZGVyIFByb2Nlc3NpbmcsIHdpdGhvdXQgYXNzZXJ0aW5nIGEgbmV0d29yayBjcm9zc2luZy4iLCJzb3VyY2VSZWZzIjpbInN5c3RlbS1ib3VuZGFyeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6IlRoZSBzZXBhcmF0ZSBzeXN0ZW0gY29udGFpbmluZyBGdWxmaWxsbWVudC4ifSwicGVyc3BlY3RpdmVSZWYiOiJzeXN0ZW0tc3RydWN0dXJlIn0seyJpZCI6ImNvbW1lcmNlIiwibGFiZWwiOiJDb21tZXJjZSIsIm1lYW5pbmciOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJEZWZpbmVzIHRoZSBjYW5kaWRhdGUgb3duZXIgaWRlbnRpdHksIG5vdCBhY2NlcHRlZCB3b3JrZXIgbWVtYmVyc2hpcC4iLCJzb3VyY2VSZWZzIjpbImNvbW1lcmNlLXJlcG9ydCJdfSwic3RhdHVzIjoicmVwb3J0ZWQiLCJ2YWx1ZSI6IkFuIG9yZ2FuaXphdGlvbmFsIG93bmVyIG5hbWVkIGJ5IHRoZSBDb21tZXJjZSByZXByZXNlbnRhdGl2ZS4ifSwicGVyc3BlY3RpdmVSZWYiOiJydW50aW1lLW93bmVyc2hpcCJ9LHsiaWQiOiJvcGVyYXRpb25zIiwibGFiZWwiOiJPcGVyYXRpb25zIiwibWVhbmluZyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkRlZmluZXMgdGhlIGNhbmRpZGF0ZSBvd25lciBpZGVudGl0eSwgbm90IGFjY2VwdGVkIHdvcmtlciBtZW1iZXJzaGlwLiIsInNvdXJjZVJlZnMiOlsib3BlcmF0aW9ucy1yZXBvcnQiXX0sInN0YXR1cyI6InJlcG9ydGVkIiwidmFsdWUiOiJBbiBvcmdhbml6YXRpb25hbCBvd25lciBuYW1lZCBieSB0aGUgT3BlcmF0aW9ucyByZXByZXNlbnRhdGl2ZS4ifSwicGVyc3BlY3RpdmVSZWYiOiJydW50aW1lLW93bmVyc2hpcCJ9LHsiaWQiOiJuZXN0ZWQiLCJsYWJlbCI6Ik5lc3RlZCBzZXJ2aWNlcyIsIm1lYW5pbmciOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJBIHN5c3RlbSBncm91cGluZzsgaXQgbWFrZXMgbm8gc2VjdXJpdHkgb3Igb3duZXJzaGlwIGNsYWltLiIsInNvdXJjZVJlZnMiOlsic3lzdGVtLWJvdW5kYXJ5Il19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiVGhlIGN1cnJlbnQgT3JkZXIgUHJvY2Vzc2luZyBzeXN0ZW0gYm91bmRhcnkgaW4gdGhlIGZpeHR1cmUgc2VydmljZSBjYXRhbG9nLiJ9LCJwZXJzcGVjdGl2ZVJlZiI6InN5c3RlbS1zdHJ1Y3R1cmUifV0sImlkIjoib3JkZXItcHJvY2Vzc2luZyIsIm1lbWJlcnNoaXBzIjpbeyJncm91cCI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGNhdGFsb2cgZXhwbGljaXRseSBhc3NpZ25zIHRoaXMgc3lzdGVtIG1lbWJlcnNoaXAuIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJvcmRlci1zeXN0ZW0ifSwiaWQiOiJhcGktc3lzdGVtIiwibWVtYmVyUmVmIjoiY2hlY2tvdXQtYXBpIiwicGVyc3BlY3RpdmVSZWYiOiJzeXN0ZW0tc3RydWN0dXJlIn0seyJncm91cCI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGNhdGFsb2cgZXhwbGljaXRseSBhc3NpZ25zIHRoaXMgc3lzdGVtIG1lbWJlcnNoaXAuIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJvcmRlci1zeXN0ZW0ifSwiaWQiOiJkYi1zeXN0ZW0iLCJtZW1iZXJSZWYiOiJvcmRlcnMtZGIiLCJwZXJzcGVjdGl2ZVJlZiI6InN5c3RlbS1zdHJ1Y3R1cmUifSx7Imdyb3VwIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgY2F0YWxvZyBleHBsaWNpdGx5IGFzc2lnbnMgdGhpcyBzeXN0ZW0gbWVtYmVyc2hpcC4iLCJzb3VyY2VSZWZzIjpbInN5c3RlbS1ib3VuZGFyeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6Im9yZGVyLXN5c3RlbSJ9LCJpZCI6InF1ZXVlLXN5c3RlbSIsIm1lbWJlclJlZiI6Im9yZGVyLXF1ZXVlIiwicGVyc3BlY3RpdmVSZWYiOiJzeXN0ZW0tc3RydWN0dXJlIn0seyJncm91cCI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGNhdGFsb2cgZXhwbGljaXRseSBhc3NpZ25zIHRoaXMgc3lzdGVtIG1lbWJlcnNoaXAuIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJuZXN0ZWQifSwiaWQiOiJ3b3JrZXItc3lzdGVtIiwibWVtYmVyUmVmIjoib3JkZXItd29ya2VyIiwicGVyc3BlY3RpdmVSZWYiOiJzeXN0ZW0tc3RydWN0dXJlIn0seyJncm91cCI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoZSBmaXh0dXJlIGNhdGFsb2cgZXhwbGljaXRseSBhc3NpZ25zIHRoaXMgc3lzdGVtIG1lbWJlcnNoaXAuIiwic291cmNlUmVmcyI6WyJzeXN0ZW0tYm91bmRhcnkiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJmdWxmaWxsbWVudC1zeXN0ZW0ifSwiaWQiOiJmdWxmaWxsbWVudC1tZW1iZXJzaGlwIiwibWVtYmVyUmVmIjoiZnVsZmlsbG1lbnQiLCJwZXJzcGVjdGl2ZVJlZiI6InN5c3RlbS1zdHJ1Y3R1cmUifSx7Imdyb3VwIjp7ImFsdGVybmF0aXZlcyI6W3siYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJDb21tZXJjZSByZXBvcnRzIGN1cnJlbnQgb3duZXJzaGlwLiIsInNvdXJjZVJlZnMiOlsiY29tbWVyY2UtcmVwb3J0Il19LCJzdGF0dXMiOiJyZXBvcnRlZCIsInZhbHVlIjoiY29tbWVyY2UifSx7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiT3BlcmF0aW9ucyByZXBvcnRzIGN1cnJlbnQgb3duZXJzaGlwLiIsInNvdXJjZVJlZnMiOlsib3BlcmF0aW9ucy1yZXBvcnQiXX0sInN0YXR1cyI6InJlcG9ydGVkIiwidmFsdWUiOiJvcGVyYXRpb25zIn1dLCJyZWFzb24iOiJUaGUgdHdvIHJlcG9ydHMgZGlzYWdyZWUgYWJvdXQgZXhjbHVzaXZlIHByb2R1Y3Rpb24tZGVwbG95bWVudCBhcHByb3ZhbCBhdXRob3JpdHkgZm9yIHRoZSBzYW1lIHdvcmtlciBzZXJ2aWNlIGFuZCBzbmFwc2hvdC4gTm8gcmVzb2x2aW5nIHJlY29yZCBpcyBlc3RhYmxpc2hlZC4iLCJzdGF0dXMiOiJkaXNwdXRlZCJ9LCJpZCI6Indvcmtlci1vd25lciIsIm1lbWJlclJlZiI6Im9yZGVyLXdvcmtlciIsInBlcnNwZWN0aXZlUmVmIjoicnVudGltZS1vd25lcnNoaXAifSx7Imdyb3VwIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIGZpeHR1cmUgY2F0YWxvZyBleHBsaWNpdGx5IGFzc2lnbnMgdGhpcyBzeXN0ZW0gbWVtYmVyc2hpcC4iLCJzb3VyY2VSZWZzIjpbInN5c3RlbS1ib3VuZGFyeSJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6Im9yZGVyLXN5c3RlbSJ9LCJpZCI6Im5lc3RlZC1pbi1vcmRlciIsIm1lbWJlclJlZiI6Im5lc3RlZCIsInBlcnNwZWN0aXZlUmVmIjoic3lzdGVtLXN0cnVjdHVyZSJ9XSwibm90ZXMiOlt7ImFuc3dlciI6eyJyZWFzb24iOiJUaGUgZml4dHVyZSBkb2VzIG5vdCBlc3RhYmxpc2ggZXhjbHVzaXZpdHkgb3IgZHVwbGljYXRlIHN1Ym1pc3Npb24gYmVoYXZpb3IuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWNvbm5lY3Rpb25zIl0sInN0YXR1cyI6InVua25vd24ifSwiaWQiOiJkdWFsLXN1Ym1pc3Npb24iLCJzdGF0ZW1lbnQiOiJDYW4gb25lIG9yZGVyIHRha2UgYm90aCBkaXJlY3QgYW5kIHF1ZXVlZCBzdWJtaXNzaW9uIHJvdXRlcz8iLCJzdWJqZWN0UmVmcyI6WyJkaXJlY3Qtc3VibWl0IiwiZW5xdWV1ZS1vcmRlciIsIndvcmtlci1zdWJtaXQiXSwidG9waWMiOiJiZWhhdmlvciJ9LHsiYW5zd2VyIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiQSBtYWludGFpbmVyIGV4cGxhbmF0aW9uOyBvcGVyYXRpb25hbCBlZmZlY3RpdmVuZXNzIGhhcyBub3QgYmVlbiBlc3RhYmxpc2hlZC4iLCJzb3VyY2VSZWZzIjpbInF1ZXVlLXJhdGlvbmFsZS1yZXBvcnQiXX0sInN0YXR1cyI6InJlcG9ydGVkIiwidmFsdWUiOiJUbyBhYnNvcmIgRnVsZmlsbG1lbnQgb3V0YWdlcy4ifSwiaWQiOiJxdWV1ZS1yYXRpb25hbGUiLCJzdGF0ZW1lbnQiOiJXaHkgd2FzIHRoZSBleGlzdGluZyBxdWV1ZSBpbnRyb2R1Y2VkPyIsInN1YmplY3RSZWZzIjpbIm9yZGVyLXF1ZXVlIl0sInRvcGljIjoicmF0aW9uYWxlIn0seyJhbnN3ZXIiOnsicmVhc29uIjoiTm8gZGVsaXZlcnkgZ3VhcmFudGVlcywgcmV0cnkgYmVoYXZpb3IsIG9yIGlkZW1wb3RlbmN5IGV2aWRlbmNlIHdhcyBzdXBwbGllZC4iLCJzb3VyY2VSZWZzIjpbInJ1bnRpbWUtY29ubmVjdGlvbnMiXSwic3RhdHVzIjoidW5rbm93biJ9LCJpZCI6ImRlbGl2ZXJ5LWd1YXJhbnRlZXMiLCJzdGF0ZW1lbnQiOiJXaGF0IGRlbGl2ZXJ5IGFuZCByZXRyeSBndWFyYW50ZWVzIGFwcGx5IHRvIHF1ZXVlZCBvcmRlcnM/Iiwic3ViamVjdFJlZnMiOlsib3JkZXItcXVldWUiLCJjb25zdW1lLW9yZGVyIl0sInRvcGljIjoiYmVoYXZpb3IifSx7ImFuc3dlciI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkRvIG5vdCB0dXJuIGFuIHVua25vd24gc2VsZWN0aW9uIHJ1bGUgaW50byBhbiBpbnZlbnRlZCBmYWxsYmFjayBvciBtaWdyYXRpb24gc3RvcnkuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWNvbm5lY3Rpb25zIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiVHdvIGN1cnJlbnRseSBpbXBsZW1lbnRlZCByb3V0ZXM7IG5laXRoZXIgaXMgZXN0YWJsaXNoZWQgYXMgdGhlIHByaW1hcnksIGZhbGxiYWNrLCBvciBleGNsdXNpdmUgcm91dGUuIn0sImlkIjoicGF0aC1mcmFtaW5nIiwic3RhdGVtZW50IjoiSG93IHNob3VsZCB0aGUgdHdvIHN1Ym1pc3Npb24gcm91dGVzIGJlIGRlc2NyaWJlZD8iLCJzdWJqZWN0UmVmcyI6WyJkaXJlY3Qtc3VibWl0IiwiZW5xdWV1ZS1vcmRlciIsIndvcmtlci1zdWJtaXQiXSwidG9waWMiOiJpbnRlcnByZXRhdGlvbiJ9XSwicGVyc3BlY3RpdmVzIjpbeyJpZCI6InN5c3RlbS1zdHJ1Y3R1cmUiLCJsYWJlbCI6IlN5c3RlbSBzdHJ1Y3R1cmUiLCJtZWFuaW5nIjoiQ2F0YWxvZyBtZW1iZXJzaGlwIGluIG9uZSBjdXJyZW50IHN5c3RlbTsgbm8gb3duZXJzaGlwLCBkZXBsb3ltZW50LCBvciBuZXR3b3JrIGlzb2xhdGlvbiBpcyBpbXBsaWVkLiIsInBlcmlvZCI6ImZpeHR1cmUtMSIsInNjb3BlIjoiVGhlIGZpdmUgcmVwcmVzZW50ZWQgcnVudGltZSBlbnRpdGllcyBpbiBmaWN0aW9uYWwgcHJvZHVjdGlvbi4ifSx7ImlkIjoicnVudGltZS1vd25lcnNoaXAiLCJsYWJlbCI6IlJ1bnRpbWUgb3duZXJzaGlwIiwibWVhbmluZyI6IkV4Y2x1c2l2ZSBhdXRob3JpdHkgdG8gYXBwcm92ZSBwcm9kdWN0aW9uIGRlcGxveW1lbnRzIG9mIHRoZSByZXByZXNlbnRlZCB1bml0LCBhcyByZXBvcnRlZCBieSB0aGUgdHdvIHJlcHJlc2VudGF0aXZlcy4iLCJwZXJpb2QiOiJmaXh0dXJlLTEiLCJzY29wZSI6IlRoZSB3aG9sZSBPcmRlciBXb3JrZXIgc2VydmljZSBpbiBmaWN0aW9uYWwgcHJvZHVjdGlvbiwgbm90IGFuIGludGVybmFsIGNvbXBvbmVudC4ifV0sInJlbGF0aW9uc2hpcHMiOlt7ImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IkV4cGxpY2l0bHkgbGlzdGVkIGluIHRoZSBjdXJyZW50IGZpY3Rpb25hbCBpbXBsZW1lbnRhdGlvbi4iLCJzb3VyY2VSZWZzIjpbInJ1bnRpbWUtY29ubmVjdGlvbnMiXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoiY2hlY2tvdXQtYXBpIiwiaWQiOiJwZXJzaXN0LW9yZGVyIiwia2luZCI6IndyaXRlcyIsImxhYmVsIjoiV3JpdGVzIG9yZGVycyIsInRvIjoib3JkZXJzLWRiIn0seyJjb25kaXRpb24iOnsicmVhc29uIjoiVGhlIGNvbmRpdGlvbiBzZWxlY3RpbmcgcXVldWVkIHN1Ym1pc3Npb24gaXMgdW5hdmFpbGFibGUuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWNvbm5lY3Rpb25zIl0sInN0YXR1cyI6InVua25vd24ifSwiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBsaXN0ZWQgaW4gdGhlIGN1cnJlbnQgZmljdGlvbmFsIGltcGxlbWVudGF0aW9uLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1jb25uZWN0aW9ucyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJjaGVja291dC1hcGkiLCJpZCI6ImVucXVldWUtb3JkZXIiLCJraW5kIjoicHVibGlzaGVzIiwibGFiZWwiOiJQdWJsaXNoZXMgb3JkZXIgc3VibWlzc2lvbnMiLCJ0byI6Im9yZGVyLXF1ZXVlIn0seyJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IGxpc3RlZCBpbiB0aGUgY3VycmVudCBmaWN0aW9uYWwgaW1wbGVtZW50YXRpb24uIiwic291cmNlUmVmcyI6WyJydW50aW1lLWNvbm5lY3Rpb25zIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiZnJvbSI6Im9yZGVyLXdvcmtlciIsImlkIjoiY29uc3VtZS1vcmRlciIsImtpbmQiOiJjb25zdW1lcyIsImxhYmVsIjoiQ29uc3VtZXMgb3JkZXIgc3VibWlzc2lvbnMiLCJ0byI6Im9yZGVyLXF1ZXVlIn0seyJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJFeHBsaWNpdGx5IGxpc3RlZCBpbiB0aGUgY3VycmVudCBmaWN0aW9uYWwgaW1wbGVtZW50YXRpb24uIiwic291cmNlUmVmcyI6WyJydW50aW1lLWNvbm5lY3Rpb25zIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiZnJvbSI6Im9yZGVyLXdvcmtlciIsImlkIjoid29ya2VyLXN1Ym1pdCIsImtpbmQiOiJjYWxscyIsImxhYmVsIjoiU3VibWl0cyBvcmRlcnMgdG8gRnVsZmlsbG1lbnQiLCJ0byI6ImZ1bGZpbGxtZW50In0seyJjb25kaXRpb24iOnsicmVhc29uIjoiVGhlIGNvbmRpdGlvbiBzZWxlY3RpbmcgZGlyZWN0IHN1Ym1pc3Npb24gaXMgdW5hdmFpbGFibGUuIiwic291cmNlUmVmcyI6WyJydW50aW1lLWNvbm5lY3Rpb25zIl0sInN0YXR1cyI6InVua25vd24ifSwiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiRXhwbGljaXRseSBsaXN0ZWQgaW4gdGhlIGN1cnJlbnQgZmljdGlvbmFsIGltcGxlbWVudGF0aW9uLiIsInNvdXJjZVJlZnMiOlsicnVudGltZS1jb25uZWN0aW9ucyJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImZyb20iOiJjaGVja291dC1hcGkiLCJpZCI6ImRpcmVjdC1zdWJtaXQiLCJraW5kIjoiY2FsbHMiLCJsYWJlbCI6IlN1Ym1pdHMgb3JkZXJzIGRpcmVjdGx5IiwidG8iOiJmdWxmaWxsbWVudCJ9XSwic2NoZW1hVmVyc2lvbiI6IjAuMi1kcmFmdCIsInNjb3BlIjp7ImFic3RyYWN0aW9uIjoiRGVwbG95ZWQgc2VydmljZXMgYW5kIGluZnJhc3RydWN0dXJlIHJlc291cmNlczsgc2VydmljZSBpbnRlcm5hbHMgYXJlIGNvbGxhcHNlZC4gTWVtYmVyc2hpcCBjbGFpbXMgcmVmZXIgdG8gdGhlc2UgcmVwcmVzZW50ZWQgdW5pdHMuIiwiY292ZXJhZ2UiOiJwYXJ0aWFsIiwiZW52aXJvbm1lbnQiOiJmaWN0aW9uYWwgcHJvZHVjdGlvbiIsImV4Y2x1ZGVzIjpbIlByb3Bvc2VkIG9yIGludGVuZGVkIGZ1dHVyZSB0b3BvbG9neSIsIkF1dGhlbnRpY2F0aW9uIGFuZCBjdXN0b21lciBpbnRlcmZhY2VzIiwiUmVwbGljYSBjb3VudHMsIGRhdGFiYXNlIHNjaGVtYXMsIGFuZCBkZXBsb3ltZW50IG5ldHdvcmtzIl0sImluY2x1ZGVzIjpbIkZpdmUgcnVudGltZSBlbnRpdGllcyBhbmQgdGhlaXIgY3VycmVudCBjb25uZWN0aW9ucyIsIlN5c3RlbSBtZW1iZXJzaGlwIGFuZCB0aGUgd29ya2VyIG93bmVyc2hpcCBkaXNwdXRlIiwiTWlzc2luZyByb3V0ZSBjb25kaXRpb25zIGFuZCByZXBvcnRlZCBxdWV1ZSByYXRpb25hbGUiXSwicXVlc3Rpb24iOiJIb3cgY2FuIG9yZGVycyByZWFjaCBGdWxmaWxsbWVudCwgYW5kIHdoYXQgZG8gd2UgYWN0dWFsbHkga25vdyBhYm91dCB0aGUgdHdvIHJvdXRlcz8iLCJzbmFwc2hvdCI6ImZpeHR1cmUtMSIsInRpbWVmcmFtZSI6ImN1cnJlbnQifSwic291cmNlcyI6W3siZGVzY3JpcHRpb24iOiJTdGlwdWxhdGVkIGRlcGxveWVkIGVudGl0aWVzLCBjYXRlZ29yaWVzLCBhbmQgaW50ZXJuYWwgcmVzcG9uc2liaWxpdGllcy4iLCJpZCI6InJ1bnRpbWUtaW52ZW50b3J5Iiwia2luZCI6ImZpeHR1cmUiLCJsb2NhdG9yIjoiZXZpZGVuY2UubWQjcnVudGltZS1pbnZlbnRvcnkifSx7ImRlc2NyaXB0aW9uIjoiU3RpcHVsYXRlZCBjdXJyZW50IGNvbm5lY3Rpb25zIGFuZCBtaXNzaW5nIGJlaGF2aW9yYWwga25vd2xlZGdlLiIsImlkIjoicnVudGltZS1jb25uZWN0aW9ucyIsImtpbmQiOiJmaXh0dXJlIiwibG9jYXRvciI6ImV2aWRlbmNlLm1kI3J1bnRpbWUtY29ubmVjdGlvbnMifSx7ImRlc2NyaXB0aW9uIjoiU3RpcHVsYXRlZCBzeXN0ZW0gY2F0YWxvZyBib3VuZGFyaWVzOyBubyBzZWN1cml0eSBvciBvd25lcnNoaXAgaW1wbGljYXRpb24uIiwiaWQiOiJzeXN0ZW0tYm91bmRhcnkiLCJraW5kIjoiZml4dHVyZSIsImxvY2F0b3IiOiJldmlkZW5jZS5tZCNzeXN0ZW0tYm91bmRhcnkifSx7ImRlc2NyaXB0aW9uIjoiRmljdGlvbmFsIENvbW1lcmNlIG93bmVyc2hpcCBjbGFpbS4iLCJpZCI6ImNvbW1lcmNlLXJlcG9ydCIsImtpbmQiOiJmaXh0dXJlIiwibG9jYXRvciI6ImV2aWRlbmNlLm1kI2NvbW1lcmNlLW93bmVyc2hpcC1yZXBvcnQifSx7ImRlc2NyaXB0aW9uIjoiRmljdGlvbmFsIE9wZXJhdGlvbnMgb3duZXJzaGlwIGNsYWltLiIsImlkIjoib3BlcmF0aW9ucy1yZXBvcnQiLCJraW5kIjoiZml4dHVyZSIsImxvY2F0b3IiOiJldmlkZW5jZS5tZCNvcGVyYXRpb25zLW93bmVyc2hpcC1yZXBvcnQifSx7ImRlc2NyaXB0aW9uIjoiRmljdGlvbmFsIG1haW50YWluZXIgZXhwbGFuYXRpb247IG5vdCBhbiBvcGVyYXRpb25hbCBndWFyYW50ZWUuIiwiaWQiOiJxdWV1ZS1yYXRpb25hbGUtcmVwb3J0Iiwia2luZCI6ImZpeHR1cmUiLCJsb2NhdG9yIjoiZXZpZGVuY2UubWQjcXVldWUtcmF0aW9uYWxlLXJlcG9ydCJ9XSwidGl0bGUiOiJPcmRlciBQcm9jZXNzaW5nOiBDdXJyZW50IFN1Ym1pc3Npb24gUGF0aHMifSwibW9kZWxEaWdlc3QiOiJmOThlYTk1MjMzMzlhZGU1MGI1MzI5MzZjMzBjMmMzNGY0OWYzMDViNjgxNDQxYjI5NDQzY2IwNTI2NzkzM2VkIiwibm9kZXMiOlt7ImJveCI6eyJoZWlnaHQiOjEyNCwid2lkdGgiOjIzMiwieCI6MTI2LCJ5IjozODQuNjY2NjY2NjY2NjY2N30sInJlZiI6ImNoZWNrb3V0LWFwaSJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4IjoxMjU1LCJ5IjoxNzJ9LCJyZWYiOiJmdWxmaWxsbWVudCJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4Ijo1NTEuNCwieSI6MjQyLjAwMDAwMDAwMDAwMDAzfSwicmVmIjoib3JkZXItcXVldWUifSx7ImJveCI6eyJoZWlnaHQiOjE0OCwid2lkdGgiOjIzMiwieCI6OTYsInkiOjE2NH0sInJlZiI6Im9yZGVyLXdvcmtlciJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4Ijo1NTEuNCwieSI6NDE1LjY2NjY2NjY2NjY2Njd9LCJyZWYiOiJvcmRlcnMtZGIifV0sInNjaGVtYVZlcnNpb24iOiIwLjEtZHJhZnQifQ==</metadata>
+    <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+
+/* Skins share all text metrics and geometry. Category and qualification cues remain. */
+.ww-svg[data-skin="engineering"] { --canvas:#f0f6fa; --surface:#fff; --ink:#102e48; --muted:#526d83; --line:#55748b; --border:#bbcdda; --frame:#e5eff6; --accent:#155f9b; }
+.ww-svg[data-skin="engineering"][data-theme="dark"] { --canvas:#0e1c2a; --surface:#162b3d; --ink:#e1eff9; --muted:#a3bed0; --line:#88aabd; --border:#39566c; --frame:#122535; --accent:#7cc9fc; }
+.ww-svg[data-skin="engineering"] .node-box { rx:3px; }
+.ww-svg[data-skin="editorial"] { --canvas:#f5f0e7; --surface:#fffdf8; --ink:#302e29; --muted:#71695c; --line:#92816c; --border:#d4c8b7; --frame:#ece4d8; --accent:#87533b; }
+.ww-svg[data-skin="editorial"][data-theme="dark"] { --canvas:#201d19; --surface:#2e2923; --ink:#f2e9dd; --muted:#c5b6a0; --line:#b9a386; --border:#5e5141; --frame:#28231e; --accent:#efb38d; }
+.ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
+</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
+    <g class="record" data-ref="order-system" tabindex="0" role="button" aria-label="Inspect Order Processing"><rect class="frame" x="36" y="36" width="777.4" height="533.667" rx="16"/><text class="frame-title" x="58" y="66">Order Processing</text></g><g class="record" data-ref="nested" tabindex="0" role="button" aria-label="Inspect Nested services"><rect class="frame" x="66" y="100" width="292" height="242" rx="16"/><text class="frame-title" x="88" y="130">Nested services</text></g><g class="record" data-ref="fulfillment-system" tabindex="0" role="button" aria-label="Inspect Fulfillment Platform"><rect class="frame" x="1225" y="108" width="292" height="218" rx="16"/><text class="frame-title" x="1247" y="138">Fulfillment Platform</text></g><g class="record" data-ref="consume-order" tabindex="0" role="button" aria-label="Inspect Consumes order submissions"><g class=""><path class="edge-hit" d="M328,262.667 L541.4,262.667 L541.4,283.333 L551.4,283.333"/><path class="edge-line" d="M328,262.667 L541.4,262.667 L541.4,283.333 L551.4,283.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="direct-submit" tabindex="0" role="button" aria-label="Inspect Submits orders directly"><g class=""><path class="edge-hit" d="M358,446.667 L383,446.667 L383,404.667 L1145,404.667 L1145,254.667 L1255,254.667"/><path class="edge-line" d="M358,446.667 L383,446.667 L383,404.667 L1145,404.667 L1145,254.667 L1255,254.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="enqueue-order" tabindex="0" role="button" aria-label="Inspect Publishes order submissions"><g class=""><path class="edge-hit" d="M358,415.667 L373,415.667 L373,324.667 L551.4,324.667"/><path class="edge-line" d="M358,415.667 L373,415.667 L373,324.667 L551.4,324.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="persist-order" tabindex="0" role="button" aria-label="Inspect Writes orders"><g class=""><path class="edge-hit" d="M358,477.667 L551.4,477.667"/><path class="edge-line" d="M358,477.667 L551.4,477.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="worker-submit" tabindex="0" role="button" aria-label="Inspect Submits orders to Fulfillment"><g class=""><path class="edge-hit" d="M328,213.333 L1255,213.333"/><path class="edge-line" d="M328,213.333 L1255,213.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout-api" tabindex="0" role="button" aria-label="Inspect Checkout API"><g class="category-service">
+      <rect class="node-box" x="126" y="384.667" width="232" height="124" rx="12"/>
+      <rect class="accent" x="144" y="403.667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="158" y="409.667">service</text>
+      <text class="node-title" x="144" y="436.667">Checkout API</text>
+      <text class="node-status" x="144" y="459.667">established · present</text>
+      <text class="node-link" x="144" y="490.667">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="fulfillment" tabindex="0" role="button" aria-label="Inspect Fulfillment"><g class="category-service">
+      <rect class="node-box" x="1255" y="172" width="232" height="124" rx="12"/>
+      <rect class="accent" x="1273" y="191" width="6" height="6" rx="2"/>
+      <text class="node-category" x="1287" y="197">service</text>
+      <text class="node-title" x="1273" y="224">Fulfillment</text>
+      <text class="node-status" x="1273" y="247">established · present</text>
+      <text class="node-link" x="1273" y="278">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="order-queue" tabindex="0" role="button" aria-label="Inspect Order Queue"><g class="category-queue">
+      <rect class="node-box" x="551.4" y="242" width="232" height="124" rx="12"/>
+      <rect class="accent" x="569.4" y="261" width="6" height="6" rx="2"/>
+      <text class="node-category" x="583.4" y="267">queue</text>
+      <text class="node-title" x="569.4" y="294">Order Queue</text>
+      <text class="node-status" x="569.4" y="317">established · present</text>
+      <text class="node-alert" x="569.4" y="348">1 unknown · 1 reported</text>
+
+    </g></g><g class="record" data-ref="order-worker" tabindex="0" role="button" aria-label="Inspect Order Worker" data-reading-anchor="true"><g class="category-service">
+      <rect class="node-box" x="96" y="164" width="232" height="148" rx="12"/>
+      <rect class="accent" x="114" y="183" width="6" height="6" rx="2"/>
+      <text class="node-category" x="128" y="189">service</text>
+      <text class="node-title" x="114" y="216">Order Worker</text>
+      <text class="node-status" x="114" y="239">established · present</text>
+      <text class="node-alert" x="114" y="270">1 disputed · 2 reported</text>
+      <text class="reading-anchor-cue" x="114" y="294">Start reading here</text>
+    </g></g><g class="record" data-ref="orders-db" tabindex="0" role="button" aria-label="Inspect Orders DB"><g class="category-datastore">
+      <rect class="node-box" x="551.4" y="415.667" width="232" height="124" rx="12"/>
+      <rect class="accent" x="569.4" y="434.667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="583.4" y="440.667">datastore</text>
+      <text class="node-title" x="569.4" y="467.667">Orders DB</text>
+      <text class="node-status" x="569.4" y="490.667">established · present</text>
+      <text class="node-link" x="569.4" y="521.667">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="consume-order" tabindex="0" role="button" aria-label="Inspect Consumes order submissions"><rect class="edge-label-bg" x="403.8" y="265.667" width="116.8" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="462.2" y="283.667">Consumes order</text><text class="edge-label" text-anchor="middle" x="462.2" y="301.667">submissions</text></g><g class="record" data-ref="direct-submit" tabindex="0" role="button" aria-label="Inspect Submits orders directly"><rect class="edge-label-bg" x="928.4" y="421.667" width="181.6" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="1019.2" y="439.667">Submits orders directly</text><text class="edge-label edge-note" text-anchor="middle" x="1019.2" y="457.667">Condition unknown</text></g><g class="record" data-ref="enqueue-order" tabindex="0" role="button" aria-label="Inspect Publishes order submissions"><rect class="edge-label-bg" x="393" y="327.667" width="138.4" height="66" rx="5"/><text class="edge-label" text-anchor="middle" x="462.2" y="345.667">Publishes order</text><text class="edge-label" text-anchor="middle" x="462.2" y="363.667">submissions</text><text class="edge-label edge-note" text-anchor="middle" x="462.2" y="381.667">Condition unknown</text></g><g class="record" data-ref="persist-order" tabindex="0" role="button" aria-label="Inspect Writes orders"><rect class="edge-label-bg" x="407.4" y="480.667" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="462.2" y="498.667">Writes orders</text></g><g class="record" data-ref="worker-submit" tabindex="0" role="button" aria-label="Inspect Submits orders to Fulfillment"><rect class="edge-label-bg" x="950" y="148.333" width="138.4" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="1019.2" y="166.333">Submits orders to</text><text class="edge-label" text-anchor="middle" x="1019.2" y="184.333">Fulfillment</text></g>
+  </svg></div>
+      <div class="map-caption"><span>Arrows describe operations: actor → resource.</span><span>Position does not imply execution order. Select any element to inspect it.</span></div>
+    </section>
+    <details id="readability"><summary id="readability-summary">Readability warnings</summary><p>Advisory geometry checks, separate from architectural truth. Fit estimates use this canvas area. No warnings does not prove visual quality.</p><div id="readability-list"></div></details>
+    <section id="graph-connections" aria-label="Connections between graph levels"></section>
+    <section class="knowledge-section" aria-labelledby="knowledge-heading"><div class="section-heading"><h2 id="knowledge-heading">What remains open</h2><span id="knowledge-count"></span></div><div id="knowledge-list"></div></section>
+    <footer><span>Full source travels with this artifact. Qualifications remain intact.</span><span>Waxwing · experimental MVP</span></footer>
+  </main>
+  <main id="document-reader" hidden aria-label="Documents">
+    <div class="document-breadcrumb"><a href="#">← Graph</a><span>/</span><a href="#documents">Documents</a></div>
+    <div class="document-workspace"><nav id="document-nav" aria-label="Included documents"></nav><section id="document-content" aria-live="polite"></section></div>
+  </main>
+
+
+
+  <aside id="inspector" hidden aria-label="Model inspector"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside>
+  <script>const inspectReadability = function inspectReadability(drawing, graphRef, viewport = { width: 1200, height: 520 }) {
+  if (![viewport.width, viewport.height].every((value) => Number.isFinite(value) && value > 0)) throw new Error('Readability viewport dimensions must be positive.');
+  const warnings = [], epsilon = 0.01;
+  const add = (code, refs, message, measurement) => warnings.push({ severity: 'warning', code: `readability/${code}`, graphRef, refs, message, measurement });
+  const segments = (edge) => edge.points.slice(1).map((b, index) => {
+    const a = edge.points[index], horizontal = Math.abs(a.y - b.y) < epsilon;
+    return { horizontal, fixed: horizontal ? a.y : a.x,
+      lo: Math.min(horizontal ? a.x : a.y, horizontal ? b.x : b.y),
+      hi: Math.max(horizontal ? a.x : a.y, horizontal ? b.x : b.y) };
+  }).filter((segment) => segment.hi - segment.lo > epsilon);
+  const overlap = (a, b) => a.horizontal === b.horizontal && Math.abs(a.fixed - b.fixed) < epsilon ? Math.max(0, Math.min(a.hi, b.hi) - Math.max(a.lo, b.lo)) : 0;
+  const routes = drawing.edges.map((edge) => ({ edge, segments: segments(edge) }));
+  for (let i = 0; i < routes.length; i++) {
+    const a = routes[i];
+    for (const b of routes.slice(i + 1)) {
+      const related = [a.edge.from, a.edge.to].some((ref) => [b.edge.from, b.edge.to].includes(ref));
+      let shared = 0, crossings = 0;
+      for (const left of a.segments) for (const right of b.segments) {
+        shared = Math.max(shared, overlap(left, right));
+        if (left.horizontal === right.horizontal) continue;
+        const h = left.horizontal ? left : right, v = left.horizontal ? right : left;
+        if (v.fixed > h.lo + epsilon && v.fixed < h.hi - epsilon && h.fixed > v.lo + epsilon && h.fixed < v.hi - epsilon) crossings++;
+      }
+      if (!related && shared >= 24) add('shared-corridor', [a.edge.ref, b.edge.ref], 'Unrelated edges share a line segment and may appear connected.', { longestSharedSegment: shared, threshold: 24 });
+      if (crossings) add('crossing', [a.edge.ref, b.edge.ref], 'Edges cross between their endpoints; the crossing is not a junction.', { crossings });
+    }
+    for (const group of drawing.groups) {
+      const { x, y, width, height } = group.box;
+      const border = [{ horizontal: true, fixed: y, lo: x, hi: x + width }, { horizontal: true, fixed: y + height, lo: x, hi: x + width },
+        { horizontal: false, fixed: x, lo: y, hi: y + height }, { horizontal: false, fixed: x + width, lo: y, hi: y + height }];
+      let longest = 0;
+      for (const segment of a.segments) for (const side of border) longest = Math.max(longest, overlap(segment, side));
+      if (longest >= 24) add('border-run', [a.edge.ref, group.ref], 'An edge follows a grouping frame border and may be confused with the boundary.', { longestSharedSegment: longest, threshold: 24 });
+    }
+    for (const other of drawing.edges) {
+      if (other.ref === a.edge.ref) continue;
+      const box = other.label;
+      let clearance = Infinity;
+      for (const segment of a.segments) {
+        const lo = segment.horizontal ? box.x : box.y, hi = lo + (segment.horizontal ? box.width : box.height);
+        const fixedLo = segment.horizontal ? box.y : box.x, fixedHi = fixedLo + (segment.horizontal ? box.height : box.width);
+        const along = Math.max(0, lo - segment.hi, segment.lo - hi);
+        const across = Math.max(0, fixedLo - segment.fixed, segment.fixed - fixedHi);
+        clearance = Math.min(clearance, Math.hypot(along, across));
+      }
+      if (clearance < 4) add('label-clearance', [a.edge.ref, other.ref], 'A route is very close to another edge’s label.', { clearance, threshold: 4 });
+    }
+  }
+  const scale = Math.min(1.3, viewport.width / drawing.canvas.width, viewport.height / drawing.canvas.height);
+  const projectedTextPx = 10 * scale; // Smallest current node status text; all skins retain these metrics.
+  if (projectedTextPx < 8) add('small-text', [], 'Small node text may be difficult to read at Fit. Use 100% or zoom in.', { viewport, scale, sourceTextPx: 10, projectedTextPx, threshold: 8 });
+  return warnings;
+};
+const selectHighlights = function selectHighlights(model, graph, { mode = 'selection', ref, boundaryRef } = {}) {
+  const visible = new Set([...graph.entityRefs, ...graph.contextRefs]);
+  const edges = model.relationships.filter((edge) => graph.relationshipRefs.includes(edge.id));
+  const refs = new Set(), findings = [];
+  const add = (id) => { if (visible.has(id) || graph.relationshipRefs.includes(id) || model.groups.some((group) => group.id === id)) refs.add(id); };
+  const addEdge = (edge) => { if (edge) { add(edge.id); add(edge.from); add(edge.to); } };
+  const hasStatus = (value) => {
+    if (!value || typeof value !== 'object') return false;
+    if ((mode === 'qualified' ? ['unknown', 'disputed', 'reported', 'inferred'] : [mode]).includes(value.status)) return true;
+    return Object.values(value).some(hasStatus);
+  };
+  const mappingRefs = (boundary) => {
+    const detail = boundary.detail;
+    const candidates = detail.status === 'unknown' ? [] : detail.status === 'disputed' ? detail.alternatives : [detail];
+    for (const candidate of candidates) for (const id of candidate.value) addEdge(edges.find((edge) => edge.id === id));
+    const parent = model.relationships.find((edge) => edge.id === boundary.relationshipRef);
+    // An unresolved caller is not replaced with an invented internal endpoint.
+    for (const id of parent ? [parent.from, parent.to] : []) if (graph.contextRefs.includes(id)) add(id);
+  };
+  if (boundaryRef) {
+    const boundary = graph.expands?.boundaries.find((item) => item.relationshipRef === boundaryRef);
+    if (!boundary) throw new Error('The requested correspondence does not belong to this graph.');
+    mappingRefs(boundary);
+    return { refs: [...refs], findings: [], boundary };
+  }
+  if (mode === 'selection' && ref) {
+    if (model.groups.some((group) => group.id === ref)) add(ref);
+    if (visible.has(ref)) { add(ref); edges.filter((edge) => [edge.from, edge.to].includes(ref)).forEach(addEdge); }
+    else addEdge(edges.find((edge) => edge.id === ref));
+    const note = model.notes.find((item) => item.id === ref);
+    for (const id of note?.subjectRefs ?? []) { add(id); addEdge(edges.find((edge) => edge.id === id)); }
+  } else if (mode === 'context') {
+    graph.contextRefs.forEach(add);
+  } else if (['calls', 'reads', 'writes', 'publishes', 'consumes'].includes(mode)) {
+    edges.filter((edge) => edge.kind === mode).forEach(addEdge);
+  } else if (['unknown', 'disputed', 'qualified'].includes(mode)) {
+    for (const entity of model.entities.filter((item) => visible.has(item.id))) if (hasStatus(entity)) {
+      add(entity.id); findings.push({ ref: entity.id, kind: 'node', reason: 'Component claims' });
+    }
+    for (const edge of edges) if (hasStatus(edge)) {
+      addEdge(edge); findings.push({ ref: edge.id, kind: 'edge', reason: 'Relationship claims' });
+    }
+    for (const membership of model.memberships.filter((item) => graph.membershipRefs.includes(item.id))) if (hasStatus(membership)) {
+      add(membership.memberRef); findings.push({ ref: membership.id, kind: 'record', reason: 'Grouping claim; no inferred containment' });
+    }
+    for (const group of model.groups) if (hasStatus(group) && model.memberships.some((member) => graph.membershipRefs.includes(member.id) &&
+      (member.group.value === group.id || member.group.alternatives?.some((alternative) => alternative.value === group.id)))) {
+      add(group.id); findings.push({ ref: group.id, kind: 'record', reason: 'Grouping meaning' });
+    }
+    for (const note of model.notes) if (note.subjectRefs.some((id) => visible.has(id) || graph.relationshipRefs.includes(id) || graph.membershipRefs.includes(id) || refs.has(id)) && hasStatus(note)) {
+      for (const id of note.subjectRefs) { add(id); addEdge(edges.find((edge) => edge.id === id)); }
+      findings.push({ ref: note.id, kind: 'record', reason: note.statement });
+    }
+    if (graph.expands && hasStatus(graph.expands.meaning)) findings.push({ ref: graph.id, kind: 'record', reason: 'Meaning of the expansion' });
+    for (const boundary of graph.expands?.boundaries ?? []) if (hasStatus(boundary.detail)) {
+      mappingRefs(boundary); findings.push({ ref: boundary.relationshipRef, kind: 'boundary', reason: `${boundary.detail.status} correspondence between levels` });
+    }
+    // On the parent view, mark edges with unresolved child correspondences too.
+    for (const child of model.graphs ?? []) if (child.expands?.graphRef === graph.id) {
+      for (const boundary of child.expands.boundaries) if (hasStatus(boundary.detail)) {
+        addEdge(edges.find((edge) => edge.id === boundary.relationshipRef));
+        findings.push({ ref: boundary.relationshipRef, kind: 'boundary', graphRef: child.id, reason: `${boundary.detail.status} correspondence in ${child.title}` });
+      }
+    }
+  }
+  return { refs: [...refs], findings };
+};
+const cleanViewerSVG = function cleanViewerSVG(svg) {
+  const clean = svg.cloneNode(true);
+  clean.removeAttribute('style');
+  clean.querySelectorAll('.selected, .highlight-match').forEach((item) => {
+    item.classList.remove('selected', 'highlight-match');
+  });
+  return clean;
+};
+(() => {
+  'use strict';
+  const payload = document.getElementById('waxwing-source').textContent;
+  const layout = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(payload), (char) => char.charCodeAt(0))));
+  const model = layout.model;
+  const documents = model.documents ?? [];
+  const graphs = model.graphs ?? [{ id: model.id, title: model.title, scope: model.scope,
+    entityRefs: model.entities.map((item) => item.id), contextRefs: [],
+    relationshipRefs: model.relationships.map((item) => item.id), membershipRefs: model.memberships.map((item) => item.id) }];
+  const root = model.rootGraphRef ?? model.id;
+  const workflows = model.workflows ?? [];
+  let activeWorkflow = null;
+  let activeAppearance = null;
+  let activeGraph = graphs.find((item) => item.id === root);
+  let drawing = layout.graphs?.find((item) => item.ref === root) ?? layout;
+  const graphNodes = (graph) => [...graph.entityRefs, ...graph.contextRefs];
+  const locations = (kind, ref) => graphs.filter((graph) => (kind === 'node' ? graphNodes(graph) : graph.relationshipRefs).includes(ref));
+  const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'graphs', 'workflows'];
+  const index = new Map(collections.flatMap((collection) => (model[collection] ?? []).map((record) => [record.id, { record, collection }])));
+  for (const workflow of workflows) for (const step of workflow.steps) index.set(step.id, { record: step, collection: 'steps', workflowRef: workflow.id });
+  let svg = document.querySelector('.ww-svg');
+  const sourceMetadata = document.getElementById('waxwing-source').cloneNode(true);
+  const viewport = document.getElementById('map-viewport');
+  const inspector = document.getElementById('inspector');
+  const content = document.getElementById('inspector-content');
+  let previousFocus;
+  let selectedRef = null;
+  let currentBoundary = null;
+  const highlightMode = document.getElementById('highlight-mode');
+  let zoom = 1;
+  let fitted = true;
+  const name = (ref) => {
+    const record = index.get(ref)?.record;
+    if (record?.memberRef) return `${index.get(record.memberRef)?.record.label ?? record.memberRef} · ${index.get(record.perspectiveRef)?.record.label ?? record.perspectiveRef}`;
+    return record?.label || record?.title || record?.statement || ref;
+  };
+  const humanize = (key) => key.replace(/([a-z])([A-Z])/g, '$1 $2').replaceAll('_', ' ');
+
+  function el(tag, text, className) {
+    const item = document.createElement(tag);
+    if (text !== undefined) item.textContent = text;
+    if (className) item.className = className;
+    return item;
+  }
+
+  function field(key, value) {
+    const container = el('div', undefined, 'detail-field');
+    container.append(el('span', humanize(key), 'detail-key'));
+    if (value && typeof value === 'object' && value.status) container.append(claim(value));
+    else if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'object') {
+          const nested = el('div', undefined, 'sub-record');
+          if (item.label || item.id) nested.append(el('h4', item.label || item.id));
+          nested.append(objectFields(item));
+          container.append(nested);
+        }
+        else container.append(el('div', key.endsWith('Refs') ? name(item) : String(item), 'detail-value'));
+      }
+      if (!value.length) container.append(el('div', 'None recorded', 'detail-value'));
+    } else if (value && typeof value === 'object') container.append(objectFields(value));
+    else if ((key.endsWith('Ref') || ['from', 'to', 'replyTo'].includes(key)) && index.has(value)) {
+      const button = el('button', name(value), 'source-ref');
+      button.addEventListener('click', () => show(value));
+      container.append(button);
+    } else container.append(el('div', String(value), 'detail-value'));
+    return container;
+  }
+
+  function sourceButtons(refs) {
+    const container = el('div');
+    for (const ref of refs ?? []) {
+      const button = el('button', ref, 'source-ref');
+      button.addEventListener('click', () => show(ref));
+      container.append(button);
+    }
+    return container;
+  }
+
+  function claim(value) {
+    const container = el('div', undefined, 'claim');
+    container.append(el('span', value.status, `status-pill ${value.status}`));
+    if (value.value && typeof value.value === 'object' && !Array.isArray(value.value)) container.append(objectFields(value.value));
+    else if (Object.hasOwn(value, 'value')) container.append(el('div', Array.isArray(value.value) ? value.value.map(name).join(' + ') : typeof value.value === 'string' && index.has(value.value) ? name(value.value) : String(value.value), 'detail-value'));
+    if (value.reason) container.append(el('div', value.reason, 'detail-value'));
+    if (value.basis) {
+      container.append(el('div', value.basis.explanation, 'claim-basis'));
+      container.append(sourceButtons(value.basis.sourceRefs));
+    }
+    if (value.sourceRefs) container.append(sourceButtons(value.sourceRefs));
+    for (const alternative of value.alternatives ?? []) container.append(claim(alternative));
+    return container;
+  }
+
+  function objectFields(record) {
+    const container = el('div');
+    for (const [key, value] of Object.entries(record)) {
+      if (['id', 'label'].includes(key)) continue;
+      container.append(field(key, value));
+    }
+    return container;
+  }
+
+  function displayRecord(ref) {
+    if (inspector.hidden || !inspector.contains(document.activeElement)) previousFocus = document.activeElement;
+    content.replaceChildren();
+    const record = ref === '__model' ? model : index.get(ref)?.record;
+    if (!record) return;
+    content.append(el('h2', ref === '__model' ? 'Model & scope' : name(ref)));
+    content.append(el('div', ref === '__model' ? `${model.schemaVersion} · ${model.id}` : ref, 'record-id'));
+    const attached = documents.filter((doc) => doc.attachments.some((target) => ref === '__model' ? target.kind === 'graph' && target.ref === activeGraph.id : target.ref === ref && ['node', 'edge', 'workflow', 'step'].includes(target.kind) && (!target.graphRef || target.graphRef === activeGraph.id) && (!target.workflowRef || target.workflowRef === activeWorkflow?.id)));
+    if (attached.length) {
+      const section = el('section', undefined, 'attached-documents');
+      section.append(el('h3', 'Documents'));
+      for (const doc of attached) {
+        const link = el('a', `${doc.title} ↗`, 'document-link');
+        link.href = `#document=${encodeURIComponent(doc.id)}`; section.append(link);
+      }
+      content.append(section);
+    }
+    for (const child of graphs.filter((graph) => graph.expands?.graphRef === activeGraph.id && graph.expands.nodeRef === ref)) {
+      const section = el('section', undefined, 'attached-documents');
+      const link = el('a', `Explore ${child.title} →`, 'document-link'); link.href = `#graph=${child.id}`;
+      section.append(link, claim(child.expands.meaning)); content.append(section);
+    }
+    for (const graph of graphs.filter((item) => item.expands?.graphRef === activeGraph.id)) {
+      const boundary = graph.expands.boundaries.find((item) => item.relationshipRef === ref);
+      if (!boundary) continue;
+      const section = el('section', undefined, 'attached-documents');
+      const mappingLink = el('a', `Highlight correspondence in ${graph.title} →`, 'document-link');
+      mappingLink.href = `#graph=${graph.id}&boundary=${ref}`;
+      section.append(el('h3', 'Detailed correspondence'), mappingLink, claim(boundary.detail)); content.append(section);
+    }
+    if (activeWorkflow && index.get(ref)?.collection === 'entities') {
+      const section = el('section', undefined, 'attached-documents');
+      section.append(el('h3', 'Participation in this workflow'), el('p', 'Every appearance below refers to this same canonical component.'));
+      if (activeAppearance?.entityRef === ref) section.append(field('selectedParticipation', { appearanceId: activeAppearance.id, entityRef: ref, afterStepRef: activeAppearance.afterStepRef ?? 'First recorded actor' }));
+      for (const a of drawing.appearances.filter((a) => a.entityRef === ref)) {
+        const link = el('a', a.afterStepRef ? `After ${name(a.afterStepRef)} →` : 'First recorded actor →', 'document-link');
+        link.href = `#workflow=${activeWorkflow.id}&node=${ref}&appearance=${a.id}`; section.append(link);
+      }
+      content.append(section);
+    }
+    if (ref === '__model') {
+      if (activeWorkflow) content.append(field('workflow', activeWorkflow));
+      content.append(field('graph', activeGraph));
+      content.append(field('modelScope', model.scope));
+      content.append(field('perspectives', model.perspectives));
+      content.append(field('sources', model.sources));
+      const catalog = el('section', undefined, 'detail-section');
+      catalog.append(el('h3', 'All model records'));
+      for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'workflows']) {
+        const row = el('div', undefined, 'detail-field');
+        row.append(el('span', collection, 'detail-key'));
+        for (const item of model[collection] ?? []) {
+          const button = el('button', name(item.id), 'source-ref');
+          button.addEventListener('click', () => show(item.id));
+          row.append(button);
+        }
+        catalog.append(row);
+      }
+      content.append(catalog);
+    } else {
+      content.append(objectFields(record));
+      const memberships = model.memberships.filter((item) => activeGraph.membershipRefs.includes(item.id) && (item.memberRef === ref || item.group.value === ref || item.group.alternatives?.some((alternative) => alternative.value === ref)));
+      const notes = model.notes.filter((item) => item.subjectRefs.includes(ref));
+      for (const [heading, records] of [['Membership and perspective', memberships], ['Related knowledge', notes]]) {
+        if (!records.length) continue;
+        const section = el('section', undefined, 'detail-section');
+        section.append(el('h3', heading));
+        for (const item of records) {
+          const part = el('div', undefined, 'sub-record');
+          part.append(el('h4', item.statement || name(item.perspectiveRef)));
+          part.append(objectFields(item));
+          section.append(part);
+        }
+        content.append(section);
+      }
+    }
+    const raw = el('details');
+    raw.append(el('summary', 'Exact JSON record'), el('pre', JSON.stringify(record, null, 2)));
+    content.append(raw);
+    inspector.hidden = false;
+    inspector.scrollTop = 0;
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.toggle('selected', element.dataset.ref === ref));
+    selectedRef = ref; refreshHighlights();
+    document.getElementById('close-inspector').focus();
+    requestAnimationFrame(() => {
+      if (!inspector.hidden && window.matchMedia('(min-width:901px)').matches) {
+        const selected = previousFocus?.matches('.selected') ? previousFocus : viewport.querySelector('.selected');
+        selected?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      } else if (!inspector.hidden) {
+        inspector.scrollIntoView({ block: 'start' });
+      }
+    });
+  }
+
+  function hideInspector() {
+    inspector.hidden = true;
+    selectedRef = null; refreshHighlights();
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.remove('selected'));
+    if (previousFocus?.isConnected) previousFocus.focus();
+  }
+  function targetHash(target) {
+    const params = new URLSearchParams();
+    if (target.kind === 'workflow') return `#workflow=${encodeURIComponent(target.ref)}`;
+    if (target.workflowRef || target.kind === 'step') {
+      const owner = target.workflowRef ?? index.get(target.ref)?.workflowRef;
+      return `#workflow=${encodeURIComponent(owner)}&${target.kind}=${encodeURIComponent(target.ref)}`;
+    }
+    if (target.kind === 'document') params.set('document', target.ref);
+    else {
+      if (target.kind === 'graph') params.set('graph', target.ref);
+      else {
+        const candidates = locations(target.kind, target.ref);
+        if (!candidates.length && !target.graphRef) return `#graph=${activeGraph.id}&record=${encodeURIComponent(target.ref)}`;
+        const graphRef = target.graphRef ?? (candidates.some((graph) => graph.id === activeGraph.id) ? activeGraph.id : candidates.length === 1 ? candidates[0].id : undefined);
+        if (graphRef) params.set('graph', graphRef);
+      }
+      if (target.kind !== 'graph') params.set(target.kind, target.ref);
+    }
+    return `#${params}`;
+  }
+  function navigate(hash) {
+    if (location.hash === hash || (!location.hash && hash === '#')) applyRoute();
+    else location.hash = hash;
+  }
+  function show(ref) {
+    const collection = index.get(ref)?.collection;
+    if (collection === 'workflows') { navigate(`#workflow=${ref}&record=${ref}`); return; }
+    if (activeWorkflow && (ref === '__model' || (collection !== 'relationships' && collection !== 'graphs' && collection !== 'documents' && collection !== 'workflows' && collection !== 'steps'))) {
+      const key = collection === 'entities' && drawing.appearances.some((a) => a.entityRef === ref) ? 'node' : 'record';
+      navigate(`#workflow=${activeWorkflow.id}&${key}=${encodeURIComponent(ref)}`); return;
+    }
+    const kind = { documents: 'document', entities: 'node', relationships: 'edge', graphs: 'graph', workflows: 'workflow', steps: 'step' }[collection];
+    navigate(kind ? targetHash({ kind, ref }) : `#graph=${activeGraph.id}&record=${encodeURIComponent(ref)}`);
+  }
+  function close() { navigate(activeWorkflow ? `#workflow=${activeWorkflow.id}` : `#graph=${activeGraph.id}`); }
+  const reader = document.getElementById('document-reader');
+  const documentContent = document.getElementById('document-content');
+  const diagramMain = document.getElementById('diagram-main');
+  const documentNav = document.getElementById('document-nav');
+  documentNav.append(el('div', 'DOCUMENTS', 'detail-key'));
+  for (const doc of documents) {
+    const link = el('a', doc.title, 'document-nav-link');
+    link.href = targetHash({ kind: 'document', ref: doc.id });
+    link.dataset.document = doc.id; documentNav.append(link);
+  }
+  function documentScreen(doc, heading) {
+    document.title = `${doc?.title ?? 'Documents'} · ${model.title} · Waxwing`;
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren();
+    documentNav.querySelectorAll('a').forEach((link) => {
+      if (link.dataset.document === doc?.id) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    if (!doc) {
+      documentContent.append(el('div', 'REFERENCE LIBRARY', 'eyebrow'), el('h1', 'Documents'));
+      documentContent.append(el('p', 'Detailed explanations attached to this graph and its components.', 'purpose'));
+      for (const item of documents) {
+        const link = el('a', item.title, 'document-card'); link.href = targetHash({ kind: 'document', ref: item.id });
+        const subjects = item.attachments.map((target) => target.kind === 'graph' ? graphs.find((graph) => graph.id === target.ref)?.title : name(target.ref));
+        link.append(el('span', subjects.join(' · ') || 'Included document')); documentContent.append(link);
+      }
+      if (!documents.length) documentContent.append(el('p', 'No documents included.'));
+    } else {
+      documentContent.append(el('div', 'DOCUMENT', 'eyebrow'), el('h1', doc.title));
+      const attachments = el('div', undefined, 'document-attachments');
+      for (const target of doc.attachments) {
+        const link = el('a', `${target.kind} · ${target.kind === 'graph' ? graphs.find((graph) => graph.id === target.ref)?.title : name(target.ref)}`);
+        link.href = targetHash(target); attachments.append(link);
+      }
+      documentContent.append(attachments);
+      documentContent.append(document.getElementById(`ww-document-${doc.id}`).content.cloneNode(true));
+      const raw = el('details', undefined, 'document-source');
+      raw.append(el('summary', 'Original Markdown'), el('pre', doc.markdown));
+      const button = el('button', 'Download .md');
+      button.addEventListener('click', () => download(doc.markdown, `${doc.id}.md`, 'text/markdown;charset=utf-8'));
+      raw.append(button); documentContent.append(raw);
+      if (heading !== undefined) {
+        const destination = document.getElementById(`ww-doc-${doc.id}--${heading}`);
+        if (!destination) { unavailable('The requested document heading does not exist.'); return; }
+        destination.scrollIntoView({ block: 'start' });
+      }
+    }
+    if (heading === undefined) window.scrollTo(0, 0);
+  }
+  function unavailable(message) {
+    document.title = 'Link unavailable · Waxwing';
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren(el('h1', 'Link unavailable'), el('p', message));
+    const link = el('a', 'Return to graph'); link.href = '#'; documentContent.append(link);
+  }
+  function applyRoute() {
+    const hash = location.hash.slice(1);
+    if (hash === 'documents') { documentScreen(); return; }
+    const params = new URLSearchParams(hash), keys = [...params.keys()];
+    if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'heading', 'graph', 'node', 'edge', 'record', 'boundary', 'workflow', 'step', 'appearance'].includes(key))) { unavailable('This link uses an unsupported or ambiguous target.'); return; }
+    if (params.has('document')) {
+      if (keys.some((key) => !['document', 'heading'].includes(key))) { unavailable('This link names conflicting destinations.'); return; }
+      const doc = documents.find((item) => item.id === params.get('document'));
+      if (!doc) { unavailable('The requested document is not included in this export.'); return; }
+      documentScreen(doc, params.has('heading') ? params.get('heading') : undefined); return;
+    }
+    if (params.has('workflow') || params.has('step')) { workflowRoute(params); return; }
+    if (params.has('appearance')) { unavailable('An appearance needs a workflow target.'); return; }
+    if (params.has('heading') || ['node', 'edge', 'record', 'boundary'].filter((key) => params.has(key)).length > 1 || (params.has('graph') && !graphs.some((graph) => graph.id === params.get('graph')))) { unavailable('The requested graph or record is not available.'); return; }
+    const requestedKind = ['node', 'edge'].find((kind) => params.has(kind));
+    let graphRef = params.get('graph') ?? root;
+    if (requestedKind) {
+      const candidates = locations(requestedKind, params.get(requestedKind));
+      if (!params.has('graph')) {
+        if (candidates.length === 1) graphRef = candidates[0].id;
+        else if (candidates.length > 1) { graphChoice(requestedKind, params.get(requestedKind), candidates); return; }
+      }
+      if (!candidates.some((graph) => graph.id === graphRef)) { unavailable('This record is not shown in the requested graph.'); return; }
+    }
+    const wasReading = !reader.hidden;
+    reader.hidden = true; diagramMain.hidden = false;
+    if (wasReading) { window.scrollTo(0, 0); if (fitted) fit(); }
+    currentBoundary = null;
+    switchGraph(graphRef);
+    document.title = `${activeGraph.title} · Waxwing`;
+    if (params.has('boundary')) {
+      const ref = params.get('boundary');
+      if (!activeGraph.expands?.boundaries.some((item) => item.relationshipRef === ref)) { unavailable('This correspondence is not recorded in the requested graph.'); return; }
+      currentBoundary = ref; highlightMode.value = 'selection'; hideInspector(); refreshHighlights(); return;
+    }
+    const key = ['node', 'edge', 'record'].find((key) => params.has(key));
+    if (!key) { hideInspector(); return; }
+    const ref = params.get(key), entry = index.get(ref);
+    if ((key === 'node' && entry?.collection !== 'entities') || (key === 'edge' && entry?.collection !== 'relationships') || (key === 'record' && ref !== '__model' && (!entry || entry.collection === 'documents'))) { unavailable('The requested record does not exist or has a different type.'); return; }
+    displayRecord(ref);
+  }
+  window.addEventListener('hashchange', applyRoute);
+  document.getElementById('close-inspector').addEventListener('click', close);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !inspector.hidden) close(); });
+  document.getElementById('model-details').addEventListener('click', () => show('__model'));
+  document.querySelector('.brand').addEventListener('click', (event) => { event.preventDefault(); navigate(`#graph=${root}`); fit(); });
+  viewport.addEventListener('click', (event) => { const record = event.target.closest('[data-ref]'); if (record) inspectVisual(record); });
+  viewport.addEventListener('keydown', (event) => {
+    if (!['Enter', ' '].includes(event.key)) return;
+    const record = event.target.closest('[data-ref]');
+    if (record) { event.preventDefault(); inspectVisual(record); }
+  });
+
+  function inspectVisual(record) {
+    if (activeWorkflow && record.dataset.appearance) navigate(`#workflow=${activeWorkflow.id}&node=${record.dataset.ref}&appearance=${record.dataset.appearance}`);
+    else show(record.dataset.ref);
+  }
+
+  function graphChoice(kind, ref, candidates) {
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren(el('h1', `Choose a graph for ${name(ref)}`));
+    for (const graph of candidates) {
+      const link = el('a', graph.title, 'document-card'); link.href = targetHash({ kind, ref, graphRef: graph.id }); documentContent.append(link);
+    }
+  }
+  function graphLink(graph, text = graph.title) {
+    const link = el('a', text, 'document-link'); link.href = `#graph=${graph.id}`; return link;
+  }
+  function switchGraph(ref) {
+    if (activeGraph.id !== ref || activeWorkflow) {
+      activeWorkflow = null; activeAppearance = null;
+      activeGraph = graphs.find((graph) => graph.id === ref);
+      drawing = layout.graphs.find((item) => item.ref === ref);
+      viewport.replaceChildren(document.getElementById(`ww-graph-${ref}`).content.cloneNode(true));
+      svg = viewport.querySelector('svg'); svg.prepend(sourceMetadata.cloneNode(true));
+      svg.dataset.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+      svg.dataset.skin = document.body.dataset.skin;
+      fitted = true; fit(); window.scrollTo(0, 0);
+    }
+    document.querySelector('.highlight-toolbar').hidden = false;
+    document.getElementById('reading-anchor').hidden = !drawing.layout.readingAnchorRef;
+    document.getElementById('reading-anchor-name').textContent = drawing.layout.readingAnchorRef ? name(drawing.layout.readingAnchorRef) : '';
+    document.getElementById('workflow-details').hidden = true;
+    document.querySelector('.map-caption').replaceChildren(el('span', 'Arrows describe operations: actor → resource.'), el('span', 'Position does not imply execution order. Select any element to inspect it.'));
+    updateViewChoices();
+    document.getElementById('graph-title').textContent = activeGraph.title;
+    document.getElementById('graph-question').textContent = activeGraph.scope.question;
+    document.getElementById('graph-abstraction').textContent = activeGraph.scope.abstraction;
+    const scope = document.getElementById('graph-scope');
+    scope.replaceChildren(...[activeGraph.scope.environment, activeGraph.scope.snapshot,
+      `${activeGraph.entityRefs.length} components · ${activeGraph.contextRefs.length} external context · ${activeGraph.relationshipRefs.length} relationships`].map((text) => el('span', text)));
+    const breadcrumb = document.getElementById('graph-breadcrumb'); breadcrumb.replaceChildren();
+    const ancestors = []; let ancestor = activeGraph;
+    while (ancestor) { ancestors.unshift(ancestor); ancestor = graphs.find((item) => item.id === ancestor.expands?.graphRef); }
+    for (const graph of ancestors) {
+      if (breadcrumb.childNodes.length) breadcrumb.append(el('span', ' / '));
+      const link = graphLink(graph); if (graph.id === ref) link.setAttribute('aria-current', 'page'); breadcrumb.append(link);
+    }
+    const connections = document.getElementById('graph-connections'); connections.replaceChildren();
+    for (const child of graphs.filter((graph) => graph.expands?.graphRef === ref)) {
+      const row = el('div', undefined, 'graph-child');
+      row.append(graphLink(child, `${name(child.expands.nodeRef)} → ${child.title}`), el('span', child.expands.meaning.status, `status-pill ${child.expands.meaning.status}`)); connections.append(row);
+    }
+    if (activeGraph.expands) {
+      const expansion = activeGraph.expands;
+      connections.append(el('h2', `How this graph expands ${name(expansion.nodeRef)}`), claim(expansion.meaning));
+      connections.append(el('p', 'Boundary mappings are recorded claims. Unknown mappings do not generate connections.'));
+      for (const boundary of expansion.boundaries) {
+        const row = el('div', undefined, 'boundary-row');
+        const link = el('a', name(boundary.relationshipRef), 'document-link');
+        link.href = targetHash({ kind: 'edge', ref: boundary.relationshipRef, graphRef: expansion.graphRef });
+        const highlight = el('a', 'Highlight correspondence', 'source-ref'); highlight.href = `#graph=${ref}&boundary=${boundary.relationshipRef}`;
+        row.append(link, highlight, claim(boundary.detail));
+        const claims = boundary.detail.status === 'unknown' ? [] : boundary.detail.status === 'disputed' ? boundary.detail.alternatives : [boundary.detail];
+        for (const candidate of claims) for (const edge of candidate.value) {
+          const detail = el('a', `Inspect ${name(edge)} ↗`, 'source-ref'); detail.href = targetHash({ kind: 'edge', ref: edge, graphRef: ref }); row.append(detail);
+        }
+        connections.append(row);
+      }
+    }
+    const documentBack = document.querySelector('.document-breadcrumb a');
+    documentBack.href = `#graph=${ref}`; documentBack.textContent = `← ${activeGraph.title}`;
+    document.getElementById('perspective-label').textContent = drawing.layout.groupingPerspectiveRef ? `Grouping: ${name(drawing.layout.groupingPerspectiveRef)}` : 'No grouping perspective selected';
+    refreshKnowledge();
+    refreshHighlights();
+    refreshReadability();
+  }
+  const viewSelect = document.getElementById('diagram-view');
+  viewSelect.addEventListener('change', () => navigate(viewSelect.value ? `#workflow=${viewSelect.value}` : `#graph=${activeGraph.id}`));
+  document.getElementById('workflow-details').addEventListener('click', () => navigate(`#workflow=${activeWorkflow.id}&record=${activeWorkflow.id}`));
+  function updateViewChoices() {
+    const choices = workflows.filter((w) => w.graphRef === activeGraph.id);
+    document.getElementById('workflow-controls').hidden = !choices.length;
+    viewSelect.replaceChildren();
+    const connectivity = el('option', 'Connectivity — one box per component'); connectivity.value = ''; viewSelect.append(connectivity);
+    for (const w of choices) { const option = el('option', `Workflow — ${w.title}`); option.value = w.id; viewSelect.append(option); }
+    viewSelect.value = activeWorkflow?.id ?? '';
+  }
+  function workflowRoute(params) {
+    const keys = [...params.keys()];
+    if (keys.some((k) => !['workflow', 'node', 'step', 'record', 'appearance'].includes(k)) || ['node','step','record'].filter((k) => params.has(k)).length > 1) { unavailable('Conflicting workflow destinations.'); return; }
+    const owner = params.get('workflow') ?? index.get(params.get('step'))?.workflowRef;
+    const workflow = workflows.find((w) => w.id === owner);
+    if (!workflow) { unavailable('This workflow is not included.'); return; }
+    const geometry = layout.workflows.find((w) => w.ref === owner);
+    const key = ['node','step','record'].find((k) => params.has(k)), ref = key && params.get(key);
+    if ((key === 'node' && !geometry.appearances.some((a) => a.entityRef === ref)) || (key === 'step' && !workflow.steps.some((s) => s.id === ref)) || (key === 'record' && ref !== '__model' && (!index.has(ref) || index.get(ref).collection === 'documents'))) { unavailable('This record is not available in the workflow.'); return; }
+    const appearance = params.has('appearance') ? geometry.appearances.find((a) => a.id === params.get('appearance') && a.entityRef === ref) : null;
+    if (params.has('appearance') && (key !== 'node' || !appearance)) { unavailable('This appearance does not represent the requested component.'); return; }
+    reader.hidden = true; diagramMain.hidden = false;
+    if (activeWorkflow?.id !== owner) {
+      switchGraph(workflow.graphRef);
+      activeWorkflow = workflow; drawing = geometry; currentBoundary = null;
+      viewport.replaceChildren(document.getElementById(`ww-workflow-${owner}`).content.cloneNode(true));
+      svg = viewport.querySelector('svg'); svg.prepend(sourceMetadata.cloneNode(true));
+      svg.dataset.theme = document.body.classList.contains('dark') ? 'dark' : 'light'; svg.dataset.skin = document.body.dataset.skin;
+      fitted = false; zoom = 1; applyZoom(); viewport.scrollTo(0, 0);
+    }
+    activeAppearance = appearance;
+    updateViewChoices();
+    document.getElementById('workflow-details').hidden = false;
+    document.getElementById('reading-anchor').hidden = true;
+    document.querySelector('.highlight-toolbar').hidden = true;
+    document.getElementById('graph-title').textContent = workflow.title;
+    document.getElementById('graph-question').textContent = workflow.scope.question;
+    document.getElementById('graph-abstraction').textContent = workflow.scope.abstraction;
+    document.getElementById('graph-scope').replaceChildren(...[workflow.scope.environment, workflow.scope.snapshot, `${new Set(drawing.appearances.map((a) => a.entityRef)).size} components · ${drawing.appearances.length} appearances · ${workflow.steps.length} steps`].map((t) => el('span',t)));
+    const direction = drawing.layout.direction === 'RIGHT' ? 'Left → right' : 'Top → bottom';
+    document.getElementById('perspective-label').textContent = `${direction} · Order ${workflow.order.status} · Entry ${workflow.entry.point.status} · Trigger ${workflow.entry.trigger.status}`;
+    document.querySelector('.map-caption').replaceChildren(el('span', 'Same component ID = same component. Selecting it highlights all its appearances.'), el('span', 'Solid: message/event · Dashed: reply · Membership labels retain the selected perspective; frames remain in Connectivity.'));
+    const documentBack = document.querySelector('.document-breadcrumb a'); documentBack.href = `#workflow=${owner}`; documentBack.textContent = `← ${workflow.title}`;
+    document.title = `${workflow.title} · Waxwing`;
+    refreshKnowledge(); refreshReadability();
+    if (ref) displayRecord(ref); else hideInspector();
+    if (appearance) {
+      const b = appearance.box;
+      viewport.scrollTo({ left: Math.max(0, b.x * zoom - viewport.clientWidth / 3), top: Math.max(0, b.y * zoom - viewport.clientHeight / 3) });
+    }
+  }
+  function refreshKnowledge() {
+    const open = [];
+    function collect(value, owner, path) {
+      if (!value || typeof value !== 'object') return;
+      if (['unknown', 'disputed'].includes(value.status)) open.push({ owner, path, ...value });
+      for (const [key, child] of Object.entries(value)) collect(child, owner, path ? `${path}.${key}` : key);
+    }
+    const visible = new Set([...graphNodes(activeGraph), ...activeGraph.relationshipRefs, ...activeGraph.membershipRefs, ...(drawing.groups ?? []).map((group) => group.ref)]);
+    if (activeWorkflow) { visible.add(activeWorkflow.id); activeWorkflow.steps.forEach((step) => visible.add(step.id)); }
+    for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes']) {
+      for (const record of model[collection]) if (visible.has(record.id) || record.subjectRefs?.some((ref) => visible.has(ref))) collect(record, record, '');
+    }
+    if (activeGraph.expands) collect(activeGraph.expands, activeGraph, 'expands');
+    if (activeWorkflow) {
+      const { steps, ...record } = activeWorkflow; collect(record, activeWorkflow, '');
+      for (const step of steps) collect(step, step, '');
+    }
+    const list = document.getElementById('knowledge-list'); list.replaceChildren();
+    for (const item of open.sort((a, b) => (a.status === 'disputed' ? 0 : 1) - (b.status === 'disputed' ? 0 : 1))) {
+      const button = el('button', undefined, 'knowledge-row');
+      const description = (item.owner.id === activeGraph.id && item.path.startsWith('expands.boundaries.') ? `${name(activeGraph.expands.boundaries[Number(item.path.split('.')[2])].relationshipRef)} · correspondence between levels` : undefined) || item.owner.statement || (item.owner.memberRef ? `${name(item.owner.memberRef)} · ${name(item.owner.perspectiveRef)}` : `${name(item.owner.id)} · ${humanize(item.path)}`);
+      button.append(el('span', item.status, `status-pill ${item.status}`), el('span', description, 'question'), el('span', '↗', 'row-arrow'));
+      button.addEventListener('click', () => item.owner.id === activeGraph.id ? navigate(`#graph=${activeGraph.id}&record=${activeGraph.id}`) : show(item.owner.id)); list.append(button);
+    }
+    if (!open.length) list.append(el('p', 'No explicit unknowns or disputes recorded. Partial scope still applies.'));
+    document.getElementById('knowledge-count').textContent = `${open.filter((item) => item.status === 'unknown').length} unknown · ${open.filter((item) => item.status === 'disputed').length} disputed`;
+  }
+
+  function refreshHighlights() {
+    if (activeWorkflow) {
+      document.getElementById('highlight-details').replaceChildren();
+      svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('highlight-match', item.dataset.ref === selectedRef));
+      return;
+    }
+    const result = selectHighlights(model, activeGraph, { mode: highlightMode.value, ref: selectedRef, boundaryRef: currentBoundary });
+    const refs = new Set(result.refs);
+    svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('highlight-match', refs.has(item.dataset.ref)));
+    const details = document.getElementById('highlight-details'); details.replaceChildren();
+    const summary = document.getElementById('highlight-summary');
+    const count = new Set([...svg.querySelectorAll('.highlight-match')].map((item) => item.dataset.ref)).size;
+    summary.textContent = `${count} visible ${count === 1 ? 'record' : 'records'} highlighted. Other records remain visible.`;
+    if (highlightMode.value === 'selection' && !selectedRef && !currentBoundary) summary.textContent = 'Select a record to highlight its direct relationships. No execution order is implied.';
+    if (result.boundary) {
+      const detail = result.boundary.detail;
+      details.append(el('strong', `Correspondence: ${name(currentBoundary)}`));
+      details.append(el('p', detail.status === 'unknown' ? 'Unknown internal correspondence. Only recorded external context is highlighted; no internal edge is invented.' : detail.status === 'disputed' ? 'All recorded alternatives are highlighted. No winner is selected.' : 'Highlighted edges are the recorded correspondence, not an inferred execution path.'));
+      details.append(claim(detail));
+      if (activeGraph.expands.meaning.status !== 'established') details.append(el('p', 'The meaning of this expansion is also qualified.'), claim(activeGraph.expands.meaning));
+      const parent = el('a', 'Inspect overview relationship ↗', 'document-link');
+      parent.href = targetHash({ kind: 'edge', ref: currentBoundary, graphRef: activeGraph.expands.graphRef }); details.append(parent);
+    }
+    for (const finding of result.findings) {
+      const link = el('a', `${name(finding.ref)} · ${finding.reason}`, 'document-link');
+      link.href = finding.kind === 'boundary' ? `#graph=${finding.graphRef ?? activeGraph.id}&boundary=${finding.ref}` : finding.kind === 'record' ? `#graph=${activeGraph.id}&record=${finding.ref}` : targetHash({ kind: finding.kind, ref: finding.ref, graphRef: activeGraph.id });
+      details.append(link);
+    }
+    if (['unknown', 'disputed', 'qualified'].includes(highlightMode.value) && !result.findings.length) details.append(el('p', 'No matching recorded claims in this graph. This does not establish completeness or certainty.'));
+  }
+  highlightMode.addEventListener('change', () => {
+    if (currentBoundary) { currentBoundary = null; navigate(`#graph=${activeGraph.id}`); }
+    else refreshHighlights();
+  });
+  document.getElementById('highlight-clear').addEventListener('click', () => {
+    highlightMode.value = 'selection'; currentBoundary = null; selectedRef = null; navigate(`#graph=${activeGraph.id}`);
+  });
+  function refreshReadability() {
+    if (!viewport.clientWidth || !viewport.clientHeight) return;
+    const measured = activeWorkflow ? { ...drawing, groups: [], edges: drawing.edges.map((e) => ({ ...e, from: e.fromAppearanceRef, to: e.toAppearanceRef })) } : drawing;
+    const warnings = inspectReadability(measured, activeWorkflow?.id ?? activeGraph.id, { width: viewport.clientWidth, height: viewport.clientHeight });
+    document.getElementById('readability-summary').textContent = `Readability · ${warnings.length} ${warnings.length === 1 ? 'warning' : 'warnings'}`;
+    const list = document.getElementById('readability-list'); list.replaceChildren();
+    if (!warnings.length) list.append(el('p', 'No issues detected by these advisory checks.'));
+    for (const warning of warnings) {
+      const row = el('div', undefined, 'readability-row'); row.append(el('p', warning.message));
+      for (const ref of warning.refs) { const button = el('button', name(ref), 'source-ref'); button.addEventListener('click', () => show(ref)); row.append(button); }
+      if (warning.code === 'readability/small-text') row.append(el('p', `Estimated smallest node text: ${warning.measurement.projectedTextPx.toFixed(1)}px at Fit; 10px at 100%.`, 'purpose'));
+      list.append(row);
+    }
+  }
+  document.getElementById('skin').addEventListener('change', (event) => {
+    document.body.dataset.skin = event.target.value; svg.dataset.skin = event.target.value;
+  });
+
+  function applyZoom() {
+    svg.style.width = `${drawing.canvas.width * zoom}px`;
+    svg.style.height = `${drawing.canvas.height * zoom}px`;
+    svg.style.marginLeft = `${Math.max(0, (viewport.clientWidth - drawing.canvas.width * zoom) / 2)}px`;
+    svg.style.marginTop = `${Math.max(0, (viewport.clientHeight - drawing.canvas.height * zoom) / 2)}px`;
+    document.getElementById('zoom-label').textContent = `${Math.round(zoom * 100)}%`;
+    document.getElementById('zoom-out').disabled = zoom <= .15;
+    document.getElementById('zoom-in').disabled = zoom >= 3;
+  }
+  function fit() { fitted = true; zoom = Math.min(viewport.clientWidth / drawing.canvas.width, viewport.clientHeight / drawing.canvas.height, 1.3); applyZoom(); viewport.scrollTo(0, 0); }
+  function changeZoom(factor) {
+    const centerX = (viewport.scrollLeft + viewport.clientWidth / 2 - parseFloat(svg.style.marginLeft || 0)) / zoom;
+    const centerY = (viewport.scrollTop + viewport.clientHeight / 2 - parseFloat(svg.style.marginTop || 0)) / zoom;
+    fitted = false;
+    zoom = Math.max(.15, Math.min(3, zoom * factor));
+    applyZoom();
+    viewport.scrollTo(
+      centerX * zoom + parseFloat(svg.style.marginLeft) - viewport.clientWidth / 2,
+      centerY * zoom + parseFloat(svg.style.marginTop) - viewport.clientHeight / 2,
+    );
+  }
+  document.getElementById('zoom-fit').addEventListener('click', fit);
+  document.getElementById('zoom-read').addEventListener('click', () => changeZoom(1 / zoom));
+  document.getElementById('zoom-in').addEventListener('click', () => changeZoom(1.25));
+  document.getElementById('zoom-out').addEventListener('click', () => changeZoom(.8));
+  document.getElementById('reading-anchor-go').addEventListener('click', () => {
+    const ref = drawing.layout.readingAnchorRef;
+    if (!ref || activeWorkflow) return;
+    changeZoom(1 / zoom); show(ref);
+  });
+  new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); refreshReadability(); }).observe(viewport);
+  fit();
+
+  document.getElementById('theme').addEventListener('click', () => {
+    const dark = document.body.classList.toggle('dark');
+    svg.dataset.theme = dark ? 'dark' : 'light';
+    document.getElementById('theme').textContent = dark ? 'Light theme' : 'Dark theme';
+  });
+  function download(contents, filename, type) {
+    const url = URL.createObjectURL(new Blob([contents], { type }));
+    const link = el('a'); link.href = url; link.download = filename;
+    link.hidden = true;
+    document.body.append(link);
+    link.click();
+    setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 1000);
+  }
+  document.getElementById('source-download').addEventListener('click', () => download(JSON.stringify(model, null, 2) + '\n', `${model.id}.model.json`, 'application/json'));
+  document.getElementById('layout-download').addEventListener('click', () => download(JSON.stringify(layout, null, 2) + '\n', `${model.id}.layout.json`, 'application/json'));
+  document.getElementById('svg-download').addEventListener('click', () => {
+    const clean = cleanViewerSVG(svg);
+    download('<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clean), `${activeWorkflow?.id ?? activeGraph.id}.svg`, 'image/svg+xml');
+  });
+  applyRoute();
+})();
+</script>
+</body></html>

@@ -1,0 +1,1231 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Checkout: three focused workflows · Waxwing</title><style>:root { color-scheme:light; --bg:#f7f8fa; --surface:#fff; --ink:#17283a; --muted:#657588; --border:#dce3ea; --accent:#087d78; --soft:#edf3f3; --warning:#9c630d; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+body.dark { color-scheme:dark; --bg:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --border:#34495e; --accent:#5dd6c4; --soft:#1b3541; --warning:#f1c778; }
+button,a { -webkit-tap-highlight-color:transparent; }
+button { color:var(--ink); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 13px; cursor:pointer; font:inherit; font-size:12px; }
+button:hover { border-color:var(--accent); }
+button:disabled { opacity:.45; cursor:default; border-color:var(--border); }
+button:focus-visible,a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+.masthead { height:72px; padding:0 38px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:16px; background:var(--surface); }
+.brand { display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink); font-size:12px; font-weight:750; letter-spacing:2px; }
+.brand-mark { background:var(--accent); color:var(--surface); width:29px; height:29px; text-align:center; border-radius:8px; font-size:22px; font-family:Georgia,serif; font-style:italic; line-height:26px; }
+.brand-note { border-left:1px solid var(--border); padding-left:16px; margin-left:6px; color:var(--muted); font-weight:500; font-size:10px; letter-spacing:1.4px; }
+.header-actions { display:flex; gap:8px; }
+main { max-width:1800px; margin:0 auto; padding:32px 38px 20px; }
+.eyebrow { display:flex; gap:9px; align-items:center; font-size:10px; font-weight:650; letter-spacing:1.6px; color:var(--muted); }
+.live-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); }
+.sep { opacity:.5; padding:0 4px; }
+.title-row { display:flex; align-items:center; justify-content:space-between; gap:20px; }
+h1 { font-size:clamp(21px,2.2vw,34px); font-weight:620; letter-spacing:-1px; margin:12px 0 8px; line-height:1.25; }
+.purpose { margin:0; color:var(--muted); max-width:900px; }
+.scope-line { display:flex; flex-wrap:wrap; gap:22px; margin:17px 0 24px; color:var(--muted); font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+.map-panel { border:1px solid var(--border); background:var(--surface); border-radius:12px; overflow:hidden; }
+.map-toolbar { min-height:50px; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); }
+.map-toolbar>div { display:flex; align-items:center; gap:14px; }
+.toolbar-label { font-size:10px; font-weight:700; letter-spacing:1.5px; color:var(--accent); }
+#perspective-label { color:var(--muted); font-size:12px; }
+.zoom-controls { gap:5px!important; }
+.zoom-controls button { padding:3px 10px; min-width:30px; }
+#zoom-label { color:var(--muted); font-size:11px; min-width:34px; }
+#map-viewport { width:100%; height:clamp(330px,43vw,520px); overflow:auto; background:var(--bg); display:block; position:relative; }
+#map-viewport svg { display:block; flex-shrink:0; max-width:none; }
+.map-caption { padding:12px 18px; display:flex; justify-content:space-between; gap:16px; color:var(--muted); font-size:11px; border-top:1px solid var(--border); }
+.knowledge-section { margin-top:25px; }
+.section-heading { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+h2 { font-size:16px; letter-spacing:-.2px; margin:0; font-weight:620; }
+#knowledge-count { color:var(--muted); font-size:12px; }
+#knowledge-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 26px; }
+.knowledge-row { display:flex; align-items:center; gap:13px; text-align:left; background:none; border:0; border-top:1px solid var(--border); border-radius:0; padding:13px 0; width:100%; font-size:12px; }
+.knowledge-row:hover .question { color:var(--accent); }
+.status-pill { display:inline-block; flex-shrink:0; font:10px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; border:1px solid var(--border); padding:2px 7px; border-radius:5px; color:var(--warning); text-transform:uppercase; letter-spacing:.4px; }
+.status-pill.disputed { color:#bd5262; }
+.question { flex:1; }
+.row-arrow { color:var(--muted); }
+footer { border-top:1px solid var(--border); margin-top:25px; padding-top:16px; display:flex; justify-content:space-between; color:var(--muted); font-size:10px; }
+#inspector { position:fixed; z-index:10; top:0; bottom:0; right:0; width:min(480px,100vw); background:var(--surface); box-shadow:-16px 0 55px #071c3625; border-left:1px solid var(--border); overflow-y:auto; }
+#inspector[hidden] { display:none; }
+/* Reserve the inspector's column so it never covers the reading area. */
+@media(min-width:901px) {
+  body:has(#inspector:not([hidden])) { padding-right:min(480px,38vw); }
+  #inspector { width:min(480px,38vw); }
+}
+@media(max-width:900px) {
+  #inspector { position:relative; width:100%; max-height:60vh; border-left:0; border-top:1px solid var(--border); box-shadow:none; }
+}
+.inspector-header { position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; background:var(--surface); padding:18px 24px; border-bottom:1px solid var(--border); font-size:10px; letter-spacing:1.8px; color:var(--muted); }
+.inspector-header button { font-size:20px; line-height:20px; padding:4px 9px; }
+#inspector-content { padding:23px; }
+#inspector-content h2 { font-size:22px; margin-bottom:5px; overflow-wrap:anywhere; }
+.record-id { font:11px ui-monospace,monospace; color:var(--muted); margin-bottom:22px; }
+.detail-field { margin:16px 0; }
+.detail-key { display:block; color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+.detail-value { white-space:pre-wrap; overflow-wrap:anywhere; }
+.detail-section { border-top:1px solid var(--border); padding-top:14px; margin-top:22px; }
+.detail-section h3 { font-size:14px; margin:0 0 12px; }
+.claim { padding:12px; border:1px solid var(--border); border-radius:8px; margin:8px 0; background:var(--bg); }
+.claim .detail-value { margin-top:8px; }
+.claim-basis { color:var(--muted); font-size:12px; margin-top:10px; }
+.source-ref { display:inline-block; margin:6px 4px 0 0; padding:4px 7px; font-size:10px; }
+a.source-ref { color:var(--accent); text-underline-offset:3px; }
+.sub-record { margin:10px 0; padding:12px 0; border-bottom:1px solid var(--border); }
+.sub-record h4 { font-size:13px; margin:0 0 7px; }
+details { margin-top:22px; }
+summary { cursor:pointer; font-size:12px; color:var(--muted); }
+pre { font:11px/1.6 ui-monospace,monospace; white-space:pre-wrap; overflow-wrap:anywhere; padding:12px; background:var(--bg); border:1px solid var(--border); border-radius:7px; }
+@media(max-width:700px) { .masthead { height:auto; min-height:68px; padding:14px 18px; flex-wrap:wrap; }.brand-note { display:none; }main { padding:24px 18px; }.header-actions { flex-wrap:wrap; }.title-row { align-items:flex-start; }#knowledge-list { grid-template-columns:1fr; }.map-caption { flex-direction:column; gap:4px; }footer { flex-direction:column; gap:5px; }.scope-line { gap:12px; } }
+@media(prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; } }
+
+[hidden] { display:none!important; }
+.header-link { display:inline-flex; align-items:center; gap:8px; color:var(--ink); border:1px solid var(--border); border-radius:7px; padding:8px 13px; font-size:12px; text-decoration:none; }
+.header-link span { color:var(--accent); }
+.attached-documents { border:1px solid var(--border); border-radius:9px; padding:14px; background:var(--bg); margin:18px 0; }
+.attached-documents h3 { font-size:12px; margin:0 0 8px; color:var(--muted); }
+.document-link { display:block; color:var(--accent); font-size:13px; padding:5px 0; text-decoration:none; }
+#document-reader { max-width:1360px; padding-bottom:80px; }
+.document-breadcrumb { display:flex; gap:13px; align-items:center; margin:4px 0 32px; color:var(--muted); font-size:12px; }
+.document-breadcrumb a { color:var(--accent); text-decoration:none; }
+.document-workspace { display:grid; grid-template-columns:220px minmax(0,1fr); gap:48px; align-items:start; }
+#document-nav { position:sticky; top:24px; max-height:85vh; overflow:auto; padding-right:20px; border-right:1px solid var(--border); }
+.document-nav-link { display:block; margin:8px 0; padding:10px 12px; color:var(--muted); text-decoration:none; border-radius:7px; font-size:13px; overflow-wrap:anywhere; }
+.document-nav-link[aria-current=page] { color:var(--accent); background:var(--soft); font-weight:600; }
+#document-content { min-width:0; max-width:850px; }
+#document-content h1 { margin-top:12px; overflow-wrap:anywhere; }
+.document-attachments { display:flex; flex-wrap:wrap; gap:8px; margin:18px 0 28px; }
+.document-attachments a { text-decoration:none; border:1px solid var(--border); border-radius:6px; color:var(--accent); padding:5px 9px; font-size:11px; overflow-wrap:anywhere; }
+.document-card { display:block; margin-top:18px; border:1px solid var(--border); border-radius:10px; padding:20px; text-decoration:none; color:var(--ink); background:var(--surface); font-weight:600; }
+.document-card:hover { border-color:var(--accent); }
+.document-card span { display:block; margin-top:7px; color:var(--muted); font-size:12px; font-weight:400; }
+.markdown-body { line-height:1.8; font-size:15px; overflow-wrap:anywhere; }
+.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4 { line-height:1.35; margin:1.5em 0 .6em; scroll-margin-top:24px; }
+.markdown-body h2 { font-size:22px; border-top:1px solid var(--border); padding-top:22px; }
+.markdown-body h3 { font-size:18px; }
+.markdown-body a { color:var(--accent); text-underline-offset:3px; }
+.markdown-body p { margin:12px 0; }
+.markdown-body blockquote { border-left:3px solid var(--accent); margin:20px 0; padding:8px 20px; background:var(--soft); color:var(--muted); }
+.markdown-body table { display:block; max-width:100%; overflow:auto; border-collapse:collapse; font-size:13px; margin:20px 0; }
+.markdown-body th,.markdown-body td { border:1px solid var(--border); padding:10px 14px; text-align:left; }
+.markdown-body th { background:var(--soft); }
+.markdown-body code { font-size:.85em; background:var(--soft); padding:2px 5px; border-radius:4px; }
+.markdown-body pre { overflow:auto; white-space:pre; padding:18px; font-size:12px; }
+.markdown-body pre code { background:none; padding:0; font-size:inherit; }
+.markdown-body img { max-width:100%; height:auto; }
+.document-source { border-top:1px solid var(--border); padding-top:20px; margin-top:36px; }
+.document-source pre { max-height:420px; overflow:auto; }
+@media(max-width:800px) { .document-workspace { grid-template-columns:1fr; gap:24px; }#document-nav { position:static; max-height:none; padding:0 0 14px; border:0; border-bottom:1px solid var(--border); }.document-nav-link { display:inline-block; margin:4px 4px 0 0; }#document-content { max-width:100%; } }
+
+#graph-breadcrumb { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:18px; font-size:12px; }
+#graph-breadcrumb .document-link { display:inline; padding:0; }
+#graph-abstraction { font-size:12px; margin-top:8px; }
+#graph-connections { margin-top:22px; }
+#graph-connections:empty { display:none; }
+.graph-child { display:flex; gap:12px; align-items:center; margin:8px 0; }
+.boundary-row { border-top:1px solid var(--border); padding:14px 0; }
+.boundary-row>.claim { margin:8px 0; }
+
+/* Visual presets change chrome and palette; diagram text retains fixed metrics. */
+body[data-skin="engineering"] { --bg:#f0f6fa; --surface:#fff; --ink:#102e48; --muted:#526d83; --border:#bbcdda; --accent:#155f9b; --soft:#e5eff6; }
+body[data-skin="engineering"].dark { --bg:#0e1c2a; --surface:#162b3d; --ink:#e1eff9; --muted:#a3bed0; --border:#39566c; --accent:#7cc9fc; --soft:#122535; }
+body[data-skin="engineering"] .map-panel, body[data-skin="engineering"] .claim { border-radius:3px; }
+body[data-skin="engineering"] .eyebrow, body[data-skin="engineering"] .masthead { font-family:ui-monospace,monospace; }
+body[data-skin="editorial"] { --bg:#f5f0e7; --surface:#fffdf8; --ink:#302e29; --muted:#71695c; --border:#d4c8b7; --accent:#87533b; --soft:#ece4d8; }
+body[data-skin="editorial"].dark { --bg:#201d19; --surface:#2e2923; --ink:#f2e9dd; --muted:#c5b6a0; --border:#5e5141; --accent:#efb38d; --soft:#28231e; }
+body[data-skin="editorial"] h1, body[data-skin="editorial"] .markdown-body h2 { font-family:Georgia,"Times New Roman",serif; font-weight:500; letter-spacing:-.5px; }
+body[data-skin="editorial"] .map-panel { box-shadow:0 10px 28px #302e2909; border-radius:4px; }
+body[data-skin="editorial"] .eyebrow { letter-spacing:2px; }
+select { font:inherit; font-size:12px; color:var(--ink); background:var(--surface); padding:7px 9px; border:1px solid var(--border); border-radius:6px; max-width:100%; }
+select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.skin-control { display:inline-flex; align-items:center; gap:7px; color:var(--muted); font-size:11px; }
+.masthead { height:auto; min-height:72px; padding-top:12px; padding-bottom:12px; flex-wrap:wrap; }
+.header-actions { flex-wrap:wrap; }
+.highlight-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:10px; padding:12px 18px; border-bottom:1px solid var(--border); font-size:12px; }
+#highlight-summary { color:var(--muted); font-size:11px; flex-basis:100%; }
+#highlight-details { padding:0 18px; max-height:260px; overflow:auto; background:var(--surface); }
+#highlight-details:empty { display:none; }
+#highlight-details .claim { font-size:12px; }
+#highlight-details p { font-size:12px; }
+#readability { padding:12px 16px; border:1px solid var(--border); border-radius:8px; background:var(--surface); }
+#readability p { font-size:12px; }
+.readability-row { padding:8px 0; border-top:1px solid var(--border); }
+@media(max-width:700px) { .map-toolbar, .map-toolbar>div { flex-wrap:wrap; gap:8px; }.highlight-toolbar select { min-width:0; width:100%; } }
+
+#workflow-controls { display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin:18px 0; }
+#workflow-controls[hidden], .highlight-toolbar[hidden] { display:none; }
+#workflow-controls select { max-width:min(80vw, 560px); font:inherit; padding:8px; }
+
+.sequence-entry-summary { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:18px; margin:0 0 20px; padding:18px 20px; border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; background:var(--surface); }
+.sequence-entry-copy { min-width:0; flex:1 1 240px; overflow-wrap:anywhere; }
+.sequence-entry-copy h2 { font-size:18px; }
+.sequence-entry-copy p { margin:6px 0 0; }
+.sequence-entry-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+#sequence-start { background:var(--accent); color:var(--surface); border-color:var(--accent); font-weight:600; }
+.reading-anchor { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin:0 0 20px; padding:14px 18px; border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; background:var(--surface); }
+.reading-anchor>div { min-width:0; flex:1 1 220px; overflow-wrap:anywhere; }
+.reading-anchor strong { font-size:16px; }
+.reading-anchor p { margin:4px 0 0; font-size:12px; color:var(--muted); }
+</style></head>
+<body data-skin="standard">
+  <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions"><a class="header-link" href="#documents">Documents <span>2</span></a><label class="skin-control">Style <select id="skin" aria-label="Visual style"><option value="standard" selected>Standard</option><option value="engineering">Engineering</option><option value="editorial">Editorial</option></select></label><button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
+  <main id="diagram-main">
+    <nav id="graph-breadcrumb" aria-label="Graph hierarchy"></nav>
+    <div class="eyebrow"><span class="live-dot"></span> CURRENT IMPLEMENTATION <span class="sep">/</span> PARTIAL MODEL</div>
+    <div class="title-row"><h1 id="graph-title">Checkout connectivity</h1><button id="model-details">Model details ↗</button></div>
+    <p class="purpose" id="graph-question">Which services invoke which operations?</p>
+    <p class="purpose" id="graph-abstraction">One box per service. Relationships express actor-to-resource operations, without execution order.</p>
+    <div class="scope-line" id="graph-scope"></div>
+    <div id="reading-anchor" class="reading-anchor" hidden><div><span class="detail-key">Start reading here</span><strong id="reading-anchor-name"></strong><p>Reading preference for this view. Arrows retain their operation direction.</p></div><button id="reading-anchor-go">Go to starting node</button></div>
+    <div id="workflow-controls" hidden><label>View <select id="diagram-view" aria-label="Diagram view"></select></label><button id="workflow-details" hidden>Workflow entry & order ↗</button></div>
+    <section class="map-panel" aria-label="Architecture diagram">
+      <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
+      <div class="highlight-toolbar"><label for="highlight-mode">Highlight</label><select id="highlight-mode"><option value="selection">Selection and direct relationships</option><option value="unknown">Unknown claims</option><option value="disputed">Disputed claims</option><option value="qualified">All qualified claims</option><option value="context">External context</option><option value="calls">Calls</option><option value="reads">Reads</option><option value="writes">Writes</option><option value="publishes">Publishes</option><option value="consumes">Consumes</option></select><button id="highlight-clear">Clear highlights</button><span id="highlight-summary" role="status"></span></div>
+      <div id="highlight-details" aria-live="polite"></div>
+      <div id="map-viewport" tabindex="0" aria-label="Diagram canvas. Use zoom controls; scroll to pan."><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-skin="standard" data-graph-ref="services" data-theme="light" viewBox="0 0 887.2 808" width="887.2" height="808" role="group" aria-labelledby="ww-title ww-description">
+    <title id="ww-title">Checkout connectivity</title><desc id="ww-description">One box per service. Relationships express actor-to-resource operations, without execution order. Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+    <metadata id="waxwing-source" data-encoding="base64">eyJncmFwaHMiOlt7ImNhbnZhcyI6eyJoZWlnaHQiOjgwOCwid2lkdGgiOjg4Ny4yfSwiZWRnZXMiOlt7ImZyb20iOiJjaGVja291dCIsImxhYmVsIjp7ImhlaWdodCI6MzAsIndpZHRoIjoxMDkuNjAwMDAwMDAwMDAwMDEsIngiOjM4OC44LCJ5Ijo1MjN9LCJwb2ludHMiOlt7IngiOjYxOS4yLCJ5Ijo1MDZ9LHsieCI6MzEzLCJ5Ijo1MDZ9LHsieCI6MzEzLCJ5IjoxNTcuMjAwMDAwMDAwMDAwMDJ9LHsieCI6MjY4LCJ5IjoxNTcuMjAwMDAwMDAwMDAwMDJ9XSwicmVmIjoiY2hlY2tvdXQtb3JjaGVzdHJhdG9yIiwidG8iOiJvcmNoZXN0cmF0b3IifSx7ImZyb20iOiJvcmNoZXN0cmF0b3IiLCJsYWJlbCI6eyJoZWlnaHQiOjMwLCJ3aWR0aCI6MTA5LjYwMDAwMDAwMDAwMDAxLCJ4IjozODguOCwieSI6NzI3fSwicG9pbnRzIjpbeyJ4IjoyNjgsInkiOjE4Ni44fSx7IngiOjMwMywieSI6MTg2Ljh9LHsieCI6MzAzLCJ5Ijo3MTB9LHsieCI6NjE5LjIsInkiOjcxMH1dLCJyZWYiOiJvcmNoZXN0cmF0b3ItcGF5bWVudCIsInRvIjoicGF5bWVudCJ9LHsiZnJvbSI6Im9yY2hlc3RyYXRvciIsImxhYmVsIjp7ImhlaWdodCI6MzAsIndpZHRoIjoxMzEuMiwieCI6Mzc4LCJ5IjoxMTV9LCJwb2ludHMiOlt7IngiOjI2OCwieSI6OTh9LHsieCI6NjE5LjIsInkiOjk4fV0sInJlZiI6Im9yY2hlc3RyYXRvci1wcmljaW5nIiwidG8iOiJwcmljaW5nIn0seyJmcm9tIjoib3JjaGVzdHJhdG9yIiwibGFiZWwiOnsiaGVpZ2h0IjozMCwid2lkdGgiOjk1LjIsIngiOjM5NiwieSI6MzE5fSwicG9pbnRzIjpbeyJ4IjoyNjgsInkiOjEyNy42fSx7IngiOjMyMywieSI6MTI3LjZ9LHsieCI6MzIzLCJ5IjozMDJ9LHsieCI6NjE5LjIsInkiOjMwMn1dLCJyZWYiOiJvcmNoZXN0cmF0b3Itc3RvY2siLCJ0byI6InN0b2NrIn1dLCJncm91cHMiOltdLCJsYXlvdXQiOnsiZGlyZWN0aW9uIjoiUklHSFQiLCJlbmdpbmUiOiJlbGstbGF5ZXJlZEAwLjEyLjAiLCJncm91cGluZ1BlcnNwZWN0aXZlUmVmIjpudWxsLCJyZWFkaW5nQW5jaG9yUmVmIjoib3JjaGVzdHJhdG9yIn0sIm5vZGVzIjpbeyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjYxOS4yLCJ5Ijo0NDR9LCJyZWYiOiJjaGVja291dCJ9LHsiYm94Ijp7ImhlaWdodCI6MTQ4LCJ3aWR0aCI6MjMyLCJ4IjozNiwieSI6NjguNH0sInJlZiI6Im9yY2hlc3RyYXRvciJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4Ijo2MTkuMiwieSI6NjQ4fSwicmVmIjoicGF5bWVudCJ9LHsiYm94Ijp7ImhlaWdodCI6MTI0LCJ3aWR0aCI6MjMyLCJ4Ijo2MTkuMiwieSI6MzZ9LCJyZWYiOiJwcmljaW5nIn0seyJib3giOnsiaGVpZ2h0IjoxMjQsIndpZHRoIjoyMzIsIngiOjYxOS4yLCJ5IjoyNDB9LCJyZWYiOiJzdG9jayJ9XSwicmVmIjoic2VydmljZXMifV0sIm1vZGVsIjp7ImRvY3VtZW50cyI6W3siYXNzZXRzIjpbXSwiYXR0YWNobWVudHMiOlt7ImtpbmQiOiJncmFwaCIsInJlZiI6InNlcnZpY2VzIn0seyJraW5kIjoid29ya2Zsb3ciLCJyZWYiOiJjaGVja291dC1ydW4ifSx7ImtpbmQiOiJub2RlIiwicmVmIjoib3JjaGVzdHJhdG9yIn0seyJraW5kIjoic3RlcCIsInJlZiI6InN0b2NrLXJlc3VsdCIsIndvcmtmbG93UmVmIjoiY2hlY2tvdXQtcnVuIn1dLCJmb3JtYXQiOiJtYXJrZG93biIsImlkIjoicmVhZGluZy13b3JrZmxvdyIsImxpbmtzIjpbeyJocmVmIjoiI2dyYXBoPXNlcnZpY2VzIiwidGFyZ2V0Ijp7ImtpbmQiOiJncmFwaCIsInJlZiI6InNlcnZpY2VzIn19LHsiaHJlZiI6IiN3b3JrZmxvdz1jaGVja291dC1ydW4iLCJ0YXJnZXQiOnsia2luZCI6IndvcmtmbG93IiwicmVmIjoiY2hlY2tvdXQtcnVuIn19LHsiaHJlZiI6IiN3b3JrZmxvdz1jaGVja291dC1ydW4mbm9kZT1vcmNoZXN0cmF0b3IiLCJ0YXJnZXQiOnsia2luZCI6Im5vZGUiLCJyZWYiOiJvcmNoZXN0cmF0b3IiLCJ3b3JrZmxvd1JlZiI6ImNoZWNrb3V0LXJ1biJ9fSx7ImhyZWYiOiIjd29ya2Zsb3c9Y2hlY2tvdXQtcnVuJnN0ZXA9c3RvY2stcmVzdWx0IiwidGFyZ2V0Ijp7ImtpbmQiOiJzdGVwIiwicmVmIjoic3RvY2stcmVzdWx0Iiwid29ya2Zsb3dSZWYiOiJjaGVja291dC1ydW4ifX1dLCJtYXJrZG93biI6IiMgUmVhZGluZyByZXBlYXRlZCBwYXJ0aWNpcGF0aW9uXG5cblRoZSBbY29ubmVjdGl2aXR5IHZpZXddKCNncmFwaD1zZXJ2aWNlcykgaGFzIG9uZSBib3ggcGVyIHNlcnZpY2UuIEl0IGFuc3dlcnMgd2hpY2ggc2VydmljZXMgaW52b2tlIHdoaWNoIG9wZXJhdGlvbnMuIEl0IGRvZXMgbm90IHJlY29yZCB0aGUgb3JkZXIgb2YgdGhvc2Ugb3BlcmF0aW9ucy5cblxuVGhlIFtjaGVja291dCB3b3JrZmxvd10oI3dvcmtmbG93PWNoZWNrb3V0LXJ1bikgYW5zd2VycyBhIGRpZmZlcmVudCBxdWVzdGlvbjogd2hlcmUgZG9lcyB0aGlzIG9uZSByZWNvcmRlZCBpbnRlcmFjdGlvbiBwYXRoIGdvIG5leHQ/XG5cbltPcmNoZXN0cmF0b3JdKCN3b3JrZmxvdz1jaGVja291dC1ydW4mbm9kZT1vcmNoZXN0cmF0b3IpIGFwcGVhcnMgdGhyZWUgdGltZXMuIEVhY2ggYXBwZWFyYW5jZSByZWZlcnMgdG8gdGhlICoqc2FtZSBzZXJ2aWNlKiosIG5vdCBhIHJlcGxpY2EsIHNlcGFyYXRlIGRlcGxveW1lbnQsIG9yIG5ldyBvd25lci4gU2VsZWN0IG9uZSB0byBpbnNwZWN0IGl0cyBwYXJ0aWNpcGF0aW9uIGFuZCB0aGUgc2hhcmVkIHNvdXJjZSByZWNvcmQuXG5cblRoZSBbc3RvY2sgcmVzdWx0XSgjd29ya2Zsb3c9Y2hlY2tvdXQtcnVuJnN0ZXA9c3RvY2stcmVzdWx0KSBpcyBhIHJlcGx5IHRvIHRoZSBzdG9jayByZXF1ZXN0LiBJdCBjcmVhdGVzIG5vIG5ldyBTdG9jayDihpIgT3JjaGVzdHJhdG9yIGFyY2hpdGVjdHVyZSBkZXBlbmRlbmN5LlxuXG4jIyBMaW1pdHMgb2YgdGhpcyByZWNvcmRpbmdcblxuVGhlIHVwc3RyZWFtIHRyaWdnZXIgaXMgZXhwbGljaXRseSB1bmtub3duLiBUaGUgcnVuIHN0b3BzIGFmdGVyIHRoZSBwYXltZW50IHJlcXVlc3Q7IG5vIHBheW1lbnQgc3VjY2VzcyBvciBmaW5hbCByZXNwb25zZSBpcyBpbXBsaWVkLiBOZWl0aGVyIHRoZSBzcGFjaW5nIG5vciBhIG1lc3NhZ2UgYXJyb3cgZXN0YWJsaXNoZXMgZWxhcHNlZCB0aW1lIG9yIGJsb2NraW5nLlxuIiwidGl0bGUiOiJSZWFkaW5nIHJlcGVhdGVkIHBhcnRpY2lwYXRpb24ifSx7ImFzc2V0cyI6W10sImF0dGFjaG1lbnRzIjpbeyJraW5kIjoiZ3JhcGgiLCJyZWYiOiJzZXJ2aWNlcyJ9LHsia2luZCI6IndvcmtmbG93IiwicmVmIjoiY2hlY2tvdXQtcnVuIn0seyJraW5kIjoid29ya2Zsb3ciLCJyZWYiOiJzdG9jay1yb3VuZHRyaXAifSx7ImtpbmQiOiJ3b3JrZmxvdyIsInJlZiI6InByaWNpbmctcm91bmR0cmlwIn1dLCJmb3JtYXQiOiJtYXJrZG93biIsImlkIjoid29ya2Zsb3ctZ3VpZGUiLCJsaW5rcyI6W3siaHJlZiI6IiN3b3JrZmxvdz1jaGVja291dC1ydW4iLCJ0YXJnZXQiOnsia2luZCI6IndvcmtmbG93IiwicmVmIjoiY2hlY2tvdXQtcnVuIn19LHsiaHJlZiI6IiN3b3JrZmxvdz1zdG9jay1yb3VuZHRyaXAiLCJ0YXJnZXQiOnsia2luZCI6IndvcmtmbG93IiwicmVmIjoic3RvY2stcm91bmR0cmlwIn19LHsiaHJlZiI6IiN3b3JrZmxvdz1wcmljaW5nLXJvdW5kdHJpcCIsInRhcmdldCI6eyJraW5kIjoid29ya2Zsb3ciLCJyZWYiOiJwcmljaW5nLXJvdW5kdHJpcCJ9fSx7ImhyZWYiOiIjZ3JhcGg9c2VydmljZXMiLCJ0YXJnZXQiOnsia2luZCI6ImdyYXBoIiwicmVmIjoic2VydmljZXMifX0seyJocmVmIjoiI3dvcmtmbG93PXN0b2NrLXJvdW5kdHJpcCZub2RlPW9yY2hlc3RyYXRvciIsInRhcmdldCI6eyJraW5kIjoibm9kZSIsInJlZiI6Im9yY2hlc3RyYXRvciIsIndvcmtmbG93UmVmIjoic3RvY2stcm91bmR0cmlwIn19LHsiaHJlZiI6IiN3b3JrZmxvdz1wcmljaW5nLXJvdW5kdHJpcCZub2RlPW9yY2hlc3RyYXRvciIsInRhcmdldCI6eyJraW5kIjoibm9kZSIsInJlZiI6Im9yY2hlc3RyYXRvciIsIndvcmtmbG93UmVmIjoicHJpY2luZy1yb3VuZHRyaXAifX0seyJocmVmIjoicmVhZGluZy5tZCNsaW1pdHMtb2YtdGhpcy1yZWNvcmRpbmciLCJ0YXJnZXQiOnsiaGVhZGluZyI6ImxpbWl0cy1vZi10aGlzLXJlY29yZGluZyIsImtpbmQiOiJkb2N1bWVudCIsInJlZiI6InJlYWRpbmctd29ya2Zsb3cifX0seyJocmVmIjoiI3NoYXJlZC1jb250ZXh0IiwidGFyZ2V0Ijp7ImhlYWRpbmciOiJzaGFyZWQtY29udGV4dCIsImtpbmQiOiJkb2N1bWVudCIsInJlZiI6IndvcmtmbG93LWd1aWRlIn19XSwibWFya2Rvd24iOiIjIENob29zZSBhIHdvcmtmbG93XG5cbkFsbCB0aHJlZSB2aWV3cyB1c2UgdGhlIHNhbWUgc2VydmljZSByZWdpc3RyeS4gRGlmZmVyZW50IHBhZ2VzIGRvIG5vdCBtZWFuIGRpZmZlcmVudCBzZXJ2aWNlcyBvciBzZXBhcmF0ZSBkZXBsb3ltZW50cy5cblxuLSBbQ2hlY2tvdXRdKCN3b3JrZmxvdz1jaGVja291dC1ydW4pOiB0aGUgZnVsbCByZWNvcmRlZCBwYXRoLlxuLSBbQ2hlY2sgc3RvY2tdKCN3b3JrZmxvdz1zdG9jay1yb3VuZHRyaXApOiBvbmUgc3RvY2sgcmVxdWVzdC9yZXBseSBwYWlyLlxuLSBbQ2FsY3VsYXRlIHByaWNpbmddKCN3b3JrZmxvdz1wcmljaW5nLXJvdW5kdHJpcCk6IG9uZSBwcmljaW5nIHJlcXVlc3QvcmVwbHkgcGFpci5cblxuIyMgU2hhcmVkIGNvbnRleHRcblxuVGhlIFthcmNoaXRlY3R1cmVdKCNncmFwaD1zZXJ2aWNlcykgc2hvd3MgdGhlIGRlcGVuZGVuY2llcy4gW09yY2hlc3RyYXRvciBpbiB0aGUgc3RvY2sgdmlld10oI3dvcmtmbG93PXN0b2NrLXJvdW5kdHJpcCZub2RlPW9yY2hlc3RyYXRvcikgYW5kIFtPcmNoZXN0cmF0b3IgaW4gdGhlIHByaWNpbmcgdmlld10oI3dvcmtmbG93PXByaWNpbmctcm91bmR0cmlwJm5vZGU9b3JjaGVzdHJhdG9yKSByZWZlciB0byB0aGUgc2FtZSBjYW5vbmljYWwgY29tcG9uZW50LlxuXG5TZWUgW3RoZSByZWNvcmRpbmcgbGltaXRzXShyZWFkaW5nLm1kI2xpbWl0cy1vZi10aGlzLXJlY29yZGluZykuIFJldHVybiB0byBbdGhpcyBzZWN0aW9uXSgjc2hhcmVkLWNvbnRleHQpIHVzaW5nIGEgbm9ybWFsIE1hcmtkb3duIGhlYWRpbmcgbGluay5cblxuIyMgTGltaXRzXG5cblRoaXMgaXMgYSBmaWN0aW9uYWwgY3VycmVudCBpbXBsZW1lbnRhdGlvbi4gVGhlIGZvY3VzZWQgZXhjZXJwdHMgZG8gbm90IGNsYWltIGluZGVwZW5kZW50IHVwc3RyZWFtIHRyaWdnZXJzIG9yIHByb3ZlIGNvbXBsZXRlbmVzcy5cbiIsInRpdGxlIjoiQ2hvb3NlIGEgd29ya2Zsb3cifV0sImVudGl0aWVzIjpbeyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJDbGFzc2VzIGFuZCBkZXBsb3ltZW50IHJlcGxpY2FzLiJdLCJyZWFzb24iOiJTaG93IHNlcnZpY2UgcmVzcG9uc2liaWxpdGllcy4iLCJyZXByZXNlbnRzIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJSZWNlaXZlcyBhIHN1Ym1pdHRlZCBiYXNrZXQuIn19LCJjYXRlZ29yeSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoic2VydmljZSJ9LCJleGlzdGVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJTdGlwdWxhdGVkIGJ5IHRoZSBzeW50aGV0aWMgY2hlY2tvdXQgcnVuIGluIGV2aWRlbmNlLm1kOyBubyByZWFsIG9yZ2FuaXphdGlvbiBvciByZXBvc2l0b3J5IGlzIHJlcHJlc2VudGVkLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXJ1biJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sImlkIjoiY2hlY2tvdXQiLCJsYWJlbCI6IkNoZWNrb3V0In0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJDbGFzc2VzIGFuZCBkZXBsb3ltZW50IHJlcGxpY2FzLiJdLCJyZWFzb24iOiJTaG93IHNlcnZpY2UgcmVzcG9uc2liaWxpdGllcy4iLCJyZXByZXNlbnRzIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJDb29yZGluYXRlcyBzdG9jaywgcHJpY2luZyBhbmQgcGF5bWVudC4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJvcmNoZXN0cmF0b3IiLCJsYWJlbCI6Ik9yY2hlc3RyYXRvciJ9LHsiYWJzdHJhY3Rpb24iOnsib21pdHMiOlsiQ2xhc3NlcyBhbmQgZGVwbG95bWVudCByZXBsaWNhcy4iXSwicmVhc29uIjoiU2hvdyBzZXJ2aWNlIHJlc3BvbnNpYmlsaXRpZXMuIiwicmVwcmVzZW50cyI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjoiQ2hlY2tzIHN0b2NrIGF2YWlsYWJpbGl0eS4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJzdG9jayIsImxhYmVsIjoiU3RvY2sifSx7ImFic3RyYWN0aW9uIjp7Im9taXRzIjpbIkNsYXNzZXMgYW5kIGRlcGxveW1lbnQgcmVwbGljYXMuIl0sInJlYXNvbiI6IlNob3cgc2VydmljZSByZXNwb25zaWJpbGl0aWVzLiIsInJlcHJlc2VudHMiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJTdGlwdWxhdGVkIGJ5IHRoZSBzeW50aGV0aWMgY2hlY2tvdXQgcnVuIGluIGV2aWRlbmNlLm1kOyBubyByZWFsIG9yZ2FuaXphdGlvbiBvciByZXBvc2l0b3J5IGlzIHJlcHJlc2VudGVkLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXJ1biJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6IkNhbGN1bGF0ZXMgdGhlIGNoYXJnZS4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJwcmljaW5nIiwibGFiZWwiOiJQcmljaW5nIn0seyJhYnN0cmFjdGlvbiI6eyJvbWl0cyI6WyJDbGFzc2VzIGFuZCBkZXBsb3ltZW50IHJlcGxpY2FzLiJdLCJyZWFzb24iOiJTaG93IHNlcnZpY2UgcmVzcG9uc2liaWxpdGllcy4iLCJyZXByZXNlbnRzIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJBY2NlcHRzIHRoZSBmaW5hbCBjaGFyZ2UgcmVxdWVzdC4ifX0sImNhdGVnb3J5Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOiJzZXJ2aWNlIn0sImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiaWQiOiJwYXltZW50IiwibGFiZWwiOiJQYXltZW50In1dLCJncmFwaHMiOlt7ImNvbnRleHRSZWZzIjpbXSwiZW50aXR5UmVmcyI6WyJjaGVja291dCIsIm9yY2hlc3RyYXRvciIsInN0b2NrIiwicHJpY2luZyIsInBheW1lbnQiXSwiaWQiOiJzZXJ2aWNlcyIsIm1lbWJlcnNoaXBSZWZzIjpbXSwicmVsYXRpb25zaGlwUmVmcyI6WyJjaGVja291dC1vcmNoZXN0cmF0b3IiLCJvcmNoZXN0cmF0b3Itc3RvY2siLCJvcmNoZXN0cmF0b3ItcHJpY2luZyIsIm9yY2hlc3RyYXRvci1wYXltZW50Il0sInNjb3BlIjp7ImFic3RyYWN0aW9uIjoiT25lIGJveCBwZXIgc2VydmljZS4gUmVsYXRpb25zaGlwcyBleHByZXNzIGFjdG9yLXRvLXJlc291cmNlIG9wZXJhdGlvbnMsIHdpdGhvdXQgZXhlY3V0aW9uIG9yZGVyLiIsImNvdmVyYWdlIjoicGFydGlhbCIsImVudmlyb25tZW50IjoiRmljdGlvbmFsIGNoZWNrb3V0IHNlcnZpY2UiLCJleGNsdWRlcyI6WyJCcmFuY2hlcywgcmV0cmllcywgcmVwbGljYXMsIGVsYXBzZWQgdGltZSwgY29uY3VycmVuY3kgYW5kIHVucmVjb3JkZWQgb3BlcmF0aW9ucy4iXSwiaW5jbHVkZXMiOlsiT25lIHJlY29yZGVkIGludGVyYWN0aW9uIHBhdGggd2l0aCBleHBsaWNpdCBzdG9jayBhbmQgcHJpY2luZyByZXBsaWVzLiJdLCJxdWVzdGlvbiI6IldoaWNoIHNlcnZpY2VzIGludm9rZSB3aGljaCBvcGVyYXRpb25zPyIsInNuYXBzaG90IjoiU3ludGhldGljIHJ1biB2MSIsInRpbWVmcmFtZSI6ImN1cnJlbnQifSwidGl0bGUiOiJDaGVja291dCBjb25uZWN0aXZpdHkifV0sImdyb3VwcyI6W10sImlkIjoiY2hlY2tvdXQtc3lzdGVtIiwibWVtYmVyc2hpcHMiOltdLCJub3RlcyI6W10sInBlcnNwZWN0aXZlcyI6W10sInJlbGF0aW9uc2hpcHMiOlt7ImV4aXN0ZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwiZnJvbSI6ImNoZWNrb3V0IiwiaWQiOiJjaGVja291dC1vcmNoZXN0cmF0b3IiLCJraW5kIjoiY2FsbHMiLCJsYWJlbCI6IlN1Ym1pdCBiYXNrZXQiLCJ0byI6Im9yY2hlc3RyYXRvciJ9LHsiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoib3JjaGVzdHJhdG9yIiwiaWQiOiJvcmNoZXN0cmF0b3Itc3RvY2siLCJraW5kIjoiY2FsbHMiLCJsYWJlbCI6IkNoZWNrIHN0b2NrIiwidG8iOiJzdG9jayJ9LHsiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoib3JjaGVzdHJhdG9yIiwiaWQiOiJvcmNoZXN0cmF0b3ItcHJpY2luZyIsImtpbmQiOiJjYWxscyIsImxhYmVsIjoiQ2FsY3VsYXRlIGNoYXJnZSIsInRvIjoicHJpY2luZyJ9LHsiZXhpc3RlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJmcm9tIjoib3JjaGVzdHJhdG9yIiwiaWQiOiJvcmNoZXN0cmF0b3ItcGF5bWVudCIsImtpbmQiOiJjYWxscyIsImxhYmVsIjoiQ2hhcmdlIGJhc2tldCIsInRvIjoicGF5bWVudCJ9XSwicm9vdEdyYXBoUmVmIjoic2VydmljZXMiLCJzY2hlbWFWZXJzaW9uIjoiMC41LWRyYWZ0Iiwic2NvcGUiOnsiYWJzdHJhY3Rpb24iOiJPbmUgc2hhcmVkIHNlcnZpY2UgcmVnaXN0cnksIG9uZSBhcmNoaXRlY3R1cmUgZ3JhcGgsIGFuZCB0aHJlZSBzZXBhcmF0ZWx5IHJlYWRhYmxlIHdvcmtmbG93IHZpZXdzLiIsImNvdmVyYWdlIjoicGFydGlhbCIsImVudmlyb25tZW50IjoiRmljdGlvbmFsIGNoZWNrb3V0IHNlcnZpY2UiLCJleGNsdWRlcyI6WyJCcmFuY2hlcywgcmV0cmllcywgcmVwbGljYXMsIGVsYXBzZWQgdGltZSwgY29uY3VycmVuY3kgYW5kIHVucmVjb3JkZWQgb3BlcmF0aW9ucy4iXSwiaW5jbHVkZXMiOlsiVGhlIHJlY29yZGVkIGNoZWNrb3V0IHBhdGggYW5kIHR3byBleHBsaWNpdGx5IHNjb3BlZCBleGNlcnB0cy4iXSwicXVlc3Rpb24iOiJIb3cgY2FuIHJlYWRlcnMgaW5zcGVjdCBjaGVja291dCwgc3RvY2sgYW5kIHByaWNpbmcgaW5kZXBlbmRlbnRseSB3aGlsZSBzaGFyaW5nIG9uZSBzZXJ2aWNlIHJlZ2lzdHJ5PyIsInNuYXBzaG90IjoiU3ludGhldGljIHJ1biB2MSIsInRpbWVmcmFtZSI6ImN1cnJlbnQifSwic291cmNlcyI6W3siZGVzY3JpcHRpb24iOiJBbiBpbnZlbnRlZCBzZXJ2aWNlIHJlZ2lzdHJ5IGFuZCBzdWNjZXNzZnVsIGNoZWNrb3V0IHJ1bi4iLCJpZCI6ImZpY3Rpb25hbC1ydW4iLCJraW5kIjoiZml4dHVyZSIsImxvY2F0b3IiOiJldmlkZW5jZS5tZCJ9XSwidGl0bGUiOiJDaGVja291dDogdGhyZWUgZm9jdXNlZCB3b3JrZmxvd3MiLCJ3b3JrZmxvd3MiOlt7ImVudHJ5Ijp7InBvaW50Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnsiaXRlbVJlZiI6InN1Ym1pdCIsInBhcnRpY2lwYW50UmVmIjoiY2hlY2tvdXQifX0sInRyaWdnZXIiOnsicmVhc29uIjoiVGhlIGZpeHR1cmUgYmVnaW5zIHdpdGggc3VibWlzc2lvbjsgaXRzIHVwc3RyZWFtIHVzZXIgYWN0aW9uIGlzIG5vdCByZWNvcmRlZC4iLCJzdGF0dXMiOiJ1bmtub3duIn19LCJncmFwaFJlZiI6InNlcnZpY2VzIiwiaWQiOiJjaGVja291dC1ydW4iLCJvcmRlciI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjpbInN1Ym1pdCIsImNoZWNrLXN0b2NrIiwic3RvY2stcmVzdWx0IiwiY2FsY3VsYXRlLWNoYXJnZSIsImNoYXJnZS1yZXN1bHQiLCJjaGFyZ2UtcGF5bWVudCJdfSwic2NvcGUiOnsiYWJzdHJhY3Rpb24iOiJTZXJ2aWNlcyByZW1haW4gY2Fub25pY2FsIGNvbXBvbmVudHM7IHRoZSB3b3JrZmxvdyBleHBhbmRzIHRoZWlyIHBhcnRpY2lwYXRpb24gaW4gb25lIHJlY29yZGVkIHNjZW5hcmlvLiIsImNvdmVyYWdlIjoicGFydGlhbCIsImVudmlyb25tZW50IjoiRmljdGlvbmFsIGNoZWNrb3V0IHNlcnZpY2UiLCJleGNsdWRlcyI6WyJCcmFuY2hlcywgcmV0cmllcywgcmVwbGljYXMsIGVsYXBzZWQgdGltZSwgY29uY3VycmVuY3kgYW5kIHVucmVjb3JkZWQgb3BlcmF0aW9ucy4iXSwiaW5jbHVkZXMiOlsiT25lIHJlY29yZGVkIGludGVyYWN0aW9uIHBhdGggd2l0aCBleHBsaWNpdCBzdG9jayBhbmQgcHJpY2luZyByZXBsaWVzLiJdLCJxdWVzdGlvbiI6IkhvdyBkb2VzIGNoZWNrb3V0IHJldmlzaXQgb25lIG9yY2hlc3RyYXRvciB3aGlsZSBjaGVja2luZyBzdG9jaywgcHJpY2luZywgYW5kIHBheW1lbnQ/Iiwic25hcHNob3QiOiJTeW50aGV0aWMgcnVuIHYxIiwidGltZWZyYW1lIjoiY3VycmVudCJ9LCJzdGVwcyI6W3siZnJvbSI6ImNoZWNrb3V0IiwiaWQiOiJzdWJtaXQiLCJraW5kIjoibWVzc2FnZSIsImxhYmVsIjoiU3VibWl0IGJhc2tldCIsIm9jY3VycmVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJTdGlwdWxhdGVkIGJ5IHRoZSBzeW50aGV0aWMgY2hlY2tvdXQgcnVuIGluIGV2aWRlbmNlLm1kOyBubyByZWFsIG9yZ2FuaXphdGlvbiBvciByZXBvc2l0b3J5IGlzIHJlcHJlc2VudGVkLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXJ1biJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sInJlbGF0aW9uc2hpcFJlZiI6ImNoZWNrb3V0LW9yY2hlc3RyYXRvciIsInRvIjoib3JjaGVzdHJhdG9yIn0seyJmcm9tIjoib3JjaGVzdHJhdG9yIiwiaWQiOiJjaGVjay1zdG9jayIsImtpbmQiOiJtZXNzYWdlIiwibGFiZWwiOiJDaGVjayBzdG9jayIsIm9jY3VycmVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJTdGlwdWxhdGVkIGJ5IHRoZSBzeW50aGV0aWMgY2hlY2tvdXQgcnVuIGluIGV2aWRlbmNlLm1kOyBubyByZWFsIG9yZ2FuaXphdGlvbiBvciByZXBvc2l0b3J5IGlzIHJlcHJlc2VudGVkLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXJ1biJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sInJlbGF0aW9uc2hpcFJlZiI6Im9yY2hlc3RyYXRvci1zdG9jayIsInRvIjoic3RvY2sifSx7ImZyb20iOiJzdG9jayIsImlkIjoic3RvY2stcmVzdWx0Iiwia2luZCI6InJlcGx5IiwibGFiZWwiOiJTdG9jayBhdmFpbGFibGUiLCJvY2N1cnJlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJyZXBseVRvIjoiY2hlY2stc3RvY2siLCJ0byI6Im9yY2hlc3RyYXRvciJ9LHsiZnJvbSI6Im9yY2hlc3RyYXRvciIsImlkIjoiY2FsY3VsYXRlLWNoYXJnZSIsImtpbmQiOiJtZXNzYWdlIiwibGFiZWwiOiJDYWxjdWxhdGUgY2hhcmdlIiwib2NjdXJyZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwicmVsYXRpb25zaGlwUmVmIjoib3JjaGVzdHJhdG9yLXByaWNpbmciLCJ0byI6InByaWNpbmcifSx7ImZyb20iOiJwcmljaW5nIiwiaWQiOiJjaGFyZ2UtcmVzdWx0Iiwia2luZCI6InJlcGx5IiwibGFiZWwiOiJDaGFyZ2UgY2FsY3VsYXRlZCIsIm9jY3VycmVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJTdGlwdWxhdGVkIGJ5IHRoZSBzeW50aGV0aWMgY2hlY2tvdXQgcnVuIGluIGV2aWRlbmNlLm1kOyBubyByZWFsIG9yZ2FuaXphdGlvbiBvciByZXBvc2l0b3J5IGlzIHJlcHJlc2VudGVkLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXJ1biJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sInJlcGx5VG8iOiJjYWxjdWxhdGUtY2hhcmdlIiwidG8iOiJvcmNoZXN0cmF0b3IifSx7ImZyb20iOiJvcmNoZXN0cmF0b3IiLCJpZCI6ImNoYXJnZS1wYXltZW50Iiwia2luZCI6Im1lc3NhZ2UiLCJsYWJlbCI6IkNoYXJnZSBiYXNrZXQiLCJvY2N1cnJlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJyZWxhdGlvbnNoaXBSZWYiOiJvcmNoZXN0cmF0b3ItcGF5bWVudCIsInRvIjoicGF5bWVudCJ9XSwidGl0bGUiOiJDaGVja291dCB0aHJvdWdoIHRoZSBvcmNoZXN0cmF0b3IifSx7ImVudHJ5Ijp7InBvaW50Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIHNjb3BlZCBleGNlcnB0IHN0YXJ0cyBhdCB0aGUgcmVxdWVzdCBzZW50IGJ5IE9yY2hlc3RyYXRvci4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnsiaXRlbVJlZiI6InN0b2NrLXJvdW5kdHJpcC1jaGVjay1zdG9jayIsInBhcnRpY2lwYW50UmVmIjoib3JjaGVzdHJhdG9yIn19LCJ0cmlnZ2VyIjp7InJlYXNvbiI6IlRoaXMgc2NvcGVkIHZpZXcgZG9lcyBub3QgZXN0YWJsaXNoIHdoYXQgdHJpZ2dlcmVkIHRoZSBvcmNoZXN0cmF0b3IgcmVxdWVzdC4iLCJzdGF0dXMiOiJ1bmtub3duIn19LCJncmFwaFJlZiI6InNlcnZpY2VzIiwiaWQiOiJzdG9jay1yb3VuZHRyaXAiLCJvcmRlciI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoaXMgdmlldyBleHBsaWNpdGx5IHNlbGVjdHMgdGhlIHJlcXVlc3QvcmVwbHkgcGFpciBmcm9tIHRoZSBzeW50aGV0aWMgY2hlY2tvdXQgcmVjb3JkaW5nOyB0aGUgc3Vycm91bmRpbmcgd29ya2Zsb3cgaXMgb3V0c2lkZSB0aGlzIHNjb3BlLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXJ1biJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6WyJzdG9jay1yb3VuZHRyaXAtY2hlY2stc3RvY2siLCJzdG9jay1yb3VuZHRyaXAtc3RvY2stcmVzdWx0Il19LCJzY29wZSI6eyJhYnN0cmFjdGlvbiI6Ik9uZSByZXF1ZXN0L3JlcGx5IHBhaXIgYmV0d2VlbiBjYW5vbmljYWwgc2VydmljZXMuIiwiY292ZXJhZ2UiOiJwYXJ0aWFsIiwiZW52aXJvbm1lbnQiOiJGaWN0aW9uYWwgY2hlY2tvdXQgc2VydmljZSIsImV4Y2x1ZGVzIjpbIlRoZSBzdXJyb3VuZGluZyBjaGVja291dCBwYXRoLCByZXRyaWVzIGFuZCBhbHRlcm5hdGUgb3V0Y29tZXMuIl0sImluY2x1ZGVzIjpbIk9ubHkgdGhpcyByZXF1ZXN0IGFuZCByZXBseSwgZXhjZXJwdGVkIGZyb20gdGhlIHN5bnRoZXRpYyBjaGVja291dCByZWNvcmRpbmcuIl0sInF1ZXN0aW9uIjoiV2hhdCBoYXBwZW5zIGR1cmluZyB0aGUgY2hlY2sgc3RvY2sgaW50ZXJhY3Rpb24/Iiwic25hcHNob3QiOiJTeW50aGV0aWMgcnVuIHYxIiwidGltZWZyYW1lIjoiY3VycmVudCJ9LCJzdGVwcyI6W3siZnJvbSI6Im9yY2hlc3RyYXRvciIsImlkIjoic3RvY2stcm91bmR0cmlwLWNoZWNrLXN0b2NrIiwia2luZCI6Im1lc3NhZ2UiLCJsYWJlbCI6IkNoZWNrIHN0b2NrIiwib2NjdXJyZW5jZSI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlN0aXB1bGF0ZWQgYnkgdGhlIHN5bnRoZXRpYyBjaGVja291dCBydW4gaW4gZXZpZGVuY2UubWQ7IG5vIHJlYWwgb3JnYW5pemF0aW9uIG9yIHJlcG9zaXRvcnkgaXMgcmVwcmVzZW50ZWQuIiwic291cmNlUmVmcyI6WyJmaWN0aW9uYWwtcnVuIl19LCJzdGF0dXMiOiJlc3RhYmxpc2hlZCIsInZhbHVlIjp0cnVlfSwicmVsYXRpb25zaGlwUmVmIjoib3JjaGVzdHJhdG9yLXN0b2NrIiwidG8iOiJzdG9jayJ9LHsiZnJvbSI6InN0b2NrIiwiaWQiOiJzdG9jay1yb3VuZHRyaXAtc3RvY2stcmVzdWx0Iiwia2luZCI6InJlcGx5IiwibGFiZWwiOiJTdG9jayBhdmFpbGFibGUiLCJvY2N1cnJlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJyZXBseVRvIjoic3RvY2stcm91bmR0cmlwLWNoZWNrLXN0b2NrIiwidG8iOiJvcmNoZXN0cmF0b3IifV0sInRpdGxlIjoiQ2hlY2sgc3RvY2sifSx7ImVudHJ5Ijp7InBvaW50Ijp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiVGhlIHNjb3BlZCBleGNlcnB0IHN0YXJ0cyBhdCB0aGUgcmVxdWVzdCBzZW50IGJ5IE9yY2hlc3RyYXRvci4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnsiaXRlbVJlZiI6InByaWNpbmctcm91bmR0cmlwLWNhbGN1bGF0ZS1jaGFyZ2UiLCJwYXJ0aWNpcGFudFJlZiI6Im9yY2hlc3RyYXRvciJ9fSwidHJpZ2dlciI6eyJyZWFzb24iOiJUaGlzIHNjb3BlZCB2aWV3IGRvZXMgbm90IGVzdGFibGlzaCB3aGF0IHRyaWdnZXJlZCB0aGUgb3JjaGVzdHJhdG9yIHJlcXVlc3QuIiwic3RhdHVzIjoidW5rbm93biJ9fSwiZ3JhcGhSZWYiOiJzZXJ2aWNlcyIsImlkIjoicHJpY2luZy1yb3VuZHRyaXAiLCJvcmRlciI6eyJiYXNpcyI6eyJleHBsYW5hdGlvbiI6IlRoaXMgdmlldyBleHBsaWNpdGx5IHNlbGVjdHMgdGhlIHJlcXVlc3QvcmVwbHkgcGFpciBmcm9tIHRoZSBzeW50aGV0aWMgY2hlY2tvdXQgcmVjb3JkaW5nOyB0aGUgc3Vycm91bmRpbmcgd29ya2Zsb3cgaXMgb3V0c2lkZSB0aGlzIHNjb3BlLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXJ1biJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6WyJwcmljaW5nLXJvdW5kdHJpcC1jYWxjdWxhdGUtY2hhcmdlIiwicHJpY2luZy1yb3VuZHRyaXAtY2hhcmdlLXJlc3VsdCJdfSwic2NvcGUiOnsiYWJzdHJhY3Rpb24iOiJPbmUgcmVxdWVzdC9yZXBseSBwYWlyIGJldHdlZW4gY2Fub25pY2FsIHNlcnZpY2VzLiIsImNvdmVyYWdlIjoicGFydGlhbCIsImVudmlyb25tZW50IjoiRmljdGlvbmFsIGNoZWNrb3V0IHNlcnZpY2UiLCJleGNsdWRlcyI6WyJUaGUgc3Vycm91bmRpbmcgY2hlY2tvdXQgcGF0aCwgcmV0cmllcyBhbmQgYWx0ZXJuYXRlIG91dGNvbWVzLiJdLCJpbmNsdWRlcyI6WyJPbmx5IHRoaXMgcmVxdWVzdCBhbmQgcmVwbHksIGV4Y2VycHRlZCBmcm9tIHRoZSBzeW50aGV0aWMgY2hlY2tvdXQgcmVjb3JkaW5nLiJdLCJxdWVzdGlvbiI6IldoYXQgaGFwcGVucyBkdXJpbmcgdGhlIGNhbGN1bGF0ZSBwcmljaW5nIGludGVyYWN0aW9uPyIsInNuYXBzaG90IjoiU3ludGhldGljIHJ1biB2MSIsInRpbWVmcmFtZSI6ImN1cnJlbnQifSwic3RlcHMiOlt7ImZyb20iOiJvcmNoZXN0cmF0b3IiLCJpZCI6InByaWNpbmctcm91bmR0cmlwLWNhbGN1bGF0ZS1jaGFyZ2UiLCJraW5kIjoibWVzc2FnZSIsImxhYmVsIjoiQ2FsY3VsYXRlIGNoYXJnZSIsIm9jY3VycmVuY2UiOnsiYmFzaXMiOnsiZXhwbGFuYXRpb24iOiJTdGlwdWxhdGVkIGJ5IHRoZSBzeW50aGV0aWMgY2hlY2tvdXQgcnVuIGluIGV2aWRlbmNlLm1kOyBubyByZWFsIG9yZ2FuaXphdGlvbiBvciByZXBvc2l0b3J5IGlzIHJlcHJlc2VudGVkLiIsInNvdXJjZVJlZnMiOlsiZmljdGlvbmFsLXJ1biJdfSwic3RhdHVzIjoiZXN0YWJsaXNoZWQiLCJ2YWx1ZSI6dHJ1ZX0sInJlbGF0aW9uc2hpcFJlZiI6Im9yY2hlc3RyYXRvci1wcmljaW5nIiwidG8iOiJwcmljaW5nIn0seyJmcm9tIjoicHJpY2luZyIsImlkIjoicHJpY2luZy1yb3VuZHRyaXAtY2hhcmdlLXJlc3VsdCIsImtpbmQiOiJyZXBseSIsImxhYmVsIjoiQ2hhcmdlIGNhbGN1bGF0ZWQiLCJvY2N1cnJlbmNlIjp7ImJhc2lzIjp7ImV4cGxhbmF0aW9uIjoiU3RpcHVsYXRlZCBieSB0aGUgc3ludGhldGljIGNoZWNrb3V0IHJ1biBpbiBldmlkZW5jZS5tZDsgbm8gcmVhbCBvcmdhbml6YXRpb24gb3IgcmVwb3NpdG9yeSBpcyByZXByZXNlbnRlZC4iLCJzb3VyY2VSZWZzIjpbImZpY3Rpb25hbC1ydW4iXX0sInN0YXR1cyI6ImVzdGFibGlzaGVkIiwidmFsdWUiOnRydWV9LCJyZXBseVRvIjoicHJpY2luZy1yb3VuZHRyaXAtY2FsY3VsYXRlLWNoYXJnZSIsInRvIjoib3JjaGVzdHJhdG9yIn1dLCJ0aXRsZSI6IkNhbGN1bGF0ZSBwcmljaW5nIn1dfSwibW9kZWxEaWdlc3QiOiJiYTRlZWZmZjA5YzhiYTQ3OTYwYThlZmNiNGI5MDBiNjc0NWM5M2M4YmNmNjg3MTlmNWEwMDcwNjZmOGZiOGI2Iiwic2NoZW1hVmVyc2lvbiI6IjAuNC1kcmFmdCIsIndvcmtmbG93cyI6W3siYXBwZWFyYW5jZXMiOlt7ImFmdGVyU3RlcFJlZiI6bnVsbCwiYm94Ijp7ImhlaWdodCI6MTQ4LCJ3aWR0aCI6MjUyLCJ4IjozNiwieSI6OTZ9LCJlbnRpdHlSZWYiOiJjaGVja291dCIsImlkIjoiYXBwZWFyYW5jZS0wIn0seyJhZnRlclN0ZXBSZWYiOiJzdWJtaXQiLCJib3giOnsiaGVpZ2h0IjoxNDgsIndpZHRoIjoyNTIsIngiOjY1OS4yLCJ5Ijo5Nn0sImVudGl0eVJlZiI6Im9yY2hlc3RyYXRvciIsImlkIjoiYXBwZWFyYW5jZS0xIn0seyJhZnRlclN0ZXBSZWYiOiJjaGVjay1zdG9jayIsImJveCI6eyJoZWlnaHQiOjE0OCwid2lkdGgiOjI1MiwieCI6MTI4Mi40LCJ5Ijo5Nn0sImVudGl0eVJlZiI6InN0b2NrIiwiaWQiOiJhcHBlYXJhbmNlLTIifSx7ImFmdGVyU3RlcFJlZiI6InN0b2NrLXJlc3VsdCIsImJveCI6eyJoZWlnaHQiOjE0OCwid2lkdGgiOjI1MiwieCI6MTkwNS42MDAwMDAwMDAwMDAxLCJ5Ijo5Nn0sImVudGl0eVJlZiI6Im9yY2hlc3RyYXRvciIsImlkIjoiYXBwZWFyYW5jZS0zIn0seyJhZnRlclN0ZXBSZWYiOiJjYWxjdWxhdGUtY2hhcmdlIiwiYm94Ijp7ImhlaWdodCI6MTQ4LCJ3aWR0aCI6MjUyLCJ4IjoyNTI4LjgsInkiOjk2fSwiZW50aXR5UmVmIjoicHJpY2luZyIsImlkIjoiYXBwZWFyYW5jZS00In0seyJhZnRlclN0ZXBSZWYiOiJjaGFyZ2UtcmVzdWx0IiwiYm94Ijp7ImhlaWdodCI6MTQ4LCJ3aWR0aCI6MjUyLCJ4IjozMTQ0LjgsInkiOjk2fSwiZW50aXR5UmVmIjoib3JjaGVzdHJhdG9yIiwiaWQiOiJhcHBlYXJhbmNlLTUifSx7ImFmdGVyU3RlcFJlZiI6ImNoYXJnZS1wYXltZW50IiwiYm94Ijp7ImhlaWdodCI6MTQ4LCJ3aWR0aCI6MjUyLCJ4IjozNzY4LCJ5Ijo5Nn0sImVudGl0eVJlZiI6InBheW1lbnQiLCJpZCI6ImFwcGVhcmFuY2UtNiJ9XSwiY2FudmFzIjp7ImhlaWdodCI6MzA4LCJ3aWR0aCI6NDA1Nn0sImVkZ2VzIjpbeyJmcm9tQXBwZWFyYW5jZVJlZiI6ImFwcGVhcmFuY2UtMCIsImxhYmVsIjp7ImhlaWdodCI6NDgsIndpZHRoIjoxNzEuMjAwMDAwMDAwMDAwMDIsIngiOjM4OCwieSI6MTg3fSwicG9pbnRzIjpbeyJ4IjoyODgsInkiOjE3MH0seyJ4Ijo2NTkuMiwieSI6MTcwfV0sInJlZiI6InN1Ym1pdCIsInRvQXBwZWFyYW5jZVJlZiI6ImFwcGVhcmFuY2UtMSJ9LHsiZnJvbUFwcGVhcmFuY2VSZWYiOiJhcHBlYXJhbmNlLTEiLCJsYWJlbCI6eyJoZWlnaHQiOjQ4LCJ3aWR0aCI6MTcxLjIwMDAwMDAwMDAwMDAyLCJ4IjoxMDExLjIsInkiOjE4N30sInBvaW50cyI6W3sieCI6OTExLjIsInkiOjE3MH0seyJ4IjoxMjgyLjQsInkiOjE3MH1dLCJyZWYiOiJjaGVjay1zdG9jayIsInRvQXBwZWFyYW5jZVJlZiI6ImFwcGVhcmFuY2UtMiJ9LHsiZnJvbUFwcGVhcmFuY2VSZWYiOiJhcHBlYXJhbmNlLTIiLCJsYWJlbCI6eyJoZWlnaHQiOjY2LCJ3aWR0aCI6MTcxLjIwMDAwMDAwMDAwMDAyLCJ4IjoxNjM0LjQsInkiOjE4N30sInBvaW50cyI6W3sieCI6MTUzNC40LCJ5IjoxNzB9LHsieCI6MTkwNS42MDAwMDAwMDAwMDAxLCJ5IjoxNzB9XSwicmVmIjoic3RvY2stcmVzdWx0IiwidG9BcHBlYXJhbmNlUmVmIjoiYXBwZWFyYW5jZS0zIn0seyJmcm9tQXBwZWFyYW5jZVJlZiI6ImFwcGVhcmFuY2UtMyIsImxhYmVsIjp7ImhlaWdodCI6NDgsIndpZHRoIjoxNzEuMjAwMDAwMDAwMDAwMDIsIngiOjIyNTcuNjAwMDAwMDAwMDAwNCwieSI6MTg3fSwicG9pbnRzIjpbeyJ4IjoyMTU3LjYwMDAwMDAwMDAwMDQsInkiOjE3MH0seyJ4IjoyNTI4LjgsInkiOjE3MH1dLCJyZWYiOiJjYWxjdWxhdGUtY2hhcmdlIiwidG9BcHBlYXJhbmNlUmVmIjoiYXBwZWFyYW5jZS00In0seyJmcm9tQXBwZWFyYW5jZVJlZiI6ImFwcGVhcmFuY2UtNCIsImxhYmVsIjp7ImhlaWdodCI6ODQsIndpZHRoIjoxNjQsIngiOjI4ODAuOCwieSI6MTg3fSwicG9pbnRzIjpbeyJ4IjoyNzgwLjgsInkiOjE3MH0seyJ4IjozMTQ0LjgsInkiOjE3MH1dLCJyZWYiOiJjaGFyZ2UtcmVzdWx0IiwidG9BcHBlYXJhbmNlUmVmIjoiYXBwZWFyYW5jZS01In0seyJmcm9tQXBwZWFyYW5jZVJlZiI6ImFwcGVhcmFuY2UtNSIsImxhYmVsIjp7ImhlaWdodCI6NDgsIndpZHRoIjoxNzEuMjAwMDAwMDAwMDAwMDIsIngiOjM0OTYuOCwieSI6MTg3fSwicG9pbnRzIjpbeyJ4IjozMzk2LjgsInkiOjE3MH0seyJ4IjozNzY4LCJ5IjoxNzB9XSwicmVmIjoiY2hhcmdlLXBheW1lbnQiLCJ0b0FwcGVhcmFuY2VSZWYiOiJhcHBlYXJhbmNlLTYifV0sImxheW91dCI6eyJkaXJlY3Rpb24iOiJSSUdIVCIsImVuZ2luZSI6ImVsay1sYXllcmVkQDAuMTIuMCIsImdyb3VwaW5nUGVyc3BlY3RpdmVSZWYiOm51bGx9LCJyZWYiOiJjaGVja291dC1ydW4ifSx7ImFwcGVhcmFuY2VzIjpbeyJhZnRlclN0ZXBSZWYiOm51bGwsImJveCI6eyJoZWlnaHQiOjE0OCwid2lkdGgiOjI1MiwieCI6MzYsInkiOjk2fSwiZW50aXR5UmVmIjoib3JjaGVzdHJhdG9yIiwiaWQiOiJhcHBlYXJhbmNlLTAifSx7ImFmdGVyU3RlcFJlZiI6InByaWNpbmctcm91bmR0cmlwLWNhbGN1bGF0ZS1jaGFyZ2UiLCJib3giOnsiaGVpZ2h0IjoxNDgsIndpZHRoIjoyNTIsIngiOjY1OS4yLCJ5Ijo5Nn0sImVudGl0eVJlZiI6InByaWNpbmciLCJpZCI6ImFwcGVhcmFuY2UtMSJ9LHsiYWZ0ZXJTdGVwUmVmIjoicHJpY2luZy1yb3VuZHRyaXAtY2hhcmdlLXJlc3VsdCIsImJveCI6eyJoZWlnaHQiOjE0OCwid2lkdGgiOjI1MiwieCI6MTMwNCwieSI6OTZ9LCJlbnRpdHlSZWYiOiJvcmNoZXN0cmF0b3IiLCJpZCI6ImFwcGVhcmFuY2UtMiJ9XSwiY2FudmFzIjp7ImhlaWdodCI6MzI2LCJ3aWR0aCI6MTU5Mn0sImVkZ2VzIjpbeyJmcm9tQXBwZWFyYW5jZVJlZiI6ImFwcGVhcmFuY2UtMCIsImxhYmVsIjp7ImhlaWdodCI6NDgsIndpZHRoIjoxNzEuMjAwMDAwMDAwMDAwMDIsIngiOjM4OCwieSI6MTg3fSwicG9pbnRzIjpbeyJ4IjoyODgsInkiOjE3MH0seyJ4Ijo2NTkuMiwieSI6MTcwfV0sInJlZiI6InByaWNpbmctcm91bmR0cmlwLWNhbGN1bGF0ZS1jaGFyZ2UiLCJ0b0FwcGVhcmFuY2VSZWYiOiJhcHBlYXJhbmNlLTEifSx7ImZyb21BcHBlYXJhbmNlUmVmIjoiYXBwZWFyYW5jZS0xIiwibGFiZWwiOnsiaGVpZ2h0IjoxMDIsIndpZHRoIjoxOTIuOCwieCI6MTAxMS4yLCJ5IjoxODd9LCJwb2ludHMiOlt7IngiOjkxMS4yLCJ5IjoxNzB9LHsieCI6MTMwNCwieSI6MTcwfV0sInJlZiI6InByaWNpbmctcm91bmR0cmlwLWNoYXJnZS1yZXN1bHQiLCJ0b0FwcGVhcmFuY2VSZWYiOiJhcHBlYXJhbmNlLTIifV0sImxheW91dCI6eyJkaXJlY3Rpb24iOiJSSUdIVCIsImVuZ2luZSI6ImVsay1sYXllcmVkQDAuMTIuMCIsImdyb3VwaW5nUGVyc3BlY3RpdmVSZWYiOm51bGx9LCJyZWYiOiJwcmljaW5nLXJvdW5kdHJpcCJ9LHsiYXBwZWFyYW5jZXMiOlt7ImFmdGVyU3RlcFJlZiI6bnVsbCwiYm94Ijp7ImhlaWdodCI6MTQ4LCJ3aWR0aCI6MjUyLCJ4IjozNiwieSI6OTZ9LCJlbnRpdHlSZWYiOiJvcmNoZXN0cmF0b3IiLCJpZCI6ImFwcGVhcmFuY2UtMCJ9LHsiYWZ0ZXJTdGVwUmVmIjoic3RvY2stcm91bmR0cmlwLWNoZWNrLXN0b2NrIiwiYm94Ijp7ImhlaWdodCI6MTQ4LCJ3aWR0aCI6MjUyLCJ4Ijo2NTkuMiwieSI6OTZ9LCJlbnRpdHlSZWYiOiJzdG9jayIsImlkIjoiYXBwZWFyYW5jZS0xIn0seyJhZnRlclN0ZXBSZWYiOiJzdG9jay1yb3VuZHRyaXAtc3RvY2stcmVzdWx0IiwiYm94Ijp7ImhlaWdodCI6MTQ4LCJ3aWR0aCI6MjUyLCJ4IjoxMzA0LCJ5Ijo5Nn0sImVudGl0eVJlZiI6Im9yY2hlc3RyYXRvciIsImlkIjoiYXBwZWFyYW5jZS0yIn1dLCJjYW52YXMiOnsiaGVpZ2h0IjozMjYsIndpZHRoIjoxNTkyfSwiZWRnZXMiOlt7ImZyb21BcHBlYXJhbmNlUmVmIjoiYXBwZWFyYW5jZS0wIiwibGFiZWwiOnsiaGVpZ2h0Ijo0OCwid2lkdGgiOjE3MS4yMDAwMDAwMDAwMDAwMiwieCI6Mzg4LCJ5IjoxODd9LCJwb2ludHMiOlt7IngiOjI4OCwieSI6MTcwfSx7IngiOjY1OS4yLCJ5IjoxNzB9XSwicmVmIjoic3RvY2stcm91bmR0cmlwLWNoZWNrLXN0b2NrIiwidG9BcHBlYXJhbmNlUmVmIjoiYXBwZWFyYW5jZS0xIn0seyJmcm9tQXBwZWFyYW5jZVJlZiI6ImFwcGVhcmFuY2UtMSIsImxhYmVsIjp7ImhlaWdodCI6MTAyLCJ3aWR0aCI6MTkyLjgsIngiOjEwMTEuMiwieSI6MTg3fSwicG9pbnRzIjpbeyJ4Ijo5MTEuMiwieSI6MTcwfSx7IngiOjEzMDQsInkiOjE3MH1dLCJyZWYiOiJzdG9jay1yb3VuZHRyaXAtc3RvY2stcmVzdWx0IiwidG9BcHBlYXJhbmNlUmVmIjoiYXBwZWFyYW5jZS0yIn1dLCJsYXlvdXQiOnsiZGlyZWN0aW9uIjoiUklHSFQiLCJlbmdpbmUiOiJlbGstbGF5ZXJlZEAwLjEyLjAiLCJncm91cGluZ1BlcnNwZWN0aXZlUmVmIjpudWxsfSwicmVmIjoic3RvY2stcm91bmR0cmlwIn1dfQ==</metadata>
+    <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+
+/* Skins share all text metrics and geometry. Category and qualification cues remain. */
+.ww-svg[data-skin="engineering"] { --canvas:#f0f6fa; --surface:#fff; --ink:#102e48; --muted:#526d83; --line:#55748b; --border:#bbcdda; --frame:#e5eff6; --accent:#155f9b; }
+.ww-svg[data-skin="engineering"][data-theme="dark"] { --canvas:#0e1c2a; --surface:#162b3d; --ink:#e1eff9; --muted:#a3bed0; --line:#88aabd; --border:#39566c; --frame:#122535; --accent:#7cc9fc; }
+.ww-svg[data-skin="engineering"] .node-box { rx:3px; }
+.ww-svg[data-skin="editorial"] { --canvas:#f5f0e7; --surface:#fffdf8; --ink:#302e29; --muted:#71695c; --line:#92816c; --border:#d4c8b7; --frame:#ece4d8; --accent:#87533b; }
+.ww-svg[data-skin="editorial"][data-theme="dark"] { --canvas:#201d19; --surface:#2e2923; --ink:#f2e9dd; --muted:#c5b6a0; --line:#b9a386; --border:#5e5141; --frame:#28231e; --accent:#efb38d; }
+.ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
+</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
+    <g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><g class=""><path class="edge-hit" d="M619.2,506 L313,506 L313,157.2 L268,157.2"/><path class="edge-line" d="M619.2,506 L313,506 L313,157.2 L268,157.2" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><g class=""><path class="edge-hit" d="M268,186.8 L303,186.8 L303,710 L619.2,710"/><path class="edge-line" d="M268,186.8 L303,186.8 L303,710 L619.2,710" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><g class=""><path class="edge-hit" d="M268,98 L619.2,98"/><path class="edge-line" d="M268,98 L619.2,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><g class=""><path class="edge-hit" d="M268,127.6 L323,127.6 L323,302 L619.2,302"/><path class="edge-line" d="M268,127.6 L323,127.6 L323,302 L619.2,302" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
+      <rect class="node-box" x="619.2" y="444" width="232" height="124" rx="12"/>
+      <rect class="accent" x="637.2" y="463" width="6" height="6" rx="2"/>
+      <text class="node-category" x="651.2" y="469">service</text>
+      <text class="node-title" x="637.2" y="496">Checkout</text>
+      <text class="node-status" x="637.2" y="519">established · present</text>
+      <text class="node-link" x="637.2" y="550">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="orchestrator" tabindex="0" role="button" aria-label="Inspect Orchestrator" data-reading-anchor="true"><g class="category-service">
+      <rect class="node-box" x="36" y="68.4" width="232" height="148" rx="12"/>
+      <rect class="accent" x="54" y="87.4" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="93.4">service</text>
+      <text class="node-title" x="54" y="120.4">Orchestrator</text>
+      <text class="node-status" x="54" y="143.4">established · present</text>
+      <text class="node-link" x="54" y="174.4">Inspect evidence ↗</text>
+      <text class="reading-anchor-cue" x="54" y="198.4">Start reading here</text>
+    </g></g><g class="record" data-ref="payment" tabindex="0" role="button" aria-label="Inspect Payment"><g class="category-service">
+      <rect class="node-box" x="619.2" y="648" width="232" height="124" rx="12"/>
+      <rect class="accent" x="637.2" y="667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="651.2" y="673">service</text>
+      <text class="node-title" x="637.2" y="700">Payment</text>
+      <text class="node-status" x="637.2" y="723">established · present</text>
+      <text class="node-link" x="637.2" y="754">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="pricing" tabindex="0" role="button" aria-label="Inspect Pricing"><g class="category-service">
+      <rect class="node-box" x="619.2" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="637.2" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="651.2" y="61">service</text>
+      <text class="node-title" x="637.2" y="88">Pricing</text>
+      <text class="node-status" x="637.2" y="111">established · present</text>
+      <text class="node-link" x="637.2" y="142">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="stock" tabindex="0" role="button" aria-label="Inspect Stock"><g class="category-service">
+      <rect class="node-box" x="619.2" y="240" width="232" height="124" rx="12"/>
+      <rect class="accent" x="637.2" y="259" width="6" height="6" rx="2"/>
+      <text class="node-category" x="651.2" y="265">service</text>
+      <text class="node-title" x="637.2" y="292">Stock</text>
+      <text class="node-status" x="637.2" y="315">established · present</text>
+      <text class="node-link" x="637.2" y="346">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><rect class="edge-label-bg" x="388.8" y="523" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="443.6" y="541">Submit basket</text></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><rect class="edge-label-bg" x="388.8" y="727" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="443.6" y="745">Charge basket</text></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><rect class="edge-label-bg" x="378" y="115" width="131.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="443.6" y="133">Calculate charge</text></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><rect class="edge-label-bg" x="396" y="319" width="95.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="443.6" y="337">Check stock</text></g>
+  </svg></div>
+      <div class="map-caption"><span>Arrows describe operations: actor → resource.</span><span>Position does not imply execution order. Select any element to inspect it.</span></div>
+    </section>
+    <details id="readability"><summary id="readability-summary">Readability warnings</summary><p>Advisory geometry checks, separate from architectural truth. Fit estimates use this canvas area. No warnings does not prove visual quality.</p><div id="readability-list"></div></details>
+    <section id="graph-connections" aria-label="Connections between graph levels"></section>
+    <section class="knowledge-section" aria-labelledby="knowledge-heading"><div class="section-heading"><h2 id="knowledge-heading">What remains open</h2><span id="knowledge-count"></span></div><div id="knowledge-list"></div></section>
+    <footer><span>Full source travels with this artifact. Qualifications remain intact.</span><span>Waxwing · experimental MVP</span></footer>
+  </main>
+  <main id="document-reader" hidden aria-label="Documents">
+    <div class="document-breadcrumb"><a href="#">← Graph</a><span>/</span><a href="#documents">Documents</a></div>
+    <div class="document-workspace"><nav id="document-nav" aria-label="Included documents"></nav><section id="document-content" aria-live="polite"></section></div>
+  </main>
+<template id="ww-document-reading-workflow"><article class="markdown-body"><h1 id="ww-doc-reading-workflow--reading-repeated-participation">Reading repeated participation</h1>
+<p>The <a href="#graph=services">connectivity view</a> has one box per service. It answers which services invoke which operations. It does not record the order of those operations.</p>
+<p>The <a href="#workflow=checkout-run">checkout workflow</a> answers a different question: where does this one recorded interaction path go next?</p>
+<p><a href="#workflow=checkout-run&amp;node=orchestrator">Orchestrator</a> appears three times. Each appearance refers to the <strong>same service</strong>, not a replica, separate deployment, or new owner. Select one to inspect its participation and the shared source record.</p>
+<p>The <a href="#workflow=checkout-run&amp;step=stock-result">stock result</a> is a reply to the stock request. It creates no new Stock → Orchestrator architecture dependency.</p>
+<h2 id="ww-doc-reading-workflow--limits-of-this-recording">Limits of this recording</h2>
+<p>The upstream trigger is explicitly unknown. The run stops after the payment request; no payment success or final response is implied. Neither the spacing nor a message arrow establishes elapsed time or blocking.</p>
+</article></template><template id="ww-document-workflow-guide"><article class="markdown-body"><h1 id="ww-doc-workflow-guide--choose-a-workflow">Choose a workflow</h1>
+<p>All three views use the same service registry. Different pages do not mean different services or separate deployments.</p>
+<ul>
+<li><a href="#workflow=checkout-run">Checkout</a>: the full recorded path.</li>
+<li><a href="#workflow=stock-roundtrip">Check stock</a>: one stock request/reply pair.</li>
+<li><a href="#workflow=pricing-roundtrip">Calculate pricing</a>: one pricing request/reply pair.</li>
+</ul>
+<h2 id="ww-doc-workflow-guide--shared-context">Shared context</h2>
+<p>The <a href="#graph=services">architecture</a> shows the dependencies. <a href="#workflow=stock-roundtrip&amp;node=orchestrator">Orchestrator in the stock view</a> and <a href="#workflow=pricing-roundtrip&amp;node=orchestrator">Orchestrator in the pricing view</a> refer to the same canonical component.</p>
+<p>See <a href="#document=reading-workflow&amp;heading=limits-of-this-recording">the recording limits</a>. Return to <a href="#document=workflow-guide&amp;heading=shared-context">this section</a> using a normal Markdown heading link.</p>
+<h2 id="ww-doc-workflow-guide--limits">Limits</h2>
+<p>This is a fictional current implementation. The focused excerpts do not claim independent upstream triggers or prove completeness.</p>
+</article></template>
+<template id="ww-graph-services"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-skin="standard" data-graph-ref="services" data-theme="light" viewBox="0 0 887.2 808" width="887.2" height="808" role="group" aria-labelledby="ww-title ww-description">
+    <title id="ww-title">Checkout connectivity</title><desc id="ww-description">One box per service. Relationships express actor-to-resource operations, without execution order. Operation arrows point from actor to resource. Unknowns and disputes are retained in the export source and the HTML details viewer.</desc>
+
+    <style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+
+/* Skins share all text metrics and geometry. Category and qualification cues remain. */
+.ww-svg[data-skin="engineering"] { --canvas:#f0f6fa; --surface:#fff; --ink:#102e48; --muted:#526d83; --line:#55748b; --border:#bbcdda; --frame:#e5eff6; --accent:#155f9b; }
+.ww-svg[data-skin="engineering"][data-theme="dark"] { --canvas:#0e1c2a; --surface:#162b3d; --ink:#e1eff9; --muted:#a3bed0; --line:#88aabd; --border:#39566c; --frame:#122535; --accent:#7cc9fc; }
+.ww-svg[data-skin="engineering"] .node-box { rx:3px; }
+.ww-svg[data-skin="editorial"] { --canvas:#f5f0e7; --surface:#fffdf8; --ink:#302e29; --muted:#71695c; --line:#92816c; --border:#d4c8b7; --frame:#ece4d8; --accent:#87533b; }
+.ww-svg[data-skin="editorial"][data-theme="dark"] { --canvas:#201d19; --surface:#2e2923; --ink:#f2e9dd; --muted:#c5b6a0; --line:#b9a386; --border:#5e5141; --frame:#28231e; --accent:#efb38d; }
+.ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
+</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
+    <g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><g class=""><path class="edge-hit" d="M619.2,506 L313,506 L313,157.2 L268,157.2"/><path class="edge-line" d="M619.2,506 L313,506 L313,157.2 L268,157.2" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><g class=""><path class="edge-hit" d="M268,186.8 L303,186.8 L303,710 L619.2,710"/><path class="edge-line" d="M268,186.8 L303,186.8 L303,710 L619.2,710" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><g class=""><path class="edge-hit" d="M268,98 L619.2,98"/><path class="edge-line" d="M268,98 L619.2,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><g class=""><path class="edge-hit" d="M268,127.6 L323,127.6 L323,302 L619.2,302"/><path class="edge-line" d="M268,127.6 L323,127.6 L323,302 L619.2,302" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
+      <rect class="node-box" x="619.2" y="444" width="232" height="124" rx="12"/>
+      <rect class="accent" x="637.2" y="463" width="6" height="6" rx="2"/>
+      <text class="node-category" x="651.2" y="469">service</text>
+      <text class="node-title" x="637.2" y="496">Checkout</text>
+      <text class="node-status" x="637.2" y="519">established · present</text>
+      <text class="node-link" x="637.2" y="550">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="orchestrator" tabindex="0" role="button" aria-label="Inspect Orchestrator" data-reading-anchor="true"><g class="category-service">
+      <rect class="node-box" x="36" y="68.4" width="232" height="148" rx="12"/>
+      <rect class="accent" x="54" y="87.4" width="6" height="6" rx="2"/>
+      <text class="node-category" x="68" y="93.4">service</text>
+      <text class="node-title" x="54" y="120.4">Orchestrator</text>
+      <text class="node-status" x="54" y="143.4">established · present</text>
+      <text class="node-link" x="54" y="174.4">Inspect evidence ↗</text>
+      <text class="reading-anchor-cue" x="54" y="198.4">Start reading here</text>
+    </g></g><g class="record" data-ref="payment" tabindex="0" role="button" aria-label="Inspect Payment"><g class="category-service">
+      <rect class="node-box" x="619.2" y="648" width="232" height="124" rx="12"/>
+      <rect class="accent" x="637.2" y="667" width="6" height="6" rx="2"/>
+      <text class="node-category" x="651.2" y="673">service</text>
+      <text class="node-title" x="637.2" y="700">Payment</text>
+      <text class="node-status" x="637.2" y="723">established · present</text>
+      <text class="node-link" x="637.2" y="754">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="pricing" tabindex="0" role="button" aria-label="Inspect Pricing"><g class="category-service">
+      <rect class="node-box" x="619.2" y="36" width="232" height="124" rx="12"/>
+      <rect class="accent" x="637.2" y="55" width="6" height="6" rx="2"/>
+      <text class="node-category" x="651.2" y="61">service</text>
+      <text class="node-title" x="637.2" y="88">Pricing</text>
+      <text class="node-status" x="637.2" y="111">established · present</text>
+      <text class="node-link" x="637.2" y="142">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="stock" tabindex="0" role="button" aria-label="Inspect Stock"><g class="category-service">
+      <rect class="node-box" x="619.2" y="240" width="232" height="124" rx="12"/>
+      <rect class="accent" x="637.2" y="259" width="6" height="6" rx="2"/>
+      <text class="node-category" x="651.2" y="265">service</text>
+      <text class="node-title" x="637.2" y="292">Stock</text>
+      <text class="node-status" x="637.2" y="315">established · present</text>
+      <text class="node-link" x="637.2" y="346">Inspect evidence ↗</text>
+
+    </g></g><g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><rect class="edge-label-bg" x="388.8" y="523" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="443.6" y="541">Submit basket</text></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><rect class="edge-label-bg" x="388.8" y="727" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="443.6" y="745">Charge basket</text></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><rect class="edge-label-bg" x="378" y="115" width="131.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="443.6" y="133">Calculate charge</text></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><rect class="edge-label-bg" x="396" y="319" width="95.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="443.6" y="337">Check stock</text></g>
+  </svg></template>
+<template id="ww-workflow-checkout-run"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg workflow-svg" data-workflow-ref="checkout-run" data-graph-ref="services" data-skin="standard" data-theme="light" width="4056" height="308" viewBox="0 0 4056 308" role="group" aria-labelledby="ww-title ww-description"><title id="ww-title">Checkout through the orchestrator</title><desc id="ww-description">Services remain canonical components; the workflow expands their participation in one recorded scenario. Repeated appearances share one canonical component. Steps follow explicit order; replies do not create architecture dependencies.</desc><style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+
+/* Skins share all text metrics and geometry. Category and qualification cues remain. */
+.ww-svg[data-skin="engineering"] { --canvas:#f0f6fa; --surface:#fff; --ink:#102e48; --muted:#526d83; --line:#55748b; --border:#bbcdda; --frame:#e5eff6; --accent:#155f9b; }
+.ww-svg[data-skin="engineering"][data-theme="dark"] { --canvas:#0e1c2a; --surface:#162b3d; --ink:#e1eff9; --muted:#a3bed0; --line:#88aabd; --border:#39566c; --frame:#122535; --accent:#7cc9fc; }
+.ww-svg[data-skin="engineering"] .node-box { rx:3px; }
+.ww-svg[data-skin="editorial"] { --canvas:#f5f0e7; --surface:#fffdf8; --ink:#302e29; --muted:#71695c; --line:#92816c; --border:#d4c8b7; --frame:#ece4d8; --accent:#87533b; }
+.ww-svg[data-skin="editorial"][data-theme="dark"] { --canvas:#201d19; --surface:#2e2923; --ink:#f2e9dd; --muted:#c5b6a0; --line:#b9a386; --border:#5e5141; --frame:#28231e; --accent:#efb38d; }
+.ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
+</style><defs><marker id="ww-workflow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs><text class="edge-label" x="36" y="26">Left → right · Order: established · Entry: established · Trigger: unknown</text><text class="edge-label" x="36" y="48">Repeated boxes share one component ID. Solid: message/event · Dashed: reply.</text><text class="edge-label" x="36" y="70">Partial scenario · Spacing ≠ duration · Message ≠ blocking</text><g class="record" data-ref="submit" tabindex="0" role="button" aria-label="Inspect Submit basket"><path class="edge-hit" d="M288,170 L659.2,170"/><path class="edge-line" d="M288,170 L659.2,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="388" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="398" y="205">1. Submit basket</text><text class="edge-label" x="398" y="223">message · established</text></g><g class="record" data-ref="check-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><path class="edge-hit" d="M911.2,170 L1282.4,170"/><path class="edge-line" d="M911.2,170 L1282.4,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="1011.2" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="1021.2" y="205">2. Check stock</text><text class="edge-label" x="1021.2" y="223">message · established</text></g><g class="record" data-ref="stock-result" tabindex="0" role="button" aria-label="Inspect Stock available"><path class="edge-hit" d="M1534.4,170 L1905.6000000000001,170"/><path class="edge-line" d="M1534.4,170 L1905.6000000000001,170" stroke-dasharray="7 5" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="1634.4" y="187" width="171.20000000000002" height="66" rx="8"/><text class="edge-label" x="1644.4" y="205">3. Stock available</text><text class="edge-label" x="1644.4" y="223">reply · established</text><text class="edge-label" x="1644.4" y="241">Reply to: check-stock</text></g><g class="record" data-ref="calculate-charge" tabindex="0" role="button" aria-label="Inspect Calculate charge"><path class="edge-hit" d="M2157.6000000000004,170 L2528.8,170"/><path class="edge-line" d="M2157.6000000000004,170 L2528.8,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="2257.6000000000004" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="2267.6000000000004" y="205">4. Calculate charge</text><text class="edge-label" x="2267.6000000000004" y="223">message · established</text></g><g class="record" data-ref="charge-result" tabindex="0" role="button" aria-label="Inspect Charge calculated"><path class="edge-hit" d="M2780.8,170 L3144.8,170"/><path class="edge-line" d="M2780.8,170 L3144.8,170" stroke-dasharray="7 5" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="2880.8" y="187" width="164" height="84" rx="8"/><text class="edge-label" x="2890.8" y="205">5. Charge calculated</text><text class="edge-label" x="2890.8" y="223">reply · established</text><text class="edge-label" x="2890.8" y="241">Reply to:</text><text class="edge-label" x="2890.8" y="259">calculate-charge</text></g><g class="record" data-ref="charge-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><path class="edge-hit" d="M3396.8,170 L3768,170"/><path class="edge-line" d="M3396.8,170 L3768,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="3496.8" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="3506.8" y="205">6. Charge basket</text><text class="edge-label" x="3506.8" y="223">message · established</text></g><g class="record" data-ref="checkout" data-appearance="appearance-0" tabindex="0" role="button" aria-label="Inspect Checkout Scoped entry · established"><rect class="node-box" x="36" y="96" width="252" height="148" rx="8"/><text class="node-category" x="54" y="120">Scoped entry · established</text><text class="node-title" x="54" y="146">Checkout</text><text class="node-status" x="54" y="174">established · present</text><text class="node-status" x="54" y="194">ID: checkout</text><text class="node-link" x="54" y="230">Inspect evidence ↗</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-1" tabindex="0" role="button" aria-label="Inspect Orchestrator After step 1"><rect class="node-box" x="659.2" y="96" width="252" height="148" rx="8"/><text class="node-category" x="677.2" y="120">After step 1</text><text class="node-title" x="677.2" y="146">Orchestrator</text><text class="node-status" x="677.2" y="174">established · present</text><text class="node-status" x="677.2" y="194">ID: orchestrator</text><text class="node-link" x="677.2" y="230">Same component · 3 appearances</text></g><g class="record" data-ref="stock" data-appearance="appearance-2" tabindex="0" role="button" aria-label="Inspect Stock After step 2"><rect class="node-box" x="1282.4" y="96" width="252" height="148" rx="8"/><text class="node-category" x="1300.4" y="120">After step 2</text><text class="node-title" x="1300.4" y="146">Stock</text><text class="node-status" x="1300.4" y="174">established · present</text><text class="node-status" x="1300.4" y="194">ID: stock</text><text class="node-link" x="1300.4" y="230">Inspect evidence ↗</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-3" tabindex="0" role="button" aria-label="Inspect Orchestrator After step 3"><rect class="node-box" x="1905.6000000000001" y="96" width="252" height="148" rx="8"/><text class="node-category" x="1923.6000000000001" y="120">After step 3</text><text class="node-title" x="1923.6000000000001" y="146">Orchestrator</text><text class="node-status" x="1923.6000000000001" y="174">established · present</text><text class="node-status" x="1923.6000000000001" y="194">ID: orchestrator</text><text class="node-link" x="1923.6000000000001" y="230">Same component · 3 appearances</text></g><g class="record" data-ref="pricing" data-appearance="appearance-4" tabindex="0" role="button" aria-label="Inspect Pricing After step 4"><rect class="node-box" x="2528.8" y="96" width="252" height="148" rx="8"/><text class="node-category" x="2546.8" y="120">After step 4</text><text class="node-title" x="2546.8" y="146">Pricing</text><text class="node-status" x="2546.8" y="174">established · present</text><text class="node-status" x="2546.8" y="194">ID: pricing</text><text class="node-link" x="2546.8" y="230">Inspect evidence ↗</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-5" tabindex="0" role="button" aria-label="Inspect Orchestrator After step 5"><rect class="node-box" x="3144.8" y="96" width="252" height="148" rx="8"/><text class="node-category" x="3162.8" y="120">After step 5</text><text class="node-title" x="3162.8" y="146">Orchestrator</text><text class="node-status" x="3162.8" y="174">established · present</text><text class="node-status" x="3162.8" y="194">ID: orchestrator</text><text class="node-link" x="3162.8" y="230">Same component · 3 appearances</text></g><g class="record" data-ref="payment" data-appearance="appearance-6" tabindex="0" role="button" aria-label="Inspect Payment After step 6"><rect class="node-box" x="3768" y="96" width="252" height="148" rx="8"/><text class="node-category" x="3786" y="120">After step 6</text><text class="node-title" x="3786" y="146">Payment</text><text class="node-status" x="3786" y="174">established · present</text><text class="node-status" x="3786" y="194">ID: payment</text><text class="node-link" x="3786" y="230">Inspect evidence ↗</text></g></svg></template><template id="ww-workflow-stock-roundtrip"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg workflow-svg" data-workflow-ref="stock-roundtrip" data-graph-ref="services" data-skin="standard" data-theme="light" width="1592" height="326" viewBox="0 0 1592 326" role="group" aria-labelledby="ww-title ww-description"><title id="ww-title">Check stock</title><desc id="ww-description">One request/reply pair between canonical services. Repeated appearances share one canonical component. Steps follow explicit order; replies do not create architecture dependencies.</desc><style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+
+/* Skins share all text metrics and geometry. Category and qualification cues remain. */
+.ww-svg[data-skin="engineering"] { --canvas:#f0f6fa; --surface:#fff; --ink:#102e48; --muted:#526d83; --line:#55748b; --border:#bbcdda; --frame:#e5eff6; --accent:#155f9b; }
+.ww-svg[data-skin="engineering"][data-theme="dark"] { --canvas:#0e1c2a; --surface:#162b3d; --ink:#e1eff9; --muted:#a3bed0; --line:#88aabd; --border:#39566c; --frame:#122535; --accent:#7cc9fc; }
+.ww-svg[data-skin="engineering"] .node-box { rx:3px; }
+.ww-svg[data-skin="editorial"] { --canvas:#f5f0e7; --surface:#fffdf8; --ink:#302e29; --muted:#71695c; --line:#92816c; --border:#d4c8b7; --frame:#ece4d8; --accent:#87533b; }
+.ww-svg[data-skin="editorial"][data-theme="dark"] { --canvas:#201d19; --surface:#2e2923; --ink:#f2e9dd; --muted:#c5b6a0; --line:#b9a386; --border:#5e5141; --frame:#28231e; --accent:#efb38d; }
+.ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
+</style><defs><marker id="ww-workflow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs><text class="edge-label" x="36" y="26">Left → right · Order: established · Entry: established · Trigger: unknown</text><text class="edge-label" x="36" y="48">Repeated boxes share one component ID. Solid: message/event · Dashed: reply.</text><text class="edge-label" x="36" y="70">Partial scenario · Spacing ≠ duration · Message ≠ blocking</text><g class="record" data-ref="stock-roundtrip-check-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><path class="edge-hit" d="M288,170 L659.2,170"/><path class="edge-line" d="M288,170 L659.2,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="388" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="398" y="205">1. Check stock</text><text class="edge-label" x="398" y="223">message · established</text></g><g class="record" data-ref="stock-roundtrip-stock-result" tabindex="0" role="button" aria-label="Inspect Stock available"><path class="edge-hit" d="M911.2,170 L1304,170"/><path class="edge-line" d="M911.2,170 L1304,170" stroke-dasharray="7 5" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="1011.2" y="187" width="192.8" height="102" rx="8"/><text class="edge-label" x="1021.2" y="205">2. Stock available</text><text class="edge-label" x="1021.2" y="223">reply · established</text><text class="edge-label" x="1021.2" y="241">Reply to:</text><text class="edge-label" x="1021.2" y="259">stock-roundtrip-check-st</text><text class="edge-label" x="1021.2" y="277">ock</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-0" tabindex="0" role="button" aria-label="Inspect Orchestrator Scoped entry · established"><rect class="node-box" x="36" y="96" width="252" height="148" rx="8"/><text class="node-category" x="54" y="120">Scoped entry · established</text><text class="node-title" x="54" y="146">Orchestrator</text><text class="node-status" x="54" y="174">established · present</text><text class="node-status" x="54" y="194">ID: orchestrator</text><text class="node-link" x="54" y="230">Same component · 2 appearances</text></g><g class="record" data-ref="stock" data-appearance="appearance-1" tabindex="0" role="button" aria-label="Inspect Stock After step 1"><rect class="node-box" x="659.2" y="96" width="252" height="148" rx="8"/><text class="node-category" x="677.2" y="120">After step 1</text><text class="node-title" x="677.2" y="146">Stock</text><text class="node-status" x="677.2" y="174">established · present</text><text class="node-status" x="677.2" y="194">ID: stock</text><text class="node-link" x="677.2" y="230">Inspect evidence ↗</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-2" tabindex="0" role="button" aria-label="Inspect Orchestrator After step 2"><rect class="node-box" x="1304" y="96" width="252" height="148" rx="8"/><text class="node-category" x="1322" y="120">After step 2</text><text class="node-title" x="1322" y="146">Orchestrator</text><text class="node-status" x="1322" y="174">established · present</text><text class="node-status" x="1322" y="194">ID: orchestrator</text><text class="node-link" x="1322" y="230">Same component · 2 appearances</text></g></svg></template><template id="ww-workflow-pricing-roundtrip"><svg xmlns="http://www.w3.org/2000/svg" class="ww-svg workflow-svg" data-workflow-ref="pricing-roundtrip" data-graph-ref="services" data-skin="standard" data-theme="light" width="1592" height="326" viewBox="0 0 1592 326" role="group" aria-labelledby="ww-title ww-description"><title id="ww-title">Calculate pricing</title><desc id="ww-description">One request/reply pair between canonical services. Repeated appearances share one canonical component. Steps follow explicit order; replies do not create architecture dependencies.</desc><style>.ww-svg { --canvas:#f6f7f9; --surface:#fff; --ink:#17283a; --muted:#5f7183; --line:#7e91a2; --border:#d2dce5; --frame:#edf1f5; --accent:#087d78; --warning:#9c630d; background:var(--canvas); color:var(--ink); font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+.ww-svg[data-theme="dark"] { --canvas:#101a25; --surface:#182737; --ink:#e6eef5; --muted:#a0b2c4; --line:#7f9ab1; --border:#34495e; --frame:#142230; --accent:#5dd6c4; --warning:#f1c778; }
+.ww-svg .frame { fill:var(--frame); stroke:var(--border); stroke-width:1.5; stroke-dasharray:5 5; }
+.ww-svg text { fill:var(--ink); }
+.ww-svg .frame-title { font-size:14px; font-weight:600; letter-spacing:.2px; }
+.ww-svg .node-box { fill:var(--surface); stroke:var(--border); stroke-width:1.5; }
+.ww-svg .node-title { font-size:15px; font-weight:650; }
+.ww-svg .node-category { font-size:11px; text-transform:uppercase; fill:var(--muted); letter-spacing:1px; }
+.ww-svg .node-status { font-size:10px; fill:var(--muted); }
+.ww-svg .node-alert { font-size:11px; fill:var(--warning); }
+.ww-svg .node-link { font-size:11px; fill:var(--muted); }
+.ww-svg .accent { fill:var(--accent); }
+.ww-svg .category-datastore .accent { fill:#8970c1; }
+.ww-svg .category-queue .accent { fill:#ce9748; }
+.ww-svg .edge-line { fill:none; stroke:var(--line); stroke-width:1.6; }
+.ww-svg .edge-hit { fill:none; stroke:transparent; stroke-width:16; }
+.ww-svg .qualified .edge-line { stroke-dasharray:5 5; }
+.ww-svg .edge-label-bg { fill:var(--canvas); }
+.ww-svg .edge-label { font-size:12px; }
+.ww-svg .edge-note { fill:var(--warning); }
+.ww-svg .arrow { fill:var(--line); }
+.ww-svg .record { cursor:pointer; outline:none; }
+.ww-svg .record:hover .node-box, .ww-svg .record:focus .node-box, .ww-svg .record.selected .node-box { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:hover .edge-line, .ww-svg .record:focus .edge-line, .ww-svg .record.selected .edge-line { stroke:var(--accent); stroke-width:2.5; }
+.ww-svg .record:focus .frame, .ww-svg .record.selected .frame { stroke:var(--accent); stroke-width:2.5; }
+
+/* Skins share all text metrics and geometry. Category and qualification cues remain. */
+.ww-svg[data-skin="engineering"] { --canvas:#f0f6fa; --surface:#fff; --ink:#102e48; --muted:#526d83; --line:#55748b; --border:#bbcdda; --frame:#e5eff6; --accent:#155f9b; }
+.ww-svg[data-skin="engineering"][data-theme="dark"] { --canvas:#0e1c2a; --surface:#162b3d; --ink:#e1eff9; --muted:#a3bed0; --line:#88aabd; --border:#39566c; --frame:#122535; --accent:#7cc9fc; }
+.ww-svg[data-skin="engineering"] .node-box { rx:3px; }
+.ww-svg[data-skin="editorial"] { --canvas:#f5f0e7; --surface:#fffdf8; --ink:#302e29; --muted:#71695c; --line:#92816c; --border:#d4c8b7; --frame:#ece4d8; --accent:#87533b; }
+.ww-svg[data-skin="editorial"][data-theme="dark"] { --canvas:#201d19; --surface:#2e2923; --ink:#f2e9dd; --muted:#c5b6a0; --line:#b9a386; --border:#5e5141; --frame:#28231e; --accent:#efb38d; }
+.ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
+.ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
+</style><defs><marker id="ww-workflow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs><text class="edge-label" x="36" y="26">Left → right · Order: established · Entry: established · Trigger: unknown</text><text class="edge-label" x="36" y="48">Repeated boxes share one component ID. Solid: message/event · Dashed: reply.</text><text class="edge-label" x="36" y="70">Partial scenario · Spacing ≠ duration · Message ≠ blocking</text><g class="record" data-ref="pricing-roundtrip-calculate-charge" tabindex="0" role="button" aria-label="Inspect Calculate charge"><path class="edge-hit" d="M288,170 L659.2,170"/><path class="edge-line" d="M288,170 L659.2,170" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="388" y="187" width="171.20000000000002" height="48" rx="8"/><text class="edge-label" x="398" y="205">1. Calculate charge</text><text class="edge-label" x="398" y="223">message · established</text></g><g class="record" data-ref="pricing-roundtrip-charge-result" tabindex="0" role="button" aria-label="Inspect Charge calculated"><path class="edge-hit" d="M911.2,170 L1304,170"/><path class="edge-line" d="M911.2,170 L1304,170" stroke-dasharray="7 5" marker-end="url(#ww-workflow-arrow)"/><rect class="edge-label-bg" x="1011.2" y="187" width="192.8" height="102" rx="8"/><text class="edge-label" x="1021.2" y="205">2. Charge calculated</text><text class="edge-label" x="1021.2" y="223">reply · established</text><text class="edge-label" x="1021.2" y="241">Reply to:</text><text class="edge-label" x="1021.2" y="259">pricing-roundtrip-calcul</text><text class="edge-label" x="1021.2" y="277">ate-charge</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-0" tabindex="0" role="button" aria-label="Inspect Orchestrator Scoped entry · established"><rect class="node-box" x="36" y="96" width="252" height="148" rx="8"/><text class="node-category" x="54" y="120">Scoped entry · established</text><text class="node-title" x="54" y="146">Orchestrator</text><text class="node-status" x="54" y="174">established · present</text><text class="node-status" x="54" y="194">ID: orchestrator</text><text class="node-link" x="54" y="230">Same component · 2 appearances</text></g><g class="record" data-ref="pricing" data-appearance="appearance-1" tabindex="0" role="button" aria-label="Inspect Pricing After step 1"><rect class="node-box" x="659.2" y="96" width="252" height="148" rx="8"/><text class="node-category" x="677.2" y="120">After step 1</text><text class="node-title" x="677.2" y="146">Pricing</text><text class="node-status" x="677.2" y="174">established · present</text><text class="node-status" x="677.2" y="194">ID: pricing</text><text class="node-link" x="677.2" y="230">Inspect evidence ↗</text></g><g class="record" data-ref="orchestrator" data-appearance="appearance-2" tabindex="0" role="button" aria-label="Inspect Orchestrator After step 2"><rect class="node-box" x="1304" y="96" width="252" height="148" rx="8"/><text class="node-category" x="1322" y="120">After step 2</text><text class="node-title" x="1322" y="146">Orchestrator</text><text class="node-status" x="1322" y="174">established · present</text><text class="node-status" x="1322" y="194">ID: orchestrator</text><text class="node-link" x="1322" y="230">Same component · 2 appearances</text></g></svg></template>
+  <aside id="inspector" hidden aria-label="Model inspector"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside>
+  <script>const inspectReadability = function inspectReadability(drawing, graphRef, viewport = { width: 1200, height: 520 }) {
+  if (![viewport.width, viewport.height].every((value) => Number.isFinite(value) && value > 0)) throw new Error('Readability viewport dimensions must be positive.');
+  const warnings = [], epsilon = 0.01;
+  const add = (code, refs, message, measurement) => warnings.push({ severity: 'warning', code: `readability/${code}`, graphRef, refs, message, measurement });
+  const segments = (edge) => edge.points.slice(1).map((b, index) => {
+    const a = edge.points[index], horizontal = Math.abs(a.y - b.y) < epsilon;
+    return { horizontal, fixed: horizontal ? a.y : a.x,
+      lo: Math.min(horizontal ? a.x : a.y, horizontal ? b.x : b.y),
+      hi: Math.max(horizontal ? a.x : a.y, horizontal ? b.x : b.y) };
+  }).filter((segment) => segment.hi - segment.lo > epsilon);
+  const overlap = (a, b) => a.horizontal === b.horizontal && Math.abs(a.fixed - b.fixed) < epsilon ? Math.max(0, Math.min(a.hi, b.hi) - Math.max(a.lo, b.lo)) : 0;
+  const routes = drawing.edges.map((edge) => ({ edge, segments: segments(edge) }));
+  for (let i = 0; i < routes.length; i++) {
+    const a = routes[i];
+    for (const b of routes.slice(i + 1)) {
+      const related = [a.edge.from, a.edge.to].some((ref) => [b.edge.from, b.edge.to].includes(ref));
+      let shared = 0, crossings = 0;
+      for (const left of a.segments) for (const right of b.segments) {
+        shared = Math.max(shared, overlap(left, right));
+        if (left.horizontal === right.horizontal) continue;
+        const h = left.horizontal ? left : right, v = left.horizontal ? right : left;
+        if (v.fixed > h.lo + epsilon && v.fixed < h.hi - epsilon && h.fixed > v.lo + epsilon && h.fixed < v.hi - epsilon) crossings++;
+      }
+      if (!related && shared >= 24) add('shared-corridor', [a.edge.ref, b.edge.ref], 'Unrelated edges share a line segment and may appear connected.', { longestSharedSegment: shared, threshold: 24 });
+      if (crossings) add('crossing', [a.edge.ref, b.edge.ref], 'Edges cross between their endpoints; the crossing is not a junction.', { crossings });
+    }
+    for (const group of drawing.groups) {
+      const { x, y, width, height } = group.box;
+      const border = [{ horizontal: true, fixed: y, lo: x, hi: x + width }, { horizontal: true, fixed: y + height, lo: x, hi: x + width },
+        { horizontal: false, fixed: x, lo: y, hi: y + height }, { horizontal: false, fixed: x + width, lo: y, hi: y + height }];
+      let longest = 0;
+      for (const segment of a.segments) for (const side of border) longest = Math.max(longest, overlap(segment, side));
+      if (longest >= 24) add('border-run', [a.edge.ref, group.ref], 'An edge follows a grouping frame border and may be confused with the boundary.', { longestSharedSegment: longest, threshold: 24 });
+    }
+    for (const other of drawing.edges) {
+      if (other.ref === a.edge.ref) continue;
+      const box = other.label;
+      let clearance = Infinity;
+      for (const segment of a.segments) {
+        const lo = segment.horizontal ? box.x : box.y, hi = lo + (segment.horizontal ? box.width : box.height);
+        const fixedLo = segment.horizontal ? box.y : box.x, fixedHi = fixedLo + (segment.horizontal ? box.height : box.width);
+        const along = Math.max(0, lo - segment.hi, segment.lo - hi);
+        const across = Math.max(0, fixedLo - segment.fixed, segment.fixed - fixedHi);
+        clearance = Math.min(clearance, Math.hypot(along, across));
+      }
+      if (clearance < 4) add('label-clearance', [a.edge.ref, other.ref], 'A route is very close to another edge’s label.', { clearance, threshold: 4 });
+    }
+  }
+  const scale = Math.min(1.3, viewport.width / drawing.canvas.width, viewport.height / drawing.canvas.height);
+  const projectedTextPx = 10 * scale; // Smallest current node status text; all skins retain these metrics.
+  if (projectedTextPx < 8) add('small-text', [], 'Small node text may be difficult to read at Fit. Use 100% or zoom in.', { viewport, scale, sourceTextPx: 10, projectedTextPx, threshold: 8 });
+  return warnings;
+};
+const selectHighlights = function selectHighlights(model, graph, { mode = 'selection', ref, boundaryRef } = {}) {
+  const visible = new Set([...graph.entityRefs, ...graph.contextRefs]);
+  const edges = model.relationships.filter((edge) => graph.relationshipRefs.includes(edge.id));
+  const refs = new Set(), findings = [];
+  const add = (id) => { if (visible.has(id) || graph.relationshipRefs.includes(id) || model.groups.some((group) => group.id === id)) refs.add(id); };
+  const addEdge = (edge) => { if (edge) { add(edge.id); add(edge.from); add(edge.to); } };
+  const hasStatus = (value) => {
+    if (!value || typeof value !== 'object') return false;
+    if ((mode === 'qualified' ? ['unknown', 'disputed', 'reported', 'inferred'] : [mode]).includes(value.status)) return true;
+    return Object.values(value).some(hasStatus);
+  };
+  const mappingRefs = (boundary) => {
+    const detail = boundary.detail;
+    const candidates = detail.status === 'unknown' ? [] : detail.status === 'disputed' ? detail.alternatives : [detail];
+    for (const candidate of candidates) for (const id of candidate.value) addEdge(edges.find((edge) => edge.id === id));
+    const parent = model.relationships.find((edge) => edge.id === boundary.relationshipRef);
+    // An unresolved caller is not replaced with an invented internal endpoint.
+    for (const id of parent ? [parent.from, parent.to] : []) if (graph.contextRefs.includes(id)) add(id);
+  };
+  if (boundaryRef) {
+    const boundary = graph.expands?.boundaries.find((item) => item.relationshipRef === boundaryRef);
+    if (!boundary) throw new Error('The requested correspondence does not belong to this graph.');
+    mappingRefs(boundary);
+    return { refs: [...refs], findings: [], boundary };
+  }
+  if (mode === 'selection' && ref) {
+    if (model.groups.some((group) => group.id === ref)) add(ref);
+    if (visible.has(ref)) { add(ref); edges.filter((edge) => [edge.from, edge.to].includes(ref)).forEach(addEdge); }
+    else addEdge(edges.find((edge) => edge.id === ref));
+    const note = model.notes.find((item) => item.id === ref);
+    for (const id of note?.subjectRefs ?? []) { add(id); addEdge(edges.find((edge) => edge.id === id)); }
+  } else if (mode === 'context') {
+    graph.contextRefs.forEach(add);
+  } else if (['calls', 'reads', 'writes', 'publishes', 'consumes'].includes(mode)) {
+    edges.filter((edge) => edge.kind === mode).forEach(addEdge);
+  } else if (['unknown', 'disputed', 'qualified'].includes(mode)) {
+    for (const entity of model.entities.filter((item) => visible.has(item.id))) if (hasStatus(entity)) {
+      add(entity.id); findings.push({ ref: entity.id, kind: 'node', reason: 'Component claims' });
+    }
+    for (const edge of edges) if (hasStatus(edge)) {
+      addEdge(edge); findings.push({ ref: edge.id, kind: 'edge', reason: 'Relationship claims' });
+    }
+    for (const membership of model.memberships.filter((item) => graph.membershipRefs.includes(item.id))) if (hasStatus(membership)) {
+      add(membership.memberRef); findings.push({ ref: membership.id, kind: 'record', reason: 'Grouping claim; no inferred containment' });
+    }
+    for (const group of model.groups) if (hasStatus(group) && model.memberships.some((member) => graph.membershipRefs.includes(member.id) &&
+      (member.group.value === group.id || member.group.alternatives?.some((alternative) => alternative.value === group.id)))) {
+      add(group.id); findings.push({ ref: group.id, kind: 'record', reason: 'Grouping meaning' });
+    }
+    for (const note of model.notes) if (note.subjectRefs.some((id) => visible.has(id) || graph.relationshipRefs.includes(id) || graph.membershipRefs.includes(id) || refs.has(id)) && hasStatus(note)) {
+      for (const id of note.subjectRefs) { add(id); addEdge(edges.find((edge) => edge.id === id)); }
+      findings.push({ ref: note.id, kind: 'record', reason: note.statement });
+    }
+    if (graph.expands && hasStatus(graph.expands.meaning)) findings.push({ ref: graph.id, kind: 'record', reason: 'Meaning of the expansion' });
+    for (const boundary of graph.expands?.boundaries ?? []) if (hasStatus(boundary.detail)) {
+      mappingRefs(boundary); findings.push({ ref: boundary.relationshipRef, kind: 'boundary', reason: `${boundary.detail.status} correspondence between levels` });
+    }
+    // On the parent view, mark edges with unresolved child correspondences too.
+    for (const child of model.graphs ?? []) if (child.expands?.graphRef === graph.id) {
+      for (const boundary of child.expands.boundaries) if (hasStatus(boundary.detail)) {
+        addEdge(edges.find((edge) => edge.id === boundary.relationshipRef));
+        findings.push({ ref: boundary.relationshipRef, kind: 'boundary', graphRef: child.id, reason: `${boundary.detail.status} correspondence in ${child.title}` });
+      }
+    }
+  }
+  return { refs: [...refs], findings };
+};
+const cleanViewerSVG = function cleanViewerSVG(svg) {
+  const clean = svg.cloneNode(true);
+  clean.removeAttribute('style');
+  clean.querySelectorAll('.selected, .highlight-match').forEach((item) => {
+    item.classList.remove('selected', 'highlight-match');
+  });
+  return clean;
+};
+(() => {
+  'use strict';
+  const payload = document.getElementById('waxwing-source').textContent;
+  const layout = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(payload), (char) => char.charCodeAt(0))));
+  const model = layout.model;
+  const documents = model.documents ?? [];
+  const graphs = model.graphs ?? [{ id: model.id, title: model.title, scope: model.scope,
+    entityRefs: model.entities.map((item) => item.id), contextRefs: [],
+    relationshipRefs: model.relationships.map((item) => item.id), membershipRefs: model.memberships.map((item) => item.id) }];
+  const root = model.rootGraphRef ?? model.id;
+  const workflows = model.workflows ?? [];
+  let activeWorkflow = null;
+  let activeAppearance = null;
+  let activeGraph = graphs.find((item) => item.id === root);
+  let drawing = layout.graphs?.find((item) => item.ref === root) ?? layout;
+  const graphNodes = (graph) => [...graph.entityRefs, ...graph.contextRefs];
+  const locations = (kind, ref) => graphs.filter((graph) => (kind === 'node' ? graphNodes(graph) : graph.relationshipRefs).includes(ref));
+  const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'graphs', 'workflows'];
+  const index = new Map(collections.flatMap((collection) => (model[collection] ?? []).map((record) => [record.id, { record, collection }])));
+  for (const workflow of workflows) for (const step of workflow.steps) index.set(step.id, { record: step, collection: 'steps', workflowRef: workflow.id });
+  let svg = document.querySelector('.ww-svg');
+  const sourceMetadata = document.getElementById('waxwing-source').cloneNode(true);
+  const viewport = document.getElementById('map-viewport');
+  const inspector = document.getElementById('inspector');
+  const content = document.getElementById('inspector-content');
+  let previousFocus;
+  let selectedRef = null;
+  let currentBoundary = null;
+  const highlightMode = document.getElementById('highlight-mode');
+  let zoom = 1;
+  let fitted = true;
+  const name = (ref) => {
+    const record = index.get(ref)?.record;
+    if (record?.memberRef) return `${index.get(record.memberRef)?.record.label ?? record.memberRef} · ${index.get(record.perspectiveRef)?.record.label ?? record.perspectiveRef}`;
+    return record?.label || record?.title || record?.statement || ref;
+  };
+  const humanize = (key) => key.replace(/([a-z])([A-Z])/g, '$1 $2').replaceAll('_', ' ');
+
+  function el(tag, text, className) {
+    const item = document.createElement(tag);
+    if (text !== undefined) item.textContent = text;
+    if (className) item.className = className;
+    return item;
+  }
+
+  function field(key, value) {
+    const container = el('div', undefined, 'detail-field');
+    container.append(el('span', humanize(key), 'detail-key'));
+    if (value && typeof value === 'object' && value.status) container.append(claim(value));
+    else if (Array.isArray(value)) {
+      for (const item of value) {
+        if (typeof item === 'object') {
+          const nested = el('div', undefined, 'sub-record');
+          if (item.label || item.id) nested.append(el('h4', item.label || item.id));
+          nested.append(objectFields(item));
+          container.append(nested);
+        }
+        else container.append(el('div', key.endsWith('Refs') ? name(item) : String(item), 'detail-value'));
+      }
+      if (!value.length) container.append(el('div', 'None recorded', 'detail-value'));
+    } else if (value && typeof value === 'object') container.append(objectFields(value));
+    else if ((key.endsWith('Ref') || ['from', 'to', 'replyTo'].includes(key)) && index.has(value)) {
+      const button = el('button', name(value), 'source-ref');
+      button.addEventListener('click', () => show(value));
+      container.append(button);
+    } else container.append(el('div', String(value), 'detail-value'));
+    return container;
+  }
+
+  function sourceButtons(refs) {
+    const container = el('div');
+    for (const ref of refs ?? []) {
+      const button = el('button', ref, 'source-ref');
+      button.addEventListener('click', () => show(ref));
+      container.append(button);
+    }
+    return container;
+  }
+
+  function claim(value) {
+    const container = el('div', undefined, 'claim');
+    container.append(el('span', value.status, `status-pill ${value.status}`));
+    if (value.value && typeof value.value === 'object' && !Array.isArray(value.value)) container.append(objectFields(value.value));
+    else if (Object.hasOwn(value, 'value')) container.append(el('div', Array.isArray(value.value) ? value.value.map(name).join(' + ') : typeof value.value === 'string' && index.has(value.value) ? name(value.value) : String(value.value), 'detail-value'));
+    if (value.reason) container.append(el('div', value.reason, 'detail-value'));
+    if (value.basis) {
+      container.append(el('div', value.basis.explanation, 'claim-basis'));
+      container.append(sourceButtons(value.basis.sourceRefs));
+    }
+    if (value.sourceRefs) container.append(sourceButtons(value.sourceRefs));
+    for (const alternative of value.alternatives ?? []) container.append(claim(alternative));
+    return container;
+  }
+
+  function objectFields(record) {
+    const container = el('div');
+    for (const [key, value] of Object.entries(record)) {
+      if (['id', 'label'].includes(key)) continue;
+      container.append(field(key, value));
+    }
+    return container;
+  }
+
+  function displayRecord(ref) {
+    if (inspector.hidden || !inspector.contains(document.activeElement)) previousFocus = document.activeElement;
+    content.replaceChildren();
+    const record = ref === '__model' ? model : index.get(ref)?.record;
+    if (!record) return;
+    content.append(el('h2', ref === '__model' ? 'Model & scope' : name(ref)));
+    content.append(el('div', ref === '__model' ? `${model.schemaVersion} · ${model.id}` : ref, 'record-id'));
+    const attached = documents.filter((doc) => doc.attachments.some((target) => ref === '__model' ? target.kind === 'graph' && target.ref === activeGraph.id : target.ref === ref && ['node', 'edge', 'workflow', 'step'].includes(target.kind) && (!target.graphRef || target.graphRef === activeGraph.id) && (!target.workflowRef || target.workflowRef === activeWorkflow?.id)));
+    if (attached.length) {
+      const section = el('section', undefined, 'attached-documents');
+      section.append(el('h3', 'Documents'));
+      for (const doc of attached) {
+        const link = el('a', `${doc.title} ↗`, 'document-link');
+        link.href = `#document=${encodeURIComponent(doc.id)}`; section.append(link);
+      }
+      content.append(section);
+    }
+    for (const child of graphs.filter((graph) => graph.expands?.graphRef === activeGraph.id && graph.expands.nodeRef === ref)) {
+      const section = el('section', undefined, 'attached-documents');
+      const link = el('a', `Explore ${child.title} →`, 'document-link'); link.href = `#graph=${child.id}`;
+      section.append(link, claim(child.expands.meaning)); content.append(section);
+    }
+    for (const graph of graphs.filter((item) => item.expands?.graphRef === activeGraph.id)) {
+      const boundary = graph.expands.boundaries.find((item) => item.relationshipRef === ref);
+      if (!boundary) continue;
+      const section = el('section', undefined, 'attached-documents');
+      const mappingLink = el('a', `Highlight correspondence in ${graph.title} →`, 'document-link');
+      mappingLink.href = `#graph=${graph.id}&boundary=${ref}`;
+      section.append(el('h3', 'Detailed correspondence'), mappingLink, claim(boundary.detail)); content.append(section);
+    }
+    if (activeWorkflow && index.get(ref)?.collection === 'entities') {
+      const section = el('section', undefined, 'attached-documents');
+      section.append(el('h3', 'Participation in this workflow'), el('p', 'Every appearance below refers to this same canonical component.'));
+      if (activeAppearance?.entityRef === ref) section.append(field('selectedParticipation', { appearanceId: activeAppearance.id, entityRef: ref, afterStepRef: activeAppearance.afterStepRef ?? 'First recorded actor' }));
+      for (const a of drawing.appearances.filter((a) => a.entityRef === ref)) {
+        const link = el('a', a.afterStepRef ? `After ${name(a.afterStepRef)} →` : 'First recorded actor →', 'document-link');
+        link.href = `#workflow=${activeWorkflow.id}&node=${ref}&appearance=${a.id}`; section.append(link);
+      }
+      content.append(section);
+    }
+    if (ref === '__model') {
+      if (activeWorkflow) content.append(field('workflow', activeWorkflow));
+      content.append(field('graph', activeGraph));
+      content.append(field('modelScope', model.scope));
+      content.append(field('perspectives', model.perspectives));
+      content.append(field('sources', model.sources));
+      const catalog = el('section', undefined, 'detail-section');
+      catalog.append(el('h3', 'All model records'));
+      for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'workflows']) {
+        const row = el('div', undefined, 'detail-field');
+        row.append(el('span', collection, 'detail-key'));
+        for (const item of model[collection] ?? []) {
+          const button = el('button', name(item.id), 'source-ref');
+          button.addEventListener('click', () => show(item.id));
+          row.append(button);
+        }
+        catalog.append(row);
+      }
+      content.append(catalog);
+    } else {
+      content.append(objectFields(record));
+      const memberships = model.memberships.filter((item) => activeGraph.membershipRefs.includes(item.id) && (item.memberRef === ref || item.group.value === ref || item.group.alternatives?.some((alternative) => alternative.value === ref)));
+      const notes = model.notes.filter((item) => item.subjectRefs.includes(ref));
+      for (const [heading, records] of [['Membership and perspective', memberships], ['Related knowledge', notes]]) {
+        if (!records.length) continue;
+        const section = el('section', undefined, 'detail-section');
+        section.append(el('h3', heading));
+        for (const item of records) {
+          const part = el('div', undefined, 'sub-record');
+          part.append(el('h4', item.statement || name(item.perspectiveRef)));
+          part.append(objectFields(item));
+          section.append(part);
+        }
+        content.append(section);
+      }
+    }
+    const raw = el('details');
+    raw.append(el('summary', 'Exact JSON record'), el('pre', JSON.stringify(record, null, 2)));
+    content.append(raw);
+    inspector.hidden = false;
+    inspector.scrollTop = 0;
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.toggle('selected', element.dataset.ref === ref));
+    selectedRef = ref; refreshHighlights();
+    document.getElementById('close-inspector').focus();
+    requestAnimationFrame(() => {
+      if (!inspector.hidden && window.matchMedia('(min-width:901px)').matches) {
+        const selected = previousFocus?.matches('.selected') ? previousFocus : viewport.querySelector('.selected');
+        selected?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      } else if (!inspector.hidden) {
+        inspector.scrollIntoView({ block: 'start' });
+      }
+    });
+  }
+
+  function hideInspector() {
+    inspector.hidden = true;
+    selectedRef = null; refreshHighlights();
+    document.querySelectorAll('[data-ref]').forEach((element) => element.classList.remove('selected'));
+    if (previousFocus?.isConnected) previousFocus.focus();
+  }
+  function targetHash(target) {
+    const params = new URLSearchParams();
+    if (target.kind === 'workflow') return `#workflow=${encodeURIComponent(target.ref)}`;
+    if (target.workflowRef || target.kind === 'step') {
+      const owner = target.workflowRef ?? index.get(target.ref)?.workflowRef;
+      return `#workflow=${encodeURIComponent(owner)}&${target.kind}=${encodeURIComponent(target.ref)}`;
+    }
+    if (target.kind === 'document') params.set('document', target.ref);
+    else {
+      if (target.kind === 'graph') params.set('graph', target.ref);
+      else {
+        const candidates = locations(target.kind, target.ref);
+        if (!candidates.length && !target.graphRef) return `#graph=${activeGraph.id}&record=${encodeURIComponent(target.ref)}`;
+        const graphRef = target.graphRef ?? (candidates.some((graph) => graph.id === activeGraph.id) ? activeGraph.id : candidates.length === 1 ? candidates[0].id : undefined);
+        if (graphRef) params.set('graph', graphRef);
+      }
+      if (target.kind !== 'graph') params.set(target.kind, target.ref);
+    }
+    return `#${params}`;
+  }
+  function navigate(hash) {
+    if (location.hash === hash || (!location.hash && hash === '#')) applyRoute();
+    else location.hash = hash;
+  }
+  function show(ref) {
+    const collection = index.get(ref)?.collection;
+    if (collection === 'workflows') { navigate(`#workflow=${ref}&record=${ref}`); return; }
+    if (activeWorkflow && (ref === '__model' || (collection !== 'relationships' && collection !== 'graphs' && collection !== 'documents' && collection !== 'workflows' && collection !== 'steps'))) {
+      const key = collection === 'entities' && drawing.appearances.some((a) => a.entityRef === ref) ? 'node' : 'record';
+      navigate(`#workflow=${activeWorkflow.id}&${key}=${encodeURIComponent(ref)}`); return;
+    }
+    const kind = { documents: 'document', entities: 'node', relationships: 'edge', graphs: 'graph', workflows: 'workflow', steps: 'step' }[collection];
+    navigate(kind ? targetHash({ kind, ref }) : `#graph=${activeGraph.id}&record=${encodeURIComponent(ref)}`);
+  }
+  function close() { navigate(activeWorkflow ? `#workflow=${activeWorkflow.id}` : `#graph=${activeGraph.id}`); }
+  const reader = document.getElementById('document-reader');
+  const documentContent = document.getElementById('document-content');
+  const diagramMain = document.getElementById('diagram-main');
+  const documentNav = document.getElementById('document-nav');
+  documentNav.append(el('div', 'DOCUMENTS', 'detail-key'));
+  for (const doc of documents) {
+    const link = el('a', doc.title, 'document-nav-link');
+    link.href = targetHash({ kind: 'document', ref: doc.id });
+    link.dataset.document = doc.id; documentNav.append(link);
+  }
+  function documentScreen(doc, heading) {
+    document.title = `${doc?.title ?? 'Documents'} · ${model.title} · Waxwing`;
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren();
+    documentNav.querySelectorAll('a').forEach((link) => {
+      if (link.dataset.document === doc?.id) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    if (!doc) {
+      documentContent.append(el('div', 'REFERENCE LIBRARY', 'eyebrow'), el('h1', 'Documents'));
+      documentContent.append(el('p', 'Detailed explanations attached to this graph and its components.', 'purpose'));
+      for (const item of documents) {
+        const link = el('a', item.title, 'document-card'); link.href = targetHash({ kind: 'document', ref: item.id });
+        const subjects = item.attachments.map((target) => target.kind === 'graph' ? graphs.find((graph) => graph.id === target.ref)?.title : name(target.ref));
+        link.append(el('span', subjects.join(' · ') || 'Included document')); documentContent.append(link);
+      }
+      if (!documents.length) documentContent.append(el('p', 'No documents included.'));
+    } else {
+      documentContent.append(el('div', 'DOCUMENT', 'eyebrow'), el('h1', doc.title));
+      const attachments = el('div', undefined, 'document-attachments');
+      for (const target of doc.attachments) {
+        const link = el('a', `${target.kind} · ${target.kind === 'graph' ? graphs.find((graph) => graph.id === target.ref)?.title : name(target.ref)}`);
+        link.href = targetHash(target); attachments.append(link);
+      }
+      documentContent.append(attachments);
+      documentContent.append(document.getElementById(`ww-document-${doc.id}`).content.cloneNode(true));
+      const raw = el('details', undefined, 'document-source');
+      raw.append(el('summary', 'Original Markdown'), el('pre', doc.markdown));
+      const button = el('button', 'Download .md');
+      button.addEventListener('click', () => download(doc.markdown, `${doc.id}.md`, 'text/markdown;charset=utf-8'));
+      raw.append(button); documentContent.append(raw);
+      if (heading !== undefined) {
+        const destination = document.getElementById(`ww-doc-${doc.id}--${heading}`);
+        if (!destination) { unavailable('The requested document heading does not exist.'); return; }
+        destination.scrollIntoView({ block: 'start' });
+      }
+    }
+    if (heading === undefined) window.scrollTo(0, 0);
+  }
+  function unavailable(message) {
+    document.title = 'Link unavailable · Waxwing';
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren(el('h1', 'Link unavailable'), el('p', message));
+    const link = el('a', 'Return to graph'); link.href = '#'; documentContent.append(link);
+  }
+  function applyRoute() {
+    const hash = location.hash.slice(1);
+    if (hash === 'documents') { documentScreen(); return; }
+    const params = new URLSearchParams(hash), keys = [...params.keys()];
+    if (new Set(keys).size !== keys.length || keys.some((key) => !['document', 'heading', 'graph', 'node', 'edge', 'record', 'boundary', 'workflow', 'step', 'appearance'].includes(key))) { unavailable('This link uses an unsupported or ambiguous target.'); return; }
+    if (params.has('document')) {
+      if (keys.some((key) => !['document', 'heading'].includes(key))) { unavailable('This link names conflicting destinations.'); return; }
+      const doc = documents.find((item) => item.id === params.get('document'));
+      if (!doc) { unavailable('The requested document is not included in this export.'); return; }
+      documentScreen(doc, params.has('heading') ? params.get('heading') : undefined); return;
+    }
+    if (params.has('workflow') || params.has('step')) { workflowRoute(params); return; }
+    if (params.has('appearance')) { unavailable('An appearance needs a workflow target.'); return; }
+    if (params.has('heading') || ['node', 'edge', 'record', 'boundary'].filter((key) => params.has(key)).length > 1 || (params.has('graph') && !graphs.some((graph) => graph.id === params.get('graph')))) { unavailable('The requested graph or record is not available.'); return; }
+    const requestedKind = ['node', 'edge'].find((kind) => params.has(kind));
+    let graphRef = params.get('graph') ?? root;
+    if (requestedKind) {
+      const candidates = locations(requestedKind, params.get(requestedKind));
+      if (!params.has('graph')) {
+        if (candidates.length === 1) graphRef = candidates[0].id;
+        else if (candidates.length > 1) { graphChoice(requestedKind, params.get(requestedKind), candidates); return; }
+      }
+      if (!candidates.some((graph) => graph.id === graphRef)) { unavailable('This record is not shown in the requested graph.'); return; }
+    }
+    const wasReading = !reader.hidden;
+    reader.hidden = true; diagramMain.hidden = false;
+    if (wasReading) { window.scrollTo(0, 0); if (fitted) fit(); }
+    currentBoundary = null;
+    switchGraph(graphRef);
+    document.title = `${activeGraph.title} · Waxwing`;
+    if (params.has('boundary')) {
+      const ref = params.get('boundary');
+      if (!activeGraph.expands?.boundaries.some((item) => item.relationshipRef === ref)) { unavailable('This correspondence is not recorded in the requested graph.'); return; }
+      currentBoundary = ref; highlightMode.value = 'selection'; hideInspector(); refreshHighlights(); return;
+    }
+    const key = ['node', 'edge', 'record'].find((key) => params.has(key));
+    if (!key) { hideInspector(); return; }
+    const ref = params.get(key), entry = index.get(ref);
+    if ((key === 'node' && entry?.collection !== 'entities') || (key === 'edge' && entry?.collection !== 'relationships') || (key === 'record' && ref !== '__model' && (!entry || entry.collection === 'documents'))) { unavailable('The requested record does not exist or has a different type.'); return; }
+    displayRecord(ref);
+  }
+  window.addEventListener('hashchange', applyRoute);
+  document.getElementById('close-inspector').addEventListener('click', close);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !inspector.hidden) close(); });
+  document.getElementById('model-details').addEventListener('click', () => show('__model'));
+  document.querySelector('.brand').addEventListener('click', (event) => { event.preventDefault(); navigate(`#graph=${root}`); fit(); });
+  viewport.addEventListener('click', (event) => { const record = event.target.closest('[data-ref]'); if (record) inspectVisual(record); });
+  viewport.addEventListener('keydown', (event) => {
+    if (!['Enter', ' '].includes(event.key)) return;
+    const record = event.target.closest('[data-ref]');
+    if (record) { event.preventDefault(); inspectVisual(record); }
+  });
+
+  function inspectVisual(record) {
+    if (activeWorkflow && record.dataset.appearance) navigate(`#workflow=${activeWorkflow.id}&node=${record.dataset.ref}&appearance=${record.dataset.appearance}`);
+    else show(record.dataset.ref);
+  }
+
+  function graphChoice(kind, ref, candidates) {
+    hideInspector(); diagramMain.hidden = true; reader.hidden = false;
+    documentContent.replaceChildren(el('h1', `Choose a graph for ${name(ref)}`));
+    for (const graph of candidates) {
+      const link = el('a', graph.title, 'document-card'); link.href = targetHash({ kind, ref, graphRef: graph.id }); documentContent.append(link);
+    }
+  }
+  function graphLink(graph, text = graph.title) {
+    const link = el('a', text, 'document-link'); link.href = `#graph=${graph.id}`; return link;
+  }
+  function switchGraph(ref) {
+    if (activeGraph.id !== ref || activeWorkflow) {
+      activeWorkflow = null; activeAppearance = null;
+      activeGraph = graphs.find((graph) => graph.id === ref);
+      drawing = layout.graphs.find((item) => item.ref === ref);
+      viewport.replaceChildren(document.getElementById(`ww-graph-${ref}`).content.cloneNode(true));
+      svg = viewport.querySelector('svg'); svg.prepend(sourceMetadata.cloneNode(true));
+      svg.dataset.theme = document.body.classList.contains('dark') ? 'dark' : 'light';
+      svg.dataset.skin = document.body.dataset.skin;
+      fitted = true; fit(); window.scrollTo(0, 0);
+    }
+    document.querySelector('.highlight-toolbar').hidden = false;
+    document.getElementById('reading-anchor').hidden = !drawing.layout.readingAnchorRef;
+    document.getElementById('reading-anchor-name').textContent = drawing.layout.readingAnchorRef ? name(drawing.layout.readingAnchorRef) : '';
+    document.getElementById('workflow-details').hidden = true;
+    document.querySelector('.map-caption').replaceChildren(el('span', 'Arrows describe operations: actor → resource.'), el('span', 'Position does not imply execution order. Select any element to inspect it.'));
+    updateViewChoices();
+    document.getElementById('graph-title').textContent = activeGraph.title;
+    document.getElementById('graph-question').textContent = activeGraph.scope.question;
+    document.getElementById('graph-abstraction').textContent = activeGraph.scope.abstraction;
+    const scope = document.getElementById('graph-scope');
+    scope.replaceChildren(...[activeGraph.scope.environment, activeGraph.scope.snapshot,
+      `${activeGraph.entityRefs.length} components · ${activeGraph.contextRefs.length} external context · ${activeGraph.relationshipRefs.length} relationships`].map((text) => el('span', text)));
+    const breadcrumb = document.getElementById('graph-breadcrumb'); breadcrumb.replaceChildren();
+    const ancestors = []; let ancestor = activeGraph;
+    while (ancestor) { ancestors.unshift(ancestor); ancestor = graphs.find((item) => item.id === ancestor.expands?.graphRef); }
+    for (const graph of ancestors) {
+      if (breadcrumb.childNodes.length) breadcrumb.append(el('span', ' / '));
+      const link = graphLink(graph); if (graph.id === ref) link.setAttribute('aria-current', 'page'); breadcrumb.append(link);
+    }
+    const connections = document.getElementById('graph-connections'); connections.replaceChildren();
+    for (const child of graphs.filter((graph) => graph.expands?.graphRef === ref)) {
+      const row = el('div', undefined, 'graph-child');
+      row.append(graphLink(child, `${name(child.expands.nodeRef)} → ${child.title}`), el('span', child.expands.meaning.status, `status-pill ${child.expands.meaning.status}`)); connections.append(row);
+    }
+    if (activeGraph.expands) {
+      const expansion = activeGraph.expands;
+      connections.append(el('h2', `How this graph expands ${name(expansion.nodeRef)}`), claim(expansion.meaning));
+      connections.append(el('p', 'Boundary mappings are recorded claims. Unknown mappings do not generate connections.'));
+      for (const boundary of expansion.boundaries) {
+        const row = el('div', undefined, 'boundary-row');
+        const link = el('a', name(boundary.relationshipRef), 'document-link');
+        link.href = targetHash({ kind: 'edge', ref: boundary.relationshipRef, graphRef: expansion.graphRef });
+        const highlight = el('a', 'Highlight correspondence', 'source-ref'); highlight.href = `#graph=${ref}&boundary=${boundary.relationshipRef}`;
+        row.append(link, highlight, claim(boundary.detail));
+        const claims = boundary.detail.status === 'unknown' ? [] : boundary.detail.status === 'disputed' ? boundary.detail.alternatives : [boundary.detail];
+        for (const candidate of claims) for (const edge of candidate.value) {
+          const detail = el('a', `Inspect ${name(edge)} ↗`, 'source-ref'); detail.href = targetHash({ kind: 'edge', ref: edge, graphRef: ref }); row.append(detail);
+        }
+        connections.append(row);
+      }
+    }
+    const documentBack = document.querySelector('.document-breadcrumb a');
+    documentBack.href = `#graph=${ref}`; documentBack.textContent = `← ${activeGraph.title}`;
+    document.getElementById('perspective-label').textContent = drawing.layout.groupingPerspectiveRef ? `Grouping: ${name(drawing.layout.groupingPerspectiveRef)}` : 'No grouping perspective selected';
+    refreshKnowledge();
+    refreshHighlights();
+    refreshReadability();
+  }
+  const viewSelect = document.getElementById('diagram-view');
+  viewSelect.addEventListener('change', () => navigate(viewSelect.value ? `#workflow=${viewSelect.value}` : `#graph=${activeGraph.id}`));
+  document.getElementById('workflow-details').addEventListener('click', () => navigate(`#workflow=${activeWorkflow.id}&record=${activeWorkflow.id}`));
+  function updateViewChoices() {
+    const choices = workflows.filter((w) => w.graphRef === activeGraph.id);
+    document.getElementById('workflow-controls').hidden = !choices.length;
+    viewSelect.replaceChildren();
+    const connectivity = el('option', 'Connectivity — one box per component'); connectivity.value = ''; viewSelect.append(connectivity);
+    for (const w of choices) { const option = el('option', `Workflow — ${w.title}`); option.value = w.id; viewSelect.append(option); }
+    viewSelect.value = activeWorkflow?.id ?? '';
+  }
+  function workflowRoute(params) {
+    const keys = [...params.keys()];
+    if (keys.some((k) => !['workflow', 'node', 'step', 'record', 'appearance'].includes(k)) || ['node','step','record'].filter((k) => params.has(k)).length > 1) { unavailable('Conflicting workflow destinations.'); return; }
+    const owner = params.get('workflow') ?? index.get(params.get('step'))?.workflowRef;
+    const workflow = workflows.find((w) => w.id === owner);
+    if (!workflow) { unavailable('This workflow is not included.'); return; }
+    const geometry = layout.workflows.find((w) => w.ref === owner);
+    const key = ['node','step','record'].find((k) => params.has(k)), ref = key && params.get(key);
+    if ((key === 'node' && !geometry.appearances.some((a) => a.entityRef === ref)) || (key === 'step' && !workflow.steps.some((s) => s.id === ref)) || (key === 'record' && ref !== '__model' && (!index.has(ref) || index.get(ref).collection === 'documents'))) { unavailable('This record is not available in the workflow.'); return; }
+    const appearance = params.has('appearance') ? geometry.appearances.find((a) => a.id === params.get('appearance') && a.entityRef === ref) : null;
+    if (params.has('appearance') && (key !== 'node' || !appearance)) { unavailable('This appearance does not represent the requested component.'); return; }
+    reader.hidden = true; diagramMain.hidden = false;
+    if (activeWorkflow?.id !== owner) {
+      switchGraph(workflow.graphRef);
+      activeWorkflow = workflow; drawing = geometry; currentBoundary = null;
+      viewport.replaceChildren(document.getElementById(`ww-workflow-${owner}`).content.cloneNode(true));
+      svg = viewport.querySelector('svg'); svg.prepend(sourceMetadata.cloneNode(true));
+      svg.dataset.theme = document.body.classList.contains('dark') ? 'dark' : 'light'; svg.dataset.skin = document.body.dataset.skin;
+      fitted = false; zoom = 1; applyZoom(); viewport.scrollTo(0, 0);
+    }
+    activeAppearance = appearance;
+    updateViewChoices();
+    document.getElementById('workflow-details').hidden = false;
+    document.getElementById('reading-anchor').hidden = true;
+    document.querySelector('.highlight-toolbar').hidden = true;
+    document.getElementById('graph-title').textContent = workflow.title;
+    document.getElementById('graph-question').textContent = workflow.scope.question;
+    document.getElementById('graph-abstraction').textContent = workflow.scope.abstraction;
+    document.getElementById('graph-scope').replaceChildren(...[workflow.scope.environment, workflow.scope.snapshot, `${new Set(drawing.appearances.map((a) => a.entityRef)).size} components · ${drawing.appearances.length} appearances · ${workflow.steps.length} steps`].map((t) => el('span',t)));
+    const direction = drawing.layout.direction === 'RIGHT' ? 'Left → right' : 'Top → bottom';
+    document.getElementById('perspective-label').textContent = `${direction} · Order ${workflow.order.status} · Entry ${workflow.entry.point.status} · Trigger ${workflow.entry.trigger.status}`;
+    document.querySelector('.map-caption').replaceChildren(el('span', 'Same component ID = same component. Selecting it highlights all its appearances.'), el('span', 'Solid: message/event · Dashed: reply · Membership labels retain the selected perspective; frames remain in Connectivity.'));
+    const documentBack = document.querySelector('.document-breadcrumb a'); documentBack.href = `#workflow=${owner}`; documentBack.textContent = `← ${workflow.title}`;
+    document.title = `${workflow.title} · Waxwing`;
+    refreshKnowledge(); refreshReadability();
+    if (ref) displayRecord(ref); else hideInspector();
+    if (appearance) {
+      const b = appearance.box;
+      viewport.scrollTo({ left: Math.max(0, b.x * zoom - viewport.clientWidth / 3), top: Math.max(0, b.y * zoom - viewport.clientHeight / 3) });
+    }
+  }
+  function refreshKnowledge() {
+    const open = [];
+    function collect(value, owner, path) {
+      if (!value || typeof value !== 'object') return;
+      if (['unknown', 'disputed'].includes(value.status)) open.push({ owner, path, ...value });
+      for (const [key, child] of Object.entries(value)) collect(child, owner, path ? `${path}.${key}` : key);
+    }
+    const visible = new Set([...graphNodes(activeGraph), ...activeGraph.relationshipRefs, ...activeGraph.membershipRefs, ...(drawing.groups ?? []).map((group) => group.ref)]);
+    if (activeWorkflow) { visible.add(activeWorkflow.id); activeWorkflow.steps.forEach((step) => visible.add(step.id)); }
+    for (const collection of ['entities', 'groups', 'memberships', 'relationships', 'notes']) {
+      for (const record of model[collection]) if (visible.has(record.id) || record.subjectRefs?.some((ref) => visible.has(ref))) collect(record, record, '');
+    }
+    if (activeGraph.expands) collect(activeGraph.expands, activeGraph, 'expands');
+    if (activeWorkflow) {
+      const { steps, ...record } = activeWorkflow; collect(record, activeWorkflow, '');
+      for (const step of steps) collect(step, step, '');
+    }
+    const list = document.getElementById('knowledge-list'); list.replaceChildren();
+    for (const item of open.sort((a, b) => (a.status === 'disputed' ? 0 : 1) - (b.status === 'disputed' ? 0 : 1))) {
+      const button = el('button', undefined, 'knowledge-row');
+      const description = (item.owner.id === activeGraph.id && item.path.startsWith('expands.boundaries.') ? `${name(activeGraph.expands.boundaries[Number(item.path.split('.')[2])].relationshipRef)} · correspondence between levels` : undefined) || item.owner.statement || (item.owner.memberRef ? `${name(item.owner.memberRef)} · ${name(item.owner.perspectiveRef)}` : `${name(item.owner.id)} · ${humanize(item.path)}`);
+      button.append(el('span', item.status, `status-pill ${item.status}`), el('span', description, 'question'), el('span', '↗', 'row-arrow'));
+      button.addEventListener('click', () => item.owner.id === activeGraph.id ? navigate(`#graph=${activeGraph.id}&record=${activeGraph.id}`) : show(item.owner.id)); list.append(button);
+    }
+    if (!open.length) list.append(el('p', 'No explicit unknowns or disputes recorded. Partial scope still applies.'));
+    document.getElementById('knowledge-count').textContent = `${open.filter((item) => item.status === 'unknown').length} unknown · ${open.filter((item) => item.status === 'disputed').length} disputed`;
+  }
+
+  function refreshHighlights() {
+    if (activeWorkflow) {
+      document.getElementById('highlight-details').replaceChildren();
+      svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('highlight-match', item.dataset.ref === selectedRef));
+      return;
+    }
+    const result = selectHighlights(model, activeGraph, { mode: highlightMode.value, ref: selectedRef, boundaryRef: currentBoundary });
+    const refs = new Set(result.refs);
+    svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('highlight-match', refs.has(item.dataset.ref)));
+    const details = document.getElementById('highlight-details'); details.replaceChildren();
+    const summary = document.getElementById('highlight-summary');
+    const count = new Set([...svg.querySelectorAll('.highlight-match')].map((item) => item.dataset.ref)).size;
+    summary.textContent = `${count} visible ${count === 1 ? 'record' : 'records'} highlighted. Other records remain visible.`;
+    if (highlightMode.value === 'selection' && !selectedRef && !currentBoundary) summary.textContent = 'Select a record to highlight its direct relationships. No execution order is implied.';
+    if (result.boundary) {
+      const detail = result.boundary.detail;
+      details.append(el('strong', `Correspondence: ${name(currentBoundary)}`));
+      details.append(el('p', detail.status === 'unknown' ? 'Unknown internal correspondence. Only recorded external context is highlighted; no internal edge is invented.' : detail.status === 'disputed' ? 'All recorded alternatives are highlighted. No winner is selected.' : 'Highlighted edges are the recorded correspondence, not an inferred execution path.'));
+      details.append(claim(detail));
+      if (activeGraph.expands.meaning.status !== 'established') details.append(el('p', 'The meaning of this expansion is also qualified.'), claim(activeGraph.expands.meaning));
+      const parent = el('a', 'Inspect overview relationship ↗', 'document-link');
+      parent.href = targetHash({ kind: 'edge', ref: currentBoundary, graphRef: activeGraph.expands.graphRef }); details.append(parent);
+    }
+    for (const finding of result.findings) {
+      const link = el('a', `${name(finding.ref)} · ${finding.reason}`, 'document-link');
+      link.href = finding.kind === 'boundary' ? `#graph=${finding.graphRef ?? activeGraph.id}&boundary=${finding.ref}` : finding.kind === 'record' ? `#graph=${activeGraph.id}&record=${finding.ref}` : targetHash({ kind: finding.kind, ref: finding.ref, graphRef: activeGraph.id });
+      details.append(link);
+    }
+    if (['unknown', 'disputed', 'qualified'].includes(highlightMode.value) && !result.findings.length) details.append(el('p', 'No matching recorded claims in this graph. This does not establish completeness or certainty.'));
+  }
+  highlightMode.addEventListener('change', () => {
+    if (currentBoundary) { currentBoundary = null; navigate(`#graph=${activeGraph.id}`); }
+    else refreshHighlights();
+  });
+  document.getElementById('highlight-clear').addEventListener('click', () => {
+    highlightMode.value = 'selection'; currentBoundary = null; selectedRef = null; navigate(`#graph=${activeGraph.id}`);
+  });
+  function refreshReadability() {
+    if (!viewport.clientWidth || !viewport.clientHeight) return;
+    const measured = activeWorkflow ? { ...drawing, groups: [], edges: drawing.edges.map((e) => ({ ...e, from: e.fromAppearanceRef, to: e.toAppearanceRef })) } : drawing;
+    const warnings = inspectReadability(measured, activeWorkflow?.id ?? activeGraph.id, { width: viewport.clientWidth, height: viewport.clientHeight });
+    document.getElementById('readability-summary').textContent = `Readability · ${warnings.length} ${warnings.length === 1 ? 'warning' : 'warnings'}`;
+    const list = document.getElementById('readability-list'); list.replaceChildren();
+    if (!warnings.length) list.append(el('p', 'No issues detected by these advisory checks.'));
+    for (const warning of warnings) {
+      const row = el('div', undefined, 'readability-row'); row.append(el('p', warning.message));
+      for (const ref of warning.refs) { const button = el('button', name(ref), 'source-ref'); button.addEventListener('click', () => show(ref)); row.append(button); }
+      if (warning.code === 'readability/small-text') row.append(el('p', `Estimated smallest node text: ${warning.measurement.projectedTextPx.toFixed(1)}px at Fit; 10px at 100%.`, 'purpose'));
+      list.append(row);
+    }
+  }
+  document.getElementById('skin').addEventListener('change', (event) => {
+    document.body.dataset.skin = event.target.value; svg.dataset.skin = event.target.value;
+  });
+
+  function applyZoom() {
+    svg.style.width = `${drawing.canvas.width * zoom}px`;
+    svg.style.height = `${drawing.canvas.height * zoom}px`;
+    svg.style.marginLeft = `${Math.max(0, (viewport.clientWidth - drawing.canvas.width * zoom) / 2)}px`;
+    svg.style.marginTop = `${Math.max(0, (viewport.clientHeight - drawing.canvas.height * zoom) / 2)}px`;
+    document.getElementById('zoom-label').textContent = `${Math.round(zoom * 100)}%`;
+    document.getElementById('zoom-out').disabled = zoom <= .15;
+    document.getElementById('zoom-in').disabled = zoom >= 3;
+  }
+  function fit() { fitted = true; zoom = Math.min(viewport.clientWidth / drawing.canvas.width, viewport.clientHeight / drawing.canvas.height, 1.3); applyZoom(); viewport.scrollTo(0, 0); }
+  function changeZoom(factor) {
+    const centerX = (viewport.scrollLeft + viewport.clientWidth / 2 - parseFloat(svg.style.marginLeft || 0)) / zoom;
+    const centerY = (viewport.scrollTop + viewport.clientHeight / 2 - parseFloat(svg.style.marginTop || 0)) / zoom;
+    fitted = false;
+    zoom = Math.max(.15, Math.min(3, zoom * factor));
+    applyZoom();
+    viewport.scrollTo(
+      centerX * zoom + parseFloat(svg.style.marginLeft) - viewport.clientWidth / 2,
+      centerY * zoom + parseFloat(svg.style.marginTop) - viewport.clientHeight / 2,
+    );
+  }
+  document.getElementById('zoom-fit').addEventListener('click', fit);
+  document.getElementById('zoom-read').addEventListener('click', () => changeZoom(1 / zoom));
+  document.getElementById('zoom-in').addEventListener('click', () => changeZoom(1.25));
+  document.getElementById('zoom-out').addEventListener('click', () => changeZoom(.8));
+  document.getElementById('reading-anchor-go').addEventListener('click', () => {
+    const ref = drawing.layout.readingAnchorRef;
+    if (!ref || activeWorkflow) return;
+    changeZoom(1 / zoom); show(ref);
+  });
+  new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); refreshReadability(); }).observe(viewport);
+  fit();
+
+  document.getElementById('theme').addEventListener('click', () => {
+    const dark = document.body.classList.toggle('dark');
+    svg.dataset.theme = dark ? 'dark' : 'light';
+    document.getElementById('theme').textContent = dark ? 'Light theme' : 'Dark theme';
+  });
+  function download(contents, filename, type) {
+    const url = URL.createObjectURL(new Blob([contents], { type }));
+    const link = el('a'); link.href = url; link.download = filename;
+    link.hidden = true;
+    document.body.append(link);
+    link.click();
+    setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 1000);
+  }
+  document.getElementById('source-download').addEventListener('click', () => download(JSON.stringify(model, null, 2) + '\n', `${model.id}.model.json`, 'application/json'));
+  document.getElementById('layout-download').addEventListener('click', () => download(JSON.stringify(layout, null, 2) + '\n', `${model.id}.layout.json`, 'application/json'));
+  document.getElementById('svg-download').addEventListener('click', () => {
+    const clean = cleanViewerSVG(svg);
+    download('<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clean), `${activeWorkflow?.id ?? activeGraph.id}.svg`, 'image/svg+xml');
+  });
+  applyRoute();
+})();
+</script>
+</body></html>

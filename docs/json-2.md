@@ -31,6 +31,10 @@ See [subgraphs](subgraphs.md) for the full selection and correspondence rules.
 | `groups` | Frames for eligible established grouping memberships in the selected perspective. |
 | `edges` | One `ref`, unchanged `from`/`to`, orthogonal `points`, and label box per relationship. |
 
+Architecture drawings may also record an optional `layout.readingAnchorRef`,
+naming a drawn component placed at the leading edge. This generation preference
+is separate from JSON 1 and workflow entry claims. See [reading anchors](reading-anchors.md).
+
 Boxes have `x`, `y`, `width`, and `height`. Points have `x` and `y`. All positions
 are absolute in the canvas coordinate system, with the origin at the top left.
 Node positions and group frames are generated; no absolute positions are

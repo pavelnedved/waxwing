@@ -5,6 +5,11 @@ JSON 1, regenerate JSON 2, resolve uncertainty, or introduce system facts.
 The HTML still contains its CSS, JavaScript, documents, and complete source;
 viewing requires no framework, remote font, or application service.
 
+On desktop, opening an inspector reserves a right-hand column and keeps the
+selected diagram record in view at the current manual zoom. Closing it restores
+the full canvas width. At widths of 900 pixels or less, details open in the page
+below the content, with their own bounded scroll area, rather than covering it.
+
 ## Advisory readability checks
 
 Open **Readability** below the canvas, or run:

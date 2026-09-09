@@ -1,0 +1,232 @@
+{
+  "criterion": "Chosen anchor has no component before it on the reading axis; original source, arrows, coverage and eligible grouping pass validation and source recovery.",
+  "viewport": {
+    "width": 1200,
+    "height": 520
+  },
+  "nodeVersion": "v25.8.0",
+  "sourceHashes": {
+    "modules/layout/index.mjs": "015f198c5e862b625a1099c559559c9735ded4428edd9e2a68fca7f34ef88ed6",
+    "modules/layout/validate.mjs": "608fb35da64fc0d999b883714bf4cd68e00c4c9c2a24fd0185afc6321cd33ee9",
+    "schemas/layout.schema.json": "fc3de7a8b86679316cdffd7b89ffe9a588445d3fe6167d6dc2785126b1c79694",
+    "package-lock.json": "61780272c79e15d0df1e3c3c9dedd6cc5e91440ab92fe3c684098b6777aa3ef3"
+  },
+  "results": [
+    {
+      "id": "incoming-grouped",
+      "task": "Begin at Fulfillment and identify the components that submit orders to it.",
+      "anchor": "fulfillment",
+      "graph": "order-processing",
+      "options": {
+        "groupingPerspectiveRef": "system-structure"
+      },
+      "variants": {
+        "baseline": {
+          "options": {
+            "groupingPerspectiveRef": "system-structure"
+          },
+          "canvas": {
+            "width": 1488,
+            "height": 507
+          },
+          "anchorBox": {
+            "x": 1190,
+            "y": 317,
+            "width": 232,
+            "height": 124
+          },
+          "leading": false,
+          "fit": 0.8064516129032258,
+          "crossings": 0,
+          "bends": 10,
+          "warnings": []
+        },
+        "anchored": {
+          "options": {
+            "groupingPerspectiveRef": "system-structure",
+            "readingAnchors": {
+              "order-processing": "fulfillment"
+            }
+          },
+          "canvas": {
+            "width": 1568,
+            "height": 920
+          },
+          "anchorBox": {
+            "x": 106,
+            "y": 605,
+            "width": 232,
+            "height": 148
+          },
+          "leading": true,
+          "fit": 0.5652173913043478,
+          "crossings": 0,
+          "bends": 16,
+          "warnings": [
+            "readability/small-text"
+          ]
+        }
+      }
+    },
+    {
+      "id": "shared-hub",
+      "task": "Begin at Orchestrator and identify its checkout, stock, pricing and payment connections.",
+      "anchor": "orchestrator",
+      "graph": "services",
+      "options": {},
+      "variants": {
+        "baseline": {
+          "options": {},
+          "canvas": {
+            "width": 1448.8,
+            "height": 604
+          },
+          "anchorBox": {
+            "x": 597.6,
+            "y": 67,
+            "width": 232,
+            "height": 124
+          },
+          "leading": false,
+          "fit": 0.8282716731087797,
+          "crossings": 0,
+          "bends": 4,
+          "warnings": []
+        },
+        "anchored": {
+          "options": {
+            "readingAnchors": {
+              "services": "orchestrator"
+            }
+          },
+          "canvas": {
+            "width": 887.2,
+            "height": 808
+          },
+          "anchorBox": {
+            "x": 36,
+            "y": 68.4,
+            "width": 232,
+            "height": 148
+          },
+          "leading": true,
+          "fit": 0.6435643564356436,
+          "crossings": 0,
+          "bends": 6,
+          "warnings": [
+            "readability/small-text"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pipeline",
+      "task": "Locate Upload API first and follow its recorded connections; column position does not establish processing order.",
+      "anchor": "upload-api",
+      "graph": "image-pipeline",
+      "options": {},
+      "variants": {
+        "baseline": {
+          "options": {},
+          "canvas": {
+            "width": 930.4,
+            "height": 662
+          },
+          "anchorBox": {
+            "x": 36,
+            "y": 502,
+            "width": 232,
+            "height": 124
+          },
+          "leading": true,
+          "fit": 0.7854984894259819,
+          "crossings": 0,
+          "bends": 8,
+          "warnings": [
+            "readability/small-text"
+          ]
+        },
+        "anchored": {
+          "options": {
+            "readingAnchors": {
+              "image-pipeline": "upload-api"
+            }
+          },
+          "canvas": {
+            "width": 1272.4,
+            "height": 636.6666666666666
+          },
+          "anchorBox": {
+            "x": 36,
+            "y": 452.66666666666663,
+            "width": 232,
+            "height": 148
+          },
+          "leading": true,
+          "fit": 0.8167539267015708,
+          "crossings": 0,
+          "bends": 8,
+          "warnings": []
+        }
+      }
+    },
+    {
+      "id": "nested-group",
+      "task": "Begin at Order Worker within nested system frames and identify its queue and fulfillment connections.",
+      "anchor": "order-worker",
+      "graph": "order-processing",
+      "options": {
+        "groupingPerspectiveRef": "system-structure"
+      },
+      "variants": {
+        "baseline": {
+          "options": {
+            "groupingPerspectiveRef": "system-structure"
+          },
+          "canvas": {
+            "width": 1553,
+            "height": 589.6666666666666
+          },
+          "anchorBox": {
+            "x": 96,
+            "y": 164,
+            "width": 232,
+            "height": 124
+          },
+          "leading": true,
+          "fit": 0.77269800386349,
+          "crossings": 0,
+          "bends": 8,
+          "warnings": [
+            "readability/small-text"
+          ]
+        },
+        "anchored": {
+          "options": {
+            "groupingPerspectiveRef": "system-structure",
+            "readingAnchors": {
+              "order-processing": "order-worker"
+            }
+          },
+          "canvas": {
+            "width": 1553,
+            "height": 605.6666666666667
+          },
+          "anchorBox": {
+            "x": 96,
+            "y": 164,
+            "width": 232,
+            "height": 148
+          },
+          "leading": true,
+          "fit": 0.77269800386349,
+          "crossings": 0,
+          "bends": 8,
+          "warnings": [
+            "readability/small-text"
+          ]
+        }
+      }
+    }
+  ]
+}

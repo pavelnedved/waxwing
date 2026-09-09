@@ -17,6 +17,8 @@ const usage = `Waxwing — experimental modular diagram tool
 
 Architecture and basic sequence models use the same commands. Sequence models declare diagramType: sequence.
 --group and --direction apply only to architecture diagrams; sequence order comes from JSON 1.
+--anchor graph-id=node-id applies to layout, build, and build-site. Repeat for different architecture graphs.
+An anchor is a reading preference, not a workflow entry or execution-order claim.
 The layout stage is optional. Render accepts a compatible, independently authored JSON 2.
 build-site publishes a managed directory with an index and one page per view/document.
 render-site accepts JSON 2 directly; neither requires a Waxwing server.
@@ -41,6 +43,14 @@ function layoutArgs(args) {
   const options = {};
   for (let index = 0; index < args.length; index += 2) {
     if (!args[index + 1]) throw new Error(`Missing value for ${args[index]}.`);
+    if (args[index] === '--anchor') {
+      const pair = args[index + 1].split('=');
+      if (pair.length !== 2 || pair.some((part) => !part)) throw new Error('--anchor requires graph-id=node-id.');
+      options.readingAnchors ??= {};
+      if (Object.hasOwn(options.readingAnchors, pair[0])) throw new Error(`Repeated reading anchor for graph "${pair[0]}".`);
+      Object.defineProperty(options.readingAnchors, pair[0], { value: pair[1], enumerable: true });
+      continue;
+    }
     const key = { '--group': 'groupingPerspectiveRef', '--direction': 'direction' }[args[index]];
     if (!key || Object.hasOwn(options, key)) throw new Error(`Unknown or repeated option ${args[index]}.`);
     options[key] = args[index + 1];

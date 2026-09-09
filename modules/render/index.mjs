@@ -37,18 +37,20 @@ export function svgMarkup(source, graphRef = rootGraph(source.model), embed = tr
   }).join('');
   const nodes = layout.nodes.map(({ ref, box }) => {
     const entity = entities.get(ref);
+    const anchored = layout.layout.readingAnchorRef === ref;
     const titleLines = wrap(entity.label, 26);
     const category = knowledgeText(entity.category);
     const categoryClass = entity.category.status === 'established' ? entity.category.value : 'unspecified';
     const categoryLabel = (graph.contextRefs.includes(ref) ? 'Context · ' : '') + (entity.category.status === 'established' ? category : `Category ${entity.category.status}`);
     const flags = alerts({ ...model, memberships: model.memberships.filter((item) => graph.membershipRefs.includes(item.id)) }, entity);
-    return `<g ${attrs(ref, entity.label)}><g class="category-${categoryClass}">
+    return `<g ${attrs(ref, entity.label)}${anchored ? ' data-reading-anchor="true"' : ''}><g class="category-${categoryClass}">
       <rect class="node-box" x="${n(box.x)}" y="${n(box.y)}" width="${n(box.width)}" height="${n(box.height)}" rx="12"/>
       <rect class="accent" x="${n(box.x + 18)}" y="${n(box.y + 19)}" width="6" height="6" rx="2"/>
       <text class="node-category" x="${n(box.x + 32)}" y="${n(box.y + 25)}">${escapeXML(categoryLabel)}</text>
       ${titleLines.map((line, index) => `<text class="node-title" x="${n(box.x + 18)}" y="${n(box.y + 52 + index * 20)}">${escapeXML(line)}</text>`).join('')}
       <text class="node-status" x="${n(box.x + 18)}" y="${n(box.y + 75 + (titleLines.length - 1) * 20)}">${escapeXML(existenceText(entity.existence))}</text>
-      <text class="${flags.length ? 'node-alert' : 'node-link'}" x="${n(box.x + 18)}" y="${n(box.y + box.height - 18)}">${escapeXML(flags.length ? flags.slice(0, 2).join(' · ') : (model.graphs?.some((item) => item.expands?.graphRef === graphRef && item.expands.nodeRef === ref) ? 'Detailed graph available ↗' : 'Inspect evidence ↗'))}</text>
+      <text class="${flags.length ? 'node-alert' : 'node-link'}" x="${n(box.x + 18)}" y="${n(box.y + box.height - 18 - (anchored ? 24 : 0))}">${escapeXML(flags.length ? flags.slice(0, 2).join(' · ') : (model.graphs?.some((item) => item.expands?.graphRef === graphRef && item.expands.nodeRef === ref) ? 'Detailed graph available ↗' : 'Inspect evidence ↗'))}</text>
+${anchored ? `      <text class="reading-anchor-cue" x="${n(box.x + 18)}" y="${n(box.y + box.height - 18)}">Start reading here</text>` : ''}
     </g></g>`;
   }).join('');
   const labels = layout.edges.map((edge) => {
@@ -101,6 +103,7 @@ export function renderHTML(layout, options = {}) {
     <p class="purpose" id="graph-question">${escapeXML(graph.scope.question)}</p>
     <p class="purpose" id="graph-abstraction">${escapeXML(graph.scope.abstraction)}</p>
     <div class="scope-line" id="graph-scope"></div>
+    <div id="reading-anchor" class="reading-anchor" hidden><div><span class="detail-key">Start reading here</span><strong id="reading-anchor-name"></strong><p>Reading preference for this view. Arrows retain their operation direction.</p></div><button id="reading-anchor-go">Go to starting node</button></div>
     <div id="workflow-controls" hidden><label>View <select id="diagram-view" aria-label="Diagram view"></select></label><button id="workflow-details" hidden>Workflow entry & order ↗</button></div>
     <section class="map-panel" aria-label="Architecture diagram">
       <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>

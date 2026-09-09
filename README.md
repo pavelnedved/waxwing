@@ -240,6 +240,13 @@ become enclosing frames. Other claims remain available in the inspector and
 embedded model. `--direction RIGHT|DOWN` changes placement, not relationships. Workflow views
 follow their explicit source order in that reading direction.
 
+For an architecture reading starting point, add `--anchor graph-id=node-id` to
+`layout`, `build`, or `build-site` (repeat for different views). For example,
+`--anchor services=orchestrator` puts Orchestrator first in the multi-page demo's
+connectivity view. This is a presentation preference; all operation arrows and
+source claims remain intact. See [reading anchors](docs/reading-anchors.md) and
+the [before/after experiment](experiments/reading-anchor/README.md).
+
 ## What is preserved
 
 JSON 1 holds system facts, qualified interpretations, provenance references,

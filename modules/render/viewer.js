@@ -185,6 +185,14 @@
     document.querySelectorAll('[data-ref]').forEach((element) => element.classList.toggle('selected', element.dataset.ref === ref));
     selectedRef = ref; refreshHighlights();
     document.getElementById('close-inspector').focus();
+    requestAnimationFrame(() => {
+      if (!inspector.hidden && window.matchMedia('(min-width:901px)').matches) {
+        const selected = previousFocus?.matches('.selected') ? previousFocus : viewport.querySelector('.selected');
+        selected?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      } else if (!inspector.hidden) {
+        inspector.scrollIntoView({ block: 'start' });
+      }
+    });
   }
 
   function hideInspector() {
@@ -363,6 +371,8 @@
       fitted = true; fit(); window.scrollTo(0, 0);
     }
     document.querySelector('.highlight-toolbar').hidden = false;
+    document.getElementById('reading-anchor').hidden = !drawing.layout.readingAnchorRef;
+    document.getElementById('reading-anchor-name').textContent = drawing.layout.readingAnchorRef ? name(drawing.layout.readingAnchorRef) : '';
     document.getElementById('workflow-details').hidden = true;
     document.querySelector('.map-caption').replaceChildren(el('span', 'Arrows describe operations: actor → resource.'), el('span', 'Position does not imply execution order. Select any element to inspect it.'));
     updateViewChoices();
@@ -442,6 +452,7 @@
     activeAppearance = appearance;
     updateViewChoices();
     document.getElementById('workflow-details').hidden = false;
+    document.getElementById('reading-anchor').hidden = true;
     document.querySelector('.highlight-toolbar').hidden = true;
     document.getElementById('graph-title').textContent = workflow.title;
     document.getElementById('graph-question').textContent = workflow.scope.question;
@@ -548,13 +559,30 @@
     svg.style.marginLeft = `${Math.max(0, (viewport.clientWidth - drawing.canvas.width * zoom) / 2)}px`;
     svg.style.marginTop = `${Math.max(0, (viewport.clientHeight - drawing.canvas.height * zoom) / 2)}px`;
     document.getElementById('zoom-label').textContent = `${Math.round(zoom * 100)}%`;
+    document.getElementById('zoom-out').disabled = zoom <= .15;
+    document.getElementById('zoom-in').disabled = zoom >= 3;
   }
   function fit() { fitted = true; zoom = Math.min(viewport.clientWidth / drawing.canvas.width, viewport.clientHeight / drawing.canvas.height, 1.3); applyZoom(); viewport.scrollTo(0, 0); }
-  function changeZoom(factor) { fitted = false; zoom = Math.max(.15, Math.min(3, zoom * factor)); applyZoom(); }
+  function changeZoom(factor) {
+    const centerX = (viewport.scrollLeft + viewport.clientWidth / 2 - parseFloat(svg.style.marginLeft || 0)) / zoom;
+    const centerY = (viewport.scrollTop + viewport.clientHeight / 2 - parseFloat(svg.style.marginTop || 0)) / zoom;
+    fitted = false;
+    zoom = Math.max(.15, Math.min(3, zoom * factor));
+    applyZoom();
+    viewport.scrollTo(
+      centerX * zoom + parseFloat(svg.style.marginLeft) - viewport.clientWidth / 2,
+      centerY * zoom + parseFloat(svg.style.marginTop) - viewport.clientHeight / 2,
+    );
+  }
   document.getElementById('zoom-fit').addEventListener('click', fit);
-  document.getElementById('zoom-read').addEventListener('click', () => { fitted = false; zoom = 1; applyZoom(); });
+  document.getElementById('zoom-read').addEventListener('click', () => changeZoom(1 / zoom));
   document.getElementById('zoom-in').addEventListener('click', () => changeZoom(1.25));
   document.getElementById('zoom-out').addEventListener('click', () => changeZoom(.8));
+  document.getElementById('reading-anchor-go').addEventListener('click', () => {
+    const ref = drawing.layout.readingAnchorRef;
+    if (!ref || activeWorkflow) return;
+    changeZoom(1 / zoom); show(ref);
+  });
   new ResizeObserver(() => { if (fitted) fit(); else applyZoom(); refreshReadability(); }).observe(viewport);
   fit();
 

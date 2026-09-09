@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Waxwing JSON 2 — drafts 0.1 through 0.4",
+  "title": "Waxwing JSON 2 \u2014 drafts 0.1 through 0.4",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -48,6 +48,9 @@
             "string",
             "null"
           ]
+        },
+        "readingAnchorRef": {
+          "$ref": "system-model.schema.json#/$defs/id"
         }
       }
     },
@@ -367,6 +370,9 @@
                 "string",
                 "null"
               ]
+            },
+            "readingAnchorRef": {
+              "$ref": "system-model.schema.json#/$defs/id"
             }
           }
         },

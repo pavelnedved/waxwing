@@ -68,12 +68,20 @@ export function validateLayout(document, { expectedModel } = {}) {
 
   const canvas = { x: 0, y: 0, ...document.canvas };
   const nodes = new Map(document.nodes.map((item) => [item.ref, item.box]));
+  if (document.layout.readingAnchorRef !== undefined) {
+    const anchor = nodes.get(document.layout.readingAnchorRef);
+    const axis = document.layout.direction === 'DOWN' ? 'y' : 'x';
+    if (!anchor) add('layout/reading-anchor', '/layout/readingAnchorRef', 'Reading anchor must name a component shown in this graph.');
+    else if (document.nodes.some((node) => node.box[axis] < anchor[axis] - EPS)) {
+      add('layout/reading-anchor', '/layout/readingAnchorRef', 'Reading anchor must be at the leading edge of the diagram. This anchor and grouping may require separate views.');
+    }
+  }
   const groups = new Map(document.groups.map((item) => [item.ref, item.box]));
   const relations = new Map(document.model.relationships.map((item) => [item.id, item]));
   for (const [index, node] of document.nodes.entries()) {
     if (!contains(canvas, node.box)) add('geometry/canvas', `/nodes/${index}`, 'Node exceeds the canvas.');
     const entity = document.model.entities.find((item) => item.id === node.ref);
-    if (node.box.width < 232 || node.box.height < 104 + wrap(entity.label, 26).length * 20) add('geometry/node-size', `/nodes/${index}`, 'Node is too small for the renderer text contract.');
+    if (node.box.width < 232 || node.box.height < 104 + wrap(entity.label, 26).length * 20 + (node.ref === document.layout.readingAnchorRef ? 24 : 0)) add('geometry/node-size', `/nodes/${index}`, 'Node is too small for the renderer text contract.');
     for (const other of document.nodes.slice(index + 1)) if (overlaps(node.box, other.box)) add('geometry/overlap', `/nodes/${index}`, `Node overlaps "${other.ref}".`);
   }
   const parents = new Map(frameMemberships(document.model, perspective).map((item) => [item.memberRef, item.group.value]));

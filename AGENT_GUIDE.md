@@ -1686,6 +1686,25 @@ layouts in the built-in producer. It does not create grouping claims. Sequence
 models reject both `--group` and `--direction`; their order comes from JSON 1.
 There is no CLI `--skin` flag: style can be selected in HTML or through render APIs.
 
+To choose where a reader begins an architecture view, add
+`--anchor graph-id=node-id` to `layout`, `build`, or `build-site`. Repeat for
+different graphs; single-graph models use the model ID as graph ID. For the
+architecture example above, `--anchor processing-detail=worker` is a reading
+preference. The anchor must name a component included in that graph. It does not
+declare a workflow entry or execution order; all source claims and arrow
+directions remain unchanged. Sequence models reject this option.
+
+The generator uses ELK first-layer constraints for the anchor and its enclosing
+frames. Unrelated components cannot precede it on the chosen axis. Grouped
+components may share its leading position. JSON 2 records the preference as
+`layout.readingAnchorRef` in the affected drawing, and HTML/SVG visibly mark
+**Start reading here**. HTML offers **Go to starting node** at 100% zoom.
+Unspecified views and explicit workflows retain their existing placement rules.
+Keep the same options when regenerating from JSON 1. An incompatible
+anchor/grouping combination fails validation rather than silently ignoring the
+anchor or changing grouping. Compare dimensions and readable zoom: a successful
+anchor can make the overall diagram wider or taller.
+
 HTML includes all architecture graph/workflow views and documents, or the one
 sequence model with its documents. The default architecture SVG shows the root
 connectivity graph. To export a selected graph or architecture workflow:
@@ -1790,7 +1809,8 @@ const recovered = recoverArtifact(html);
 ```
 
 Optional architecture layout arguments are
-`{direction: 'RIGHT' | 'DOWN', groupingPerspectiveRef: ID | null}`. Optional SVG
+`{direction: 'RIGHT' | 'DOWN', groupingPerspectiveRef: ID | null, readingAnchors: {[graphID]: nodeID}}`.
+Each field is optional; `readingAnchors` is a per-view map. Optional SVG
 selectors are `graphRef` or `workflowRef`, mutually exclusive. HTML's option is
 only `skin`. `layoutModel` leaves source intact; `validateLayout` can check the
 embedded model against independently supplied JSON 1. Rendering validates JSON 2

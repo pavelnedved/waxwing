@@ -37,6 +37,8 @@
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
 </style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     <g class="record" data-ref="order-system" tabindex="0" role="button" aria-label="Inspect Order Processing"><rect class="frame" x="36" y="36" width="712.4" height="435" rx="16"/><text class="frame-title" x="58" y="66">Order Processing</text></g><g class="record" data-ref="fulfillment-system" tabindex="0" role="button" aria-label="Inspect Fulfillment Platform"><rect class="frame" x="1160" y="253" width="292" height="218" rx="16"/><text class="frame-title" x="1182" y="283">Fulfillment Platform</text></g><g class="record" data-ref="consume-order" tabindex="0" role="button" aria-label="Inspect Consumes order submissions"><g class=""><path class="edge-hit" d="M298,358.333 L308,358.333 L308,337.667 L486.4,337.667"/><path class="edge-line" d="M298,358.333 L308,358.333 L308,337.667 L486.4,337.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="direct-submit" tabindex="0" role="button" aria-label="Inspect Submits orders directly"><g class=""><path class="edge-hit" d="M298,195.667 L308,195.667 L308,100 L788.4,100 L788.4,358.333 L1190,358.333"/><path class="edge-line" d="M298,195.667 L308,195.667 L308,100 L788.4,100 L788.4,358.333 L1190,358.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="enqueue-order" tabindex="0" role="button" aria-label="Inspect Publishes order submissions"><g class=""><path class="edge-hit" d="M298,257.667 L476.4,257.667 L476.4,296.333 L486.4,296.333"/><path class="edge-line" d="M298,257.667 L476.4,257.667 L476.4,296.333 L486.4,296.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="persist-order" tabindex="0" role="button" aria-label="Inspect Writes orders"><g class=""><path class="edge-hit" d="M298,226.667 L318,226.667 L318,173 L486.4,173"/><path class="edge-line" d="M298,226.667 L318,226.667 L318,173 L486.4,173" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="worker-submit" tabindex="0" role="button" aria-label="Inspect Submits orders to Fulfillment"><g class=""><path class="edge-hit" d="M298,399.667 L1190,399.667"/><path class="edge-line" d="M298,399.667 L1190,399.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout-api" tabindex="0" role="button" aria-label="Inspect Checkout API"><g class="category-service">
       <rect class="node-box" x="66" y="164.667" width="232" height="124" rx="12"/>
@@ -45,6 +47,7 @@
       <text class="node-title" x="84" y="216.667">Checkout API</text>
       <text class="node-status" x="84" y="239.667">established · present</text>
       <text class="node-link" x="84" y="270.667">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="fulfillment" tabindex="0" role="button" aria-label="Inspect Fulfillment"><g class="category-service">
       <rect class="node-box" x="1190" y="317" width="232" height="124" rx="12"/>
       <rect class="accent" x="1208" y="336" width="6" height="6" rx="2"/>
@@ -52,6 +55,7 @@
       <text class="node-title" x="1208" y="369">Fulfillment</text>
       <text class="node-status" x="1208" y="392">established · present</text>
       <text class="node-link" x="1208" y="423">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="order-queue" tabindex="0" role="button" aria-label="Inspect Order Queue"><g class="category-queue">
       <rect class="node-box" x="486.4" y="255" width="232" height="124" rx="12"/>
       <rect class="accent" x="504.4" y="274" width="6" height="6" rx="2"/>
@@ -59,6 +63,7 @@
       <text class="node-title" x="504.4" y="307">Order Queue</text>
       <text class="node-status" x="504.4" y="330">established · present</text>
       <text class="node-alert" x="504.4" y="361">1 unknown · 1 reported</text>
+
     </g></g><g class="record" data-ref="order-worker" tabindex="0" role="button" aria-label="Inspect Order Worker"><g class="category-service">
       <rect class="node-box" x="66" y="317" width="232" height="124" rx="12"/>
       <rect class="accent" x="84" y="336" width="6" height="6" rx="2"/>
@@ -66,6 +71,7 @@
       <text class="node-title" x="84" y="369">Order Worker</text>
       <text class="node-status" x="84" y="392">established · present</text>
       <text class="node-alert" x="84" y="423">1 disputed · 2 reported</text>
+
     </g></g><g class="record" data-ref="orders-db" tabindex="0" role="button" aria-label="Inspect Orders DB"><g class="category-datastore">
       <rect class="node-box" x="486.4" y="111" width="232" height="124" rx="12"/>
       <rect class="accent" x="504.4" y="130" width="6" height="6" rx="2"/>
@@ -73,5 +79,6 @@
       <text class="node-title" x="504.4" y="163">Orders DB</text>
       <text class="node-status" x="504.4" y="186">established · present</text>
       <text class="node-link" x="504.4" y="217">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="consume-order" tabindex="0" role="button" aria-label="Inspect Consumes order submissions"><rect class="edge-label-bg" x="338.8" y="340.667" width="116.8" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="397.2" y="358.667">Consumes order</text><text class="edge-label" text-anchor="middle" x="397.2" y="376.667">submissions</text></g><g class="record" data-ref="direct-submit" tabindex="0" role="button" aria-label="Inspect Submits orders directly"><rect class="edge-label-bg" x="863.4" y="293.333" width="181.6" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="954.2" y="311.333">Submits orders directly</text><text class="edge-label edge-note" text-anchor="middle" x="954.2" y="329.333">Condition unknown</text></g><g class="record" data-ref="enqueue-order" tabindex="0" role="button" aria-label="Inspect Publishes order submissions"><rect class="edge-label-bg" x="328" y="260.667" width="138.4" height="66" rx="5"/><text class="edge-label" text-anchor="middle" x="397.2" y="278.667">Publishes order</text><text class="edge-label" text-anchor="middle" x="397.2" y="296.667">submissions</text><text class="edge-label edge-note" text-anchor="middle" x="397.2" y="314.667">Condition unknown</text></g><g class="record" data-ref="persist-order" tabindex="0" role="button" aria-label="Inspect Writes orders"><rect class="edge-label-bg" x="342.4" y="176" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="397.2" y="194">Writes orders</text></g><g class="record" data-ref="worker-submit" tabindex="0" role="button" aria-label="Inspect Submits orders to Fulfillment"><rect class="edge-label-bg" x="885" y="416.667" width="138.4" height="48" rx="5"/><text class="edge-label" text-anchor="middle" x="954.2" y="434.667">Submits orders to</text><text class="edge-label" text-anchor="middle" x="954.2" y="452.667">Fulfillment</text></g>
   </svg>

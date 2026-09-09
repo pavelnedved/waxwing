@@ -99,8 +99,17 @@ explicitly tells readers to expect that convention. A different renderer may
 choose a different presentation, but must state its rules and preserve the
 authored source rather than silently reinterpret this presentation contract.
 
-In HTML, **Workflow entry** opens both claims, their evidence, and links to the
-participant and starting item. Those records link back to the entry inspector.
+In HTML, a **Sequence start** summary names the starting participant and first
+step or control block. **Go to start** closes details, returns the canvas to its
+beginning at 100% zoom, and focuses the starting participant. Both the participant
+and starting item have accent outlines in the diagram and SVG export. These
+controls and markers also appear on sequence pages in multi-page exports.
+Unknown, disputed, and undeclared entries show their status without choosing a
+participant or offering a Go to start action.
+
+**Inspect entry & trigger** opens both claims, their evidence, and links to the
+participant and starting item (within Scope & evidence in multi-page exports).
+Those records link back to the entry inspector in the single-file viewer.
 The inspector URL survives reload and history. SVG retains its visible cue and
 the complete recoverable source; all skins preserve the claims and geometry.
 

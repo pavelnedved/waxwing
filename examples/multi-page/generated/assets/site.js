@@ -7,9 +7,14 @@
   const width = svg ? Number(svg.getAttribute('width')) : 0;
   const height = svg ? Number(svg.getAttribute('height')) : 0;
   function scale(value) {
+    const centerX = (viewport.scrollLeft + viewport.clientWidth / 2) / zoom;
+    const centerY = (viewport.scrollTop + viewport.clientHeight / 2) / zoom;
     zoom = Math.max(0.05,Math.min(3,value));
     svg.style.width = `${width*zoom}px`; svg.style.height = `${height*zoom}px`;
     $('zoom-label').textContent = `${Math.round(zoom*100)}%`;
+    $('zoom-out').disabled = zoom <= 0.05;
+    $('zoom-in').disabled = zoom >= 3;
+    viewport.scrollTo(centerX * zoom - viewport.clientWidth / 2, centerY * zoom - viewport.clientHeight / 2);
   }
   function preferences() {
     if (svg) { svg.dataset.theme = document.body.classList.contains('dark') ? 'dark' : 'light'; svg.dataset.skin = $('skin').value; }
@@ -34,6 +39,14 @@
       // All content was escaped/rendered at export time; no model strings enter innerHTML here.
       $('inspector-content').replaceChildren(record.querySelector('.record-body').cloneNode(true));
       $('close-inspector').focus({preventScroll:true});
+      requestAnimationFrame(() => {
+        if (!$('inspector').hidden && window.matchMedia('(min-width:901px)').matches) {
+          const selected = lastFocus?.matches('.selected') ? lastFocus : svg?.querySelector('.selected');
+          selected?.scrollIntoView({block:'nearest',inline:'nearest'});
+        } else if (!$('inspector').hidden) {
+          $('inspector').scrollIntoView({block:'start'});
+        }
+      });
     } else if (id && !$(id)) {
       $('navigation-error').textContent = 'This page has no target matching that link. Return to Contents to find the view.';
       $('navigation-error').hidden = false;
@@ -57,7 +70,13 @@
     $('zoom-out').onclick = () => scale(zoom/1.25);
     $('zoom-in').onclick = () => scale(zoom*1.25);
     $('zoom-read').onclick = () => scale(1);
-    $('zoom-fit').onclick = () => scale((viewport.clientWidth-24)/width);
+    $('zoom-fit').onclick = () => { scale((viewport.clientWidth-24)/width); viewport.scrollTo(0, 0); };
+    if ($('sequence-start')) $('sequence-start').onclick = () => {
+      history.replaceState(null,'',location.pathname+location.search); route();
+      scale(1); viewport.scrollTo(0,0);
+      svg.querySelector('[data-sequence-entry="participant"]')?.focus({preventScroll:true});
+      viewport.scrollIntoView({block:'nearest'});
+    };
     function select(e) {
       const record = e.target.closest('.record'); if (!record) return;
       if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;
@@ -70,6 +89,7 @@
   document.addEventListener('click',(e) => {
     const a = e.target.closest('a[href^="#record-"]'); if(!a)return;
     e.preventDefault(); lastFocus = a;
+    if (a.id === 'reading-anchor-go' && svg) scale(1);
     history.pushState(null,'',a.getAttribute('href')); route();
   });
   addEventListener('hashchange',route); addEventListener('popstate',route); route();

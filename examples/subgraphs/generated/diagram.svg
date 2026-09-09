@@ -37,6 +37,8 @@
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
 </style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     <g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><g class=""><path class="edge-hit" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333"/><path class="edge-line" d="M268,302 L515.4,302 L515.4,139.333 L590.4,139.333" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><g class=""><path class="edge-hit" d="M268,98 L590.4,98"/><path class="edge-line" d="M268,98 L590.4,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><g class=""><path class="edge-hit" d="M822.4,118.667 L1159.2,118.667"/><path class="edge-line" d="M822.4,118.667 L1159.2,118.667" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
       <rect class="node-box" x="36" y="240" width="232" height="124" rx="12"/>
@@ -45,6 +47,7 @@
       <text class="node-title" x="54" y="292">Checkout</text>
       <text class="node-status" x="54" y="315">established · present</text>
       <text class="node-link" x="54" y="346">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="operations" tabindex="0" role="button" aria-label="Inspect Operations Console"><g class="category-actor">
       <rect class="node-box" x="36" y="36" width="232" height="124" rx="12"/>
       <rect class="accent" x="54" y="55" width="6" height="6" rx="2"/>
@@ -52,6 +55,7 @@
       <text class="node-title" x="54" y="88">Operations Console</text>
       <text class="node-status" x="54" y="111">established · present</text>
       <text class="node-link" x="54" y="142">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="orders" tabindex="0" role="button" aria-label="Inspect Order Processing"><g class="category-service">
       <rect class="node-box" x="590.4" y="56.667" width="232" height="124" rx="12"/>
       <rect class="accent" x="608.4" y="75.667" width="6" height="6" rx="2"/>
@@ -59,6 +63,7 @@
       <text class="node-title" x="608.4" y="108.667">Order Processing</text>
       <text class="node-status" x="608.4" y="131.667">established · present</text>
       <text class="node-link" x="608.4" y="162.667">Detailed graph available ↗</text>
+
     </g></g><g class="record" data-ref="payments" tabindex="0" role="button" aria-label="Inspect Payment Provider"><g class="category-service">
       <rect class="node-box" x="1159.2" y="56.667" width="232" height="124" rx="12"/>
       <rect class="accent" x="1177.2" y="75.667" width="6" height="6" rx="2"/>
@@ -66,5 +71,6 @@
       <text class="node-title" x="1177.2" y="108.667">Payment Provider</text>
       <text class="node-status" x="1177.2" y="131.667">established · present</text>
       <text class="node-link" x="1177.2" y="162.667">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="checkout-orders" tabindex="0" role="button" aria-label="Inspect Submit order"><rect class="edge-label-bg" x="378" y="319" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="337">Submit order</text></g><g class="record" data-ref="ops-orders" tabindex="0" role="button" aria-label="Inspect Repair order"><rect class="edge-label-bg" x="378" y="51" width="102.4" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="429.2" y="69">Repair order</text></g><g class="record" data-ref="orders-payment" tabindex="0" role="button" aria-label="Inspect Charge payment"><rect class="edge-label-bg" x="932.4" y="135.667" width="116.8" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="990.8" y="153.667">Charge payment</text></g>
   </svg>

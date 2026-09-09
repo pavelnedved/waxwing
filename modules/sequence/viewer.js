@@ -120,7 +120,15 @@
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && !inspector.hidden) navigate(`#graph=${model.id}`); });
   document.getElementById('model-details').addEventListener('click', () => navigate(`#graph=${model.id}&record=__model`));
   document.getElementById('order-details').addEventListener('click', () => navigate(`#graph=${model.id}&record=__order`));
-  document.getElementById('entry-details').addEventListener('click', () => navigate(`#graph=${model.id}&record=__entry`));
+  document.getElementById('sequence-start')?.addEventListener('click', () => {
+    close(); navigate(`#graph=${model.id}`);
+    fitted = false; zoom = 1; applyZoom();
+    requestAnimationFrame(() => {
+      viewport.scrollTo(0, 0);
+      svg.querySelector('[data-sequence-entry="participant"]')?.focus({ preventScroll: true });
+      viewport.scrollIntoView({ block: 'nearest' });
+    });
+  });
   document.getElementById('theme').addEventListener('click', (event) => {
     const dark = document.body.classList.toggle('dark'); svg.dataset.theme = dark ? 'dark' : 'light'; event.target.textContent = dark ? 'Light theme' : 'Dark theme';
   });

@@ -37,6 +37,8 @@
 .ww-svg .record.highlight-match .node-box, .ww-svg .record.highlight-match .frame { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-line { stroke:var(--accent); stroke-width:3.5; }
 .ww-svg .record.highlight-match .edge-label-bg { stroke:var(--accent); stroke-width:1; }
+.ww-svg [data-reading-anchor="true"] .node-box { stroke:var(--accent); stroke-width:3; }
+.ww-svg .reading-anchor-cue { fill:var(--accent); font-size:11px; font-weight:700; }
 </style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     <g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><g class=""><path class="edge-hit" d="M268,129 L597.6,129"/><path class="edge-line" d="M268,129 L597.6,129" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><g class=""><path class="edge-hit" d="M829.6,129 L874.6,129 L874.6,302 L1180.8,302"/><path class="edge-line" d="M829.6,129 L874.6,129 L874.6,302 L1180.8,302" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><g class=""><path class="edge-hit" d="M829.6,160 L864.6,160 L864.6,506 L1180.8,506"/><path class="edge-line" d="M829.6,160 L864.6,160 L864.6,506 L1180.8,506" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><g class=""><path class="edge-hit" d="M829.6,98 L1180.8,98"/><path class="edge-line" d="M829.6,98 L1180.8,98" marker-end="url(#ww-arrow)"/></g></g><g class="record" data-ref="checkout" tabindex="0" role="button" aria-label="Inspect Checkout"><g class="category-service">
       <rect class="node-box" x="36" y="67" width="232" height="124" rx="12"/>
@@ -45,6 +47,7 @@
       <text class="node-title" x="54" y="119">Checkout</text>
       <text class="node-status" x="54" y="142">established · present</text>
       <text class="node-link" x="54" y="173">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="orchestrator" tabindex="0" role="button" aria-label="Inspect Orchestrator"><g class="category-service">
       <rect class="node-box" x="597.6" y="67" width="232" height="124" rx="12"/>
       <rect class="accent" x="615.6" y="86" width="6" height="6" rx="2"/>
@@ -52,6 +55,7 @@
       <text class="node-title" x="615.6" y="119">Orchestrator</text>
       <text class="node-status" x="615.6" y="142">established · present</text>
       <text class="node-link" x="615.6" y="173">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="payment" tabindex="0" role="button" aria-label="Inspect Payment"><g class="category-service">
       <rect class="node-box" x="1180.8" y="240" width="232" height="124" rx="12"/>
       <rect class="accent" x="1198.8" y="259" width="6" height="6" rx="2"/>
@@ -59,6 +63,7 @@
       <text class="node-title" x="1198.8" y="292">Payment</text>
       <text class="node-status" x="1198.8" y="315">established · present</text>
       <text class="node-link" x="1198.8" y="346">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="pricing" tabindex="0" role="button" aria-label="Inspect Pricing"><g class="category-service">
       <rect class="node-box" x="1180.8" y="444" width="232" height="124" rx="12"/>
       <rect class="accent" x="1198.8" y="463" width="6" height="6" rx="2"/>
@@ -66,6 +71,7 @@
       <text class="node-title" x="1198.8" y="496">Pricing</text>
       <text class="node-status" x="1198.8" y="519">established · present</text>
       <text class="node-link" x="1198.8" y="550">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="stock" tabindex="0" role="button" aria-label="Inspect Stock"><g class="category-service">
       <rect class="node-box" x="1180.8" y="36" width="232" height="124" rx="12"/>
       <rect class="accent" x="1198.8" y="55" width="6" height="6" rx="2"/>
@@ -73,5 +79,6 @@
       <text class="node-title" x="1198.8" y="88">Stock</text>
       <text class="node-status" x="1198.8" y="111">established · present</text>
       <text class="node-link" x="1198.8" y="142">Inspect evidence ↗</text>
+
     </g></g><g class="record" data-ref="checkout-orchestrator" tabindex="0" role="button" aria-label="Inspect Submit basket"><rect class="edge-label-bg" x="378" y="146" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="432.8" y="164">Submit basket</text></g><g class="record" data-ref="orchestrator-payment" tabindex="0" role="button" aria-label="Inspect Charge basket"><rect class="edge-label-bg" x="950.4" y="319" width="109.6" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1005.2" y="337">Charge basket</text></g><g class="record" data-ref="orchestrator-pricing" tabindex="0" role="button" aria-label="Inspect Calculate charge"><rect class="edge-label-bg" x="939.6" y="523" width="131.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1005.2" y="541">Calculate charge</text></g><g class="record" data-ref="orchestrator-stock" tabindex="0" role="button" aria-label="Inspect Check stock"><rect class="edge-label-bg" x="957.6" y="115" width="95.2" height="30" rx="5"/><text class="edge-label" text-anchor="middle" x="1005.2" y="133">Check stock</text></g>
   </svg>
