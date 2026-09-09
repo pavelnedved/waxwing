@@ -233,3 +233,7 @@ node bin/waxwing.mjs recover /tmp/internals.svg /tmp/recovered-model.json
 all original JSON 1, not only that visible graph. The HTML SVG download captures
 the current graph; JSON downloads contain the complete model/layout. Ordinary
 SVG image viewers do not provide the HTML graph and document navigation.
+
+For separate parent/child HTML pages with generated links, use the optional
+[site exporter](site-export.md). The same source relationships and boundary claims
+apply; no folder arrangement establishes a parent/child relationship.

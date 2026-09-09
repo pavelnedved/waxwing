@@ -10,13 +10,17 @@ const usage = `Waxwing — experimental modular diagram tool
   waxwing layout <model.json> <layout.json> [--group perspective-id] [--direction RIGHT|DOWN]
   waxwing check-layout <layout.json>
   waxwing render <layout.json> <output.svg|output.html> [--graph graph-id | --workflow workflow-id]
-  waxwing recover <layout.json|diagram.svg|diagram.html> <model.json>
+  waxwing render-site <layout.json> <output-directory>
+  waxwing build-site <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
+  waxwing recover <layout.json|diagram.svg|diagram.html|site-directory> <model.json>
   waxwing build <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
 
 Architecture and basic sequence models use the same commands. Sequence models declare diagramType: sequence.
 --group and --direction apply only to architecture diagrams; sequence order comes from JSON 1.
 The layout stage is optional. Render accepts a compatible, independently authored JSON 2.
-validate, prepare, layout, and build load explicitly registered Markdown files and local raster images.
+build-site publishes a managed directory with an index and one page per view/document.
+render-site accepts JSON 2 directly; neither requires a Waxwing server.
+validate, prepare, layout, build, and build-site load explicitly registered Markdown files and local raster images.
 No command scans repositories, fetches source locators, or calls an LLM.`;
 
 function readJSON(file) { return JSON.parse(fs.readFileSync(file, 'utf8')); }
@@ -44,15 +48,15 @@ function layoutArgs(args) {
   return options;
 }
 
+const [command, ...args] = process.argv.slice(2);
 try {
-  const [command, ...args] = process.argv.slice(2);
   if (!command || ['--help', '-h', 'help'].includes(command)) console.log(usage);
   else if (command === 'validate') {
     if (args.length !== 1) throw new Error('validate requires one JSON 1 file.');
     const { validateModel } = await import('../modules/model/index.mjs');
     const { loadModel } = await import('../modules/documents/index.mjs');
     const result = validateModel(loadModel(args[0]).model);
-    console.log(JSON.stringify(result, null, 2)); process.exitCode = result.ok ? 0 : 1;
+    console.log(JSON.stringify(result.ok ? result : {...result, command, input: path.resolve(args[0])}, null, 2)); process.exitCode = result.ok ? 0 : 1;
   } else if (command === 'prepare') {
     if (args.length !== 2) throw new Error('prepare requires an authoring input and a resolved JSON 1 output path.');
     const { loadModel } = await import('../modules/documents/index.mjs');
@@ -62,7 +66,19 @@ try {
     if (args.length !== 1) throw new Error('check-layout requires one JSON 2 file.');
     const { validateLayout } = await import('../modules/layout/validate.mjs');
     const result = validateLayout(readJSON(args[0]));
-    console.log(JSON.stringify(result, null, 2)); process.exitCode = result.ok ? 0 : 1;
+    console.log(JSON.stringify(result.ok ? result : {...result, command, input: path.resolve(args[0])}, null, 2)); process.exitCode = result.ok ? 0 : 1;
+  } else if (command === 'render-site' || command === 'build-site') {
+    if (args.length < 2 || (command === 'render-site' && args.length !== 2)) throw new Error(`${command} requires input and output directory paths.`);
+    const { renderSite, writeSite } = await import('../modules/site/index.mjs');
+    let layout, inputFiles;
+    if (command === 'build-site') {
+      const { loadModel } = await import('../modules/documents/index.mjs');
+      const { layoutModel } = await import('../modules/layout/index.mjs');
+      const loaded = loadModel(args[0]); inputFiles = loaded.inputFiles;
+      layout = await layoutModel(loaded.model, layoutArgs(args.slice(2)));
+    } else { layout = readJSON(args[0]); inputFiles = [args[0]]; }
+    const result = writeSite(renderSite(layout), args[1], {inputFiles});
+    console.log(JSON.stringify({ok:true,...result},null,2));
   } else if (command === 'layout' || command === 'build') {
     if (args.length < 2) throw new Error(`${command} requires input and output paths.`);
     const { layoutModel } = await import('../modules/layout/index.mjs');
@@ -88,10 +104,14 @@ try {
   } else if (command === 'recover') {
     if (args.length !== 2) throw new Error('recover requires an artifact and a JSON 1 output path.');
     const { recoverArtifact } = await import('../modules/render/artifacts.mjs');
-    const model = recoverArtifact(fs.readFileSync(args[0], 'utf8'));
-    console.log(JSON.stringify({ ok: true, output: write(args[1], JSON.stringify(model, null, 2) + '\n', [args[0]]) }));
+    const directory = fs.statSync(args[0]).isDirectory();
+    const model = directory ? (await import('../modules/site/files.mjs')).recoverSite(args[0]) : recoverArtifact(fs.readFileSync(args[0], 'utf8'));
+    if (directory) {
+      (await import('../modules/site/files.mjs')).assertOutsideSite(args[0],args[1]);
+    }
+    console.log(JSON.stringify({ ok: true, output: write(args[1], JSON.stringify(model, null, 2) + '\n', directory ? [path.join(args[0],'source/model.json'),path.join(args[0],'source/layout.json')] : [args[0]]) }));
   } else throw new Error(`Unknown command "${command}". Run with --help.`);
 } catch (error) {
-  console.error(JSON.stringify({ ok: false, message: error.message, diagnostics: error.diagnostics ?? [] }, null, 2));
+  console.error(JSON.stringify({ ok: false, command, ...(args[0] && ['validate','prepare','layout','check-layout','render','recover','build','render-site','build-site'].includes(command) ? {input: path.resolve(args[0])} : {}), message: error.message, diagnostics: error.diagnostics ?? [] }, null, 2));
   process.exitCode = 1;
 }

@@ -18,7 +18,7 @@ export const escapeXML = (value) => String(value).replaceAll('&', '&amp;').repla
 const n = (value) => Number(value.toFixed(3));
 const attrs = (ref, label) => `class="record" data-ref="${escapeXML(ref)}" tabindex="0" role="button" aria-label="Inspect ${escapeXML(label)}"`;
 
-function svgMarkup(source, graphRef = rootGraph(source.model), embed = true, skin = 'standard') {
+export function svgMarkup(source, graphRef = rootGraph(source.model), embed = true, skin = 'standard') {
   const model = source.model;
   const graph = graphsOf(model).find((item) => item.id === graphRef);
   if (!graph) throw new Error(`Unknown graph "${graphRef}".`);
@@ -60,7 +60,7 @@ function svgMarkup(source, graphRef = rootGraph(source.model), embed = true, ski
   }).join('');
   const payload = embed ? Buffer.from(canonical(source), 'utf8').toString('base64') : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" class="ww-svg" data-skin="${skin}" data-graph-ref="${escapeXML(graphRef)}" data-theme="light" viewBox="0 0 ${n(layout.canvas.width)} ${n(layout.canvas.height)}" width="${n(layout.canvas.width)}" height="${n(layout.canvas.height)}" role="group" aria-labelledby="ww-title ww-description">
-    <title id="ww-title">${escapeXML(graph.title)}</title><desc id="ww-description">${escapeXML(graph.scope.abstraction)} Operation arrows point from actor to resource. Unknowns and disputes are retained in embedded JSON 1 and the HTML details viewer.</desc>
+    <title id="ww-title">${escapeXML(graph.title)}</title><desc id="ww-description">${escapeXML(graph.scope.abstraction)} Operation arrows point from actor to resource. Unknowns and disputes are retained in ${embed ? 'embedded JSON 1' : 'the export source'} and the HTML details viewer.</desc>
 ${embed ? `    <metadata id="waxwing-source" data-encoding="base64">${payload}</metadata>` : ''}
     <style>${svgCSS}</style><defs><marker id="ww-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="arrow" d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>
     ${frames}${edges}${nodes}${labels}

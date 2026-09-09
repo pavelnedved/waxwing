@@ -1,0 +1,831 @@
+{
+  "schemaVersion": "0.5-draft",
+  "id": "checkout-system",
+  "title": "Checkout: three focused workflows",
+  "scope": {
+    "timeframe": "current",
+    "environment": "Fictional checkout service",
+    "snapshot": "Synthetic run v1",
+    "coverage": "partial",
+    "question": "How can readers inspect checkout, stock and pricing independently while sharing one service registry?",
+    "includes": [
+      "The recorded checkout path and two explicitly scoped excerpts."
+    ],
+    "excludes": [
+      "Branches, retries, replicas, elapsed time, concurrency and unrecorded operations."
+    ],
+    "abstraction": "One shared service registry, one architecture graph, and three separately readable workflow views."
+  },
+  "sources": [
+    {
+      "id": "fictional-run",
+      "kind": "fixture",
+      "locator": "evidence.md",
+      "description": "An invented service registry and successful checkout run."
+    }
+  ],
+  "perspectives": [],
+  "entities": [
+    {
+      "id": "checkout",
+      "label": "Checkout",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Receives a submitted basket.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "omits": [
+          "Classes and deployment replicas."
+        ],
+        "reason": "Show service responsibilities."
+      }
+    },
+    {
+      "id": "orchestrator",
+      "label": "Orchestrator",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Coordinates stock, pricing and payment.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "omits": [
+          "Classes and deployment replicas."
+        ],
+        "reason": "Show service responsibilities."
+      }
+    },
+    {
+      "id": "stock",
+      "label": "Stock",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Checks stock availability.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "omits": [
+          "Classes and deployment replicas."
+        ],
+        "reason": "Show service responsibilities."
+      }
+    },
+    {
+      "id": "pricing",
+      "label": "Pricing",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Calculates the charge.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "omits": [
+          "Classes and deployment replicas."
+        ],
+        "reason": "Show service responsibilities."
+      }
+    },
+    {
+      "id": "payment",
+      "label": "Payment",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "category": {
+        "status": "established",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Accepts the final charge request.",
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "omits": [
+          "Classes and deployment replicas."
+        ],
+        "reason": "Show service responsibilities."
+      }
+    }
+  ],
+  "groups": [],
+  "memberships": [],
+  "relationships": [
+    {
+      "id": "checkout-orchestrator",
+      "from": "checkout",
+      "to": "orchestrator",
+      "label": "Submit basket",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      }
+    },
+    {
+      "id": "orchestrator-stock",
+      "from": "orchestrator",
+      "to": "stock",
+      "label": "Check stock",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      }
+    },
+    {
+      "id": "orchestrator-pricing",
+      "from": "orchestrator",
+      "to": "pricing",
+      "label": "Calculate charge",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      }
+    },
+    {
+      "id": "orchestrator-payment",
+      "from": "orchestrator",
+      "to": "payment",
+      "label": "Charge basket",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      }
+    }
+  ],
+  "notes": [],
+  "rootGraphRef": "services",
+  "graphs": [
+    {
+      "id": "services",
+      "title": "Checkout connectivity",
+      "scope": {
+        "timeframe": "current",
+        "environment": "Fictional checkout service",
+        "snapshot": "Synthetic run v1",
+        "coverage": "partial",
+        "question": "Which services invoke which operations?",
+        "includes": [
+          "One recorded interaction path with explicit stock and pricing replies."
+        ],
+        "excludes": [
+          "Branches, retries, replicas, elapsed time, concurrency and unrecorded operations."
+        ],
+        "abstraction": "One box per service. Relationships express actor-to-resource operations, without execution order."
+      },
+      "entityRefs": [
+        "checkout",
+        "orchestrator",
+        "stock",
+        "pricing",
+        "payment"
+      ],
+      "contextRefs": [],
+      "relationshipRefs": [
+        "checkout-orchestrator",
+        "orchestrator-stock",
+        "orchestrator-pricing",
+        "orchestrator-payment"
+      ],
+      "membershipRefs": []
+    }
+  ],
+  "workflows": [
+    {
+      "id": "checkout-run",
+      "title": "Checkout through the orchestrator",
+      "graphRef": "services",
+      "scope": {
+        "timeframe": "current",
+        "environment": "Fictional checkout service",
+        "snapshot": "Synthetic run v1",
+        "coverage": "partial",
+        "question": "How does checkout revisit one orchestrator while checking stock, pricing, and payment?",
+        "includes": [
+          "One recorded interaction path with explicit stock and pricing replies."
+        ],
+        "excludes": [
+          "Branches, retries, replicas, elapsed time, concurrency and unrecorded operations."
+        ],
+        "abstraction": "Services remain canonical components; the workflow expands their participation in one recorded scenario."
+      },
+      "steps": [
+        {
+          "id": "submit",
+          "label": "Submit basket",
+          "kind": "message",
+          "from": "checkout",
+          "to": "orchestrator",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "relationshipRef": "checkout-orchestrator"
+        },
+        {
+          "id": "check-stock",
+          "label": "Check stock",
+          "kind": "message",
+          "from": "orchestrator",
+          "to": "stock",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "relationshipRef": "orchestrator-stock"
+        },
+        {
+          "id": "stock-result",
+          "label": "Stock available",
+          "kind": "reply",
+          "from": "stock",
+          "to": "orchestrator",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "replyTo": "check-stock"
+        },
+        {
+          "id": "calculate-charge",
+          "label": "Calculate charge",
+          "kind": "message",
+          "from": "orchestrator",
+          "to": "pricing",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "relationshipRef": "orchestrator-pricing"
+        },
+        {
+          "id": "charge-result",
+          "label": "Charge calculated",
+          "kind": "reply",
+          "from": "pricing",
+          "to": "orchestrator",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "replyTo": "calculate-charge"
+        },
+        {
+          "id": "charge-payment",
+          "label": "Charge basket",
+          "kind": "message",
+          "from": "orchestrator",
+          "to": "payment",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "relationshipRef": "orchestrator-payment"
+        }
+      ],
+      "order": {
+        "status": "established",
+        "value": [
+          "submit",
+          "check-stock",
+          "stock-result",
+          "calculate-charge",
+          "charge-result",
+          "charge-payment"
+        ],
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+        }
+      },
+      "entry": {
+        "point": {
+          "status": "established",
+          "value": {
+            "participantRef": "checkout",
+            "itemRef": "submit"
+          },
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+          }
+        },
+        "trigger": {
+          "status": "unknown",
+          "reason": "The fixture begins with submission; its upstream user action is not recorded."
+        }
+      }
+    },
+    {
+      "id": "stock-roundtrip",
+      "title": "Check stock",
+      "graphRef": "services",
+      "scope": {
+        "timeframe": "current",
+        "environment": "Fictional checkout service",
+        "snapshot": "Synthetic run v1",
+        "coverage": "partial",
+        "question": "What happens during the check stock interaction?",
+        "includes": [
+          "Only this request and reply, excerpted from the synthetic checkout recording."
+        ],
+        "excludes": [
+          "The surrounding checkout path, retries and alternate outcomes."
+        ],
+        "abstraction": "One request/reply pair between canonical services."
+      },
+      "steps": [
+        {
+          "id": "stock-roundtrip-check-stock",
+          "label": "Check stock",
+          "kind": "message",
+          "from": "orchestrator",
+          "to": "stock",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "relationshipRef": "orchestrator-stock"
+        },
+        {
+          "id": "stock-roundtrip-stock-result",
+          "label": "Stock available",
+          "kind": "reply",
+          "from": "stock",
+          "to": "orchestrator",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "replyTo": "stock-roundtrip-check-stock"
+        }
+      ],
+      "order": {
+        "status": "established",
+        "value": [
+          "stock-roundtrip-check-stock",
+          "stock-roundtrip-stock-result"
+        ],
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "This view explicitly selects the request/reply pair from the synthetic checkout recording; the surrounding workflow is outside this scope."
+        }
+      },
+      "entry": {
+        "point": {
+          "status": "established",
+          "value": {
+            "participantRef": "orchestrator",
+            "itemRef": "stock-roundtrip-check-stock"
+          },
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "The scoped excerpt starts at the request sent by Orchestrator."
+          }
+        },
+        "trigger": {
+          "status": "unknown",
+          "reason": "This scoped view does not establish what triggered the orchestrator request."
+        }
+      }
+    },
+    {
+      "id": "pricing-roundtrip",
+      "title": "Calculate pricing",
+      "graphRef": "services",
+      "scope": {
+        "timeframe": "current",
+        "environment": "Fictional checkout service",
+        "snapshot": "Synthetic run v1",
+        "coverage": "partial",
+        "question": "What happens during the calculate pricing interaction?",
+        "includes": [
+          "Only this request and reply, excerpted from the synthetic checkout recording."
+        ],
+        "excludes": [
+          "The surrounding checkout path, retries and alternate outcomes."
+        ],
+        "abstraction": "One request/reply pair between canonical services."
+      },
+      "steps": [
+        {
+          "id": "pricing-roundtrip-calculate-charge",
+          "label": "Calculate charge",
+          "kind": "message",
+          "from": "orchestrator",
+          "to": "pricing",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "relationshipRef": "orchestrator-pricing"
+        },
+        {
+          "id": "pricing-roundtrip-charge-result",
+          "label": "Charge calculated",
+          "kind": "reply",
+          "from": "pricing",
+          "to": "orchestrator",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "fictional-run"
+              ],
+              "explanation": "Stipulated by the synthetic checkout run in evidence.md; no real organization or repository is represented."
+            }
+          },
+          "replyTo": "pricing-roundtrip-calculate-charge"
+        }
+      ],
+      "order": {
+        "status": "established",
+        "value": [
+          "pricing-roundtrip-calculate-charge",
+          "pricing-roundtrip-charge-result"
+        ],
+        "basis": {
+          "sourceRefs": [
+            "fictional-run"
+          ],
+          "explanation": "This view explicitly selects the request/reply pair from the synthetic checkout recording; the surrounding workflow is outside this scope."
+        }
+      },
+      "entry": {
+        "point": {
+          "status": "established",
+          "value": {
+            "participantRef": "orchestrator",
+            "itemRef": "pricing-roundtrip-calculate-charge"
+          },
+          "basis": {
+            "sourceRefs": [
+              "fictional-run"
+            ],
+            "explanation": "The scoped excerpt starts at the request sent by Orchestrator."
+          }
+        },
+        "trigger": {
+          "status": "unknown",
+          "reason": "This scoped view does not establish what triggered the orchestrator request."
+        }
+      }
+    }
+  ],
+  "documents": [
+    {
+      "id": "reading-workflow",
+      "title": "Reading repeated participation",
+      "format": "markdown",
+      "attachments": [
+        {
+          "kind": "graph",
+          "ref": "services"
+        },
+        {
+          "kind": "workflow",
+          "ref": "checkout-run"
+        },
+        {
+          "kind": "node",
+          "ref": "orchestrator"
+        },
+        {
+          "kind": "step",
+          "ref": "stock-result",
+          "workflowRef": "checkout-run"
+        }
+      ],
+      "markdown": "# Reading repeated participation\n\nThe [connectivity view](#graph=services) has one box per service. It answers which services invoke which operations. It does not record the order of those operations.\n\nThe [checkout workflow](#workflow=checkout-run) answers a different question: where does this one recorded interaction path go next?\n\n[Orchestrator](#workflow=checkout-run&node=orchestrator) appears three times. Each appearance refers to the **same service**, not a replica, separate deployment, or new owner. Select one to inspect its participation and the shared source record.\n\nThe [stock result](#workflow=checkout-run&step=stock-result) is a reply to the stock request. It creates no new Stock → Orchestrator architecture dependency.\n\n## Limits of this recording\n\nThe upstream trigger is explicitly unknown. The run stops after the payment request; no payment success or final response is implied. Neither the spacing nor a message arrow establishes elapsed time or blocking.\n",
+      "links": [
+        {
+          "href": "#graph=services",
+          "target": {
+            "kind": "graph",
+            "ref": "services"
+          }
+        },
+        {
+          "href": "#workflow=checkout-run",
+          "target": {
+            "kind": "workflow",
+            "ref": "checkout-run"
+          }
+        },
+        {
+          "href": "#workflow=checkout-run&node=orchestrator",
+          "target": {
+            "kind": "node",
+            "ref": "orchestrator",
+            "workflowRef": "checkout-run"
+          }
+        },
+        {
+          "href": "#workflow=checkout-run&step=stock-result",
+          "target": {
+            "kind": "step",
+            "ref": "stock-result",
+            "workflowRef": "checkout-run"
+          }
+        }
+      ],
+      "assets": []
+    },
+    {
+      "id": "workflow-guide",
+      "title": "Choose a workflow",
+      "format": "markdown",
+      "attachments": [
+        {
+          "kind": "graph",
+          "ref": "services"
+        },
+        {
+          "kind": "workflow",
+          "ref": "checkout-run"
+        },
+        {
+          "kind": "workflow",
+          "ref": "stock-roundtrip"
+        },
+        {
+          "kind": "workflow",
+          "ref": "pricing-roundtrip"
+        }
+      ],
+      "markdown": "# Choose a workflow\n\nAll three views use the same service registry. Different pages do not mean different services or separate deployments.\n\n- [Checkout](#workflow=checkout-run): the full recorded path.\n- [Check stock](#workflow=stock-roundtrip): one stock request/reply pair.\n- [Calculate pricing](#workflow=pricing-roundtrip): one pricing request/reply pair.\n\n## Shared context\n\nThe [architecture](#graph=services) shows the dependencies. [Orchestrator in the stock view](#workflow=stock-roundtrip&node=orchestrator) and [Orchestrator in the pricing view](#workflow=pricing-roundtrip&node=orchestrator) refer to the same canonical component.\n\nSee [the recording limits](reading.md#limits-of-this-recording). Return to [this section](#shared-context) using a normal Markdown heading link.\n\n## Limits\n\nThis is a fictional current implementation. The focused excerpts do not claim independent upstream triggers or prove completeness.\n",
+      "links": [
+        {
+          "href": "#workflow=checkout-run",
+          "target": {
+            "kind": "workflow",
+            "ref": "checkout-run"
+          }
+        },
+        {
+          "href": "#workflow=stock-roundtrip",
+          "target": {
+            "kind": "workflow",
+            "ref": "stock-roundtrip"
+          }
+        },
+        {
+          "href": "#workflow=pricing-roundtrip",
+          "target": {
+            "kind": "workflow",
+            "ref": "pricing-roundtrip"
+          }
+        },
+        {
+          "href": "#graph=services",
+          "target": {
+            "kind": "graph",
+            "ref": "services"
+          }
+        },
+        {
+          "href": "#workflow=stock-roundtrip&node=orchestrator",
+          "target": {
+            "kind": "node",
+            "ref": "orchestrator",
+            "workflowRef": "stock-roundtrip"
+          }
+        },
+        {
+          "href": "#workflow=pricing-roundtrip&node=orchestrator",
+          "target": {
+            "kind": "node",
+            "ref": "orchestrator",
+            "workflowRef": "pricing-roundtrip"
+          }
+        },
+        {
+          "href": "reading.md#limits-of-this-recording",
+          "target": {
+            "kind": "document",
+            "ref": "reading-workflow",
+            "heading": "limits-of-this-recording"
+          }
+        },
+        {
+          "href": "#shared-context",
+          "target": {
+            "kind": "document",
+            "ref": "workflow-guide",
+            "heading": "shared-context"
+          }
+        }
+      ],
+      "assets": []
+    }
+  ]
+}

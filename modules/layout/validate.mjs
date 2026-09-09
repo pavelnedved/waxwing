@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { schemaDiagnostics, prefixDiagnostics } from '../shared/diagnostics.mjs';
 import { validateWorkflows } from '../workflow/validate.mjs';
 import { validateSequenceLayout } from '../sequence/layout.mjs';
 import { inspectReadability } from './readability.mjs';
@@ -8,7 +9,7 @@ import { validateModel } from '../model/index.mjs';
 import { canonical, digest, frameMemberships, visibleGroups, edgeLines, units, wrap } from '../shared/model.mjs';
 
 const readSchema = (name) => JSON.parse(fs.readFileSync(new URL(`../../schemas/${name}`, import.meta.url), 'utf8'));
-const ajv = new Ajv2020({ strict: true, allErrors: true, allowUnionTypes: true });
+const ajv = new Ajv2020({ strict: true, allErrors: true, verbose: true, allowUnionTypes: true });
 ajv.addSchema(readSchema('system-model.schema.json'), 'system-model.schema.json');
 const validateShape = ajv.compile(readSchema('layout.schema.json'));
 const EPS = 0.01;
@@ -24,11 +25,11 @@ function cutsBox(a, b, box) {
 
 export function validateLayout(document, { expectedModel } = {}) {
   if (document?.diagramType === 'sequence') return validateSequenceLayout(document, { expectedModel });
-  if (!validateShape(document)) return { ok: false, diagnostics: validateShape.errors.map((error) => ({ code: 'layout/schema', path: error.instancePath, message: error.message, details: error.params })) };
+  if (!validateShape(document)) return { ok: false, diagnostics: schemaDiagnostics(validateShape.errors, document, 'layout/schema', {root:validateShape.schema, ajv}) };
   const diagnostics = [];
   const add = (code, path, message) => diagnostics.push({ code, path, message });
   const modelResult = validateModel(document.model);
-  if (!modelResult.ok) return modelResult;
+  if (!modelResult.ok) return {...modelResult, diagnostics:prefixDiagnostics(modelResult.diagnostics, '/model')};
   if (digest(document.model) !== document.modelDigest) add('source/digest', '/modelDigest', 'The embedded model does not match its recorded digest.');
   if (expectedModel && canonical(document.model) !== canonical(expectedModel)) add('source/changed', '/model', 'JSON 2 changed the supplied JSON 1.');
   if (document.graphs) {
@@ -43,7 +44,7 @@ export function validateLayout(document, { expectedModel } = {}) {
       const model = projectGraph(document.model, geometry.ref);
       const { ref, ...drawing } = geometry;
       const result = validateLayout({ schemaVersion: '0.2-draft', model, modelDigest: digest(model), ...drawing });
-      diagnostics.push(...result.diagnostics.map((item) => ({ ...item, path: path + item.path })));
+      diagnostics.push(...prefixDiagnostics(result.diagnostics, path));
     });
     for (const graph of document.model.graphs) if (!seen.has(graph.id)) add('layout/coverage', '/graphs', `Missing graph "${graph.id}".`);
     const views = [...document.graphs, ...(document.workflows ?? []).map((w) => ({ ...w, groups: [], edges: w.edges.map((e) => ({ ...e, from: e.fromAppearanceRef, to: e.toAppearanceRef })) }))];

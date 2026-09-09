@@ -140,3 +140,9 @@ Back/Forward, deep links, and full source recovery work across both views.
 SVG download uses the current view. Wide paths can trigger readability warnings;
 see [workflow rules](architecture-workflows.md) and
 [warning signs](layout-warning-signs.md).
+
+## Several linked pages
+
+The optional [site exporter](site-export.md) renders separate graph, workflow and
+document pages with a generated index. Its CSS/JavaScript are shared local files,
+and recovery uses the complete directory rather than an individual page.

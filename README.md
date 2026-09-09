@@ -10,6 +10,20 @@ module entry points and recovery of the complete source model from either
 export. The contracts are experimental drafts, not stable releases. The example
 and all its evidence are fictional.
 
+For many workflows, publish separate linked pages with a generated contents page:
+
+```sh
+node bin/waxwing.mjs build-site /path/to/model.json /path/to/export
+# Try the included example:
+npm run demo:site
+```
+
+Open `export/index.html`. The source files can live anywhere; the generated
+`graphs/`, `workflows/`, `documents/`, `assets/`, and `source/` structure is fixed.
+Move/publish the whole directory. See the [publishing rules](docs/site-export.md)
+and [three-workflow demo](examples/multi-page/README.md). Existing `build` still
+produces a single self-contained HTML, SVG, and JSON 2.
+
 ## Give your agent one file
 
 Use **[AGENT_GUIDE.md](AGENT_GUIDE.md)** as the complete external handoff for
@@ -199,6 +213,7 @@ Your own producer
 | `waxwing/layout` | Generate and validate JSON 2; ELK supplies automatic geometry. |
 | `waxwing/render` | Render a valid JSON 2 without running the layout engine. |
 | `waxwing/artifacts` | Extract embedded JSON 2 and recover JSON 1. |
+| `waxwing/site` | Render, write, and recover a fixed multi-page export with automatic navigation. |
 | `waxwing/workflow` | Inspect architecture workflow scope, participation, and drawing blockers without loading ELK. |
 | `waxwing/sequence` | Independently validate, lay out, and render a sequence scenario or structured behavior. |
 

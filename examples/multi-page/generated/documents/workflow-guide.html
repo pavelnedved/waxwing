@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="waxwing-artifact" content="site-page"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Choose a workflow · Waxwing</title><link rel="stylesheet" href="../assets/site.css"><script src="../assets/site.js" defer></script></head>
+<body data-skin="standard"><header class="masthead"><a class="brand" href="../index.html"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions"><a href="../index.html" class="header-link">Contents</a><a href="../source/model.json" class="header-link" download>JSON 1</a><a href="../source/layout.json" class="header-link" download>JSON 2</a><label class="skin-control">Style <select id="skin" aria-label="Visual style"><option selected>standard</option><option>engineering</option><option>editorial</option></select></label><button id="theme">Dark theme</button></div></header>
+<main><nav class="document-breadcrumb" aria-label="Breadcrumb"><a href="../index.html" >Checkout: three focused workflows</a><span>/</span><span>document</span></nav><div class="eyebrow">CURRENT IMPLEMENTATION · PARTIAL MODEL</div><h1>Choose a workflow</h1><div class="document-attachments"><a href="../graphs/services.html">graph: services</a><a href="../workflows/checkout-run.html">workflow: checkout-run</a><a href="../workflows/stock-roundtrip.html">workflow: stock-roundtrip</a><a href="../workflows/pricing-roundtrip.html">workflow: pricing-roundtrip</a></div><div class="document-workspace"><nav id="document-nav" aria-label="Document headings"><a class="document-nav-link" href="#ww-doc-workflow-guide--choose-a-workflow">Choose a workflow</a><a class="document-nav-link" href="#ww-doc-workflow-guide--shared-context">Shared context</a><a class="document-nav-link" href="#ww-doc-workflow-guide--limits">Limits</a></nav><article class="markdown-body"><h1 id="ww-doc-workflow-guide--choose-a-workflow">Choose a workflow</h1>
+<p>All three views use the same service registry. Different pages do not mean different services or separate deployments.</p>
+<ul>
+<li><a href="../workflows/checkout-run.html">Checkout</a>: the full recorded path.</li>
+<li><a href="../workflows/stock-roundtrip.html">Check stock</a>: one stock request/reply pair.</li>
+<li><a href="../workflows/pricing-roundtrip.html">Calculate pricing</a>: one pricing request/reply pair.</li>
+</ul>
+<h2 id="ww-doc-workflow-guide--shared-context">Shared context</h2>
+<p>The <a href="../graphs/services.html">architecture</a> shows the dependencies. <a href="../workflows/stock-roundtrip.html#record-orchestrator">Orchestrator in the stock view</a> and <a href="../workflows/pricing-roundtrip.html#record-orchestrator">Orchestrator in the pricing view</a> refer to the same canonical component.</p>
+<p>See <a href="reading-workflow.html#ww-doc-reading-workflow--limits-of-this-recording">the recording limits</a>. Return to <a href="#ww-doc-workflow-guide--shared-context">this section</a> using a normal Markdown heading link.</p>
+<h2 id="ww-doc-workflow-guide--limits">Limits</h2>
+<p>This is a fictional current implementation. The focused excerpts do not claim independent upstream triggers or prove completeness.</p>
+<details><summary>Original Markdown</summary><pre># Choose a workflow
+
+All three views use the same service registry. Different pages do not mean different services or separate deployments.
+
+- [Checkout](#workflow=checkout-run): the full recorded path.
+- [Check stock](#workflow=stock-roundtrip): one stock request/reply pair.
+- [Calculate pricing](#workflow=pricing-roundtrip): one pricing request/reply pair.
+
+## Shared context
+
+The [architecture](#graph=services) shows the dependencies. [Orchestrator in the stock view](#workflow=stock-roundtrip&amp;node=orchestrator) and [Orchestrator in the pricing view](#workflow=pricing-roundtrip&amp;node=orchestrator) refer to the same canonical component.
+
+See [the recording limits](reading.md#limits-of-this-recording). Return to [this section](#shared-context) using a normal Markdown heading link.
+
+## Limits
+
+This is a fictional current implementation. The focused excerpts do not claim independent upstream triggers or prove completeness.
+</pre></details></article></div><footer><span>Keep this exported directory together. Complete source is in source/.</span><span>Waxwing · experimental MVP</span></footer></main>
+<aside id="inspector" hidden aria-label="Record details"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside><p id="navigation-error" role="alert" hidden></p></body></html>

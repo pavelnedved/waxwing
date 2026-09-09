@@ -1,0 +1,23 @@
+main { max-width:1500px; padding-bottom:48px; }
+h1 { margin:18px 0 12px; overflow-wrap:anywhere; }
+a { color:var(--accent); text-underline-offset:3px; }
+#catalog { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:32px; margin:30px 0; }
+#catalog .document-card { margin-top:12px; min-height:102px; }
+.catalog-search { display:block; margin-top:24px; color:var(--muted); font-size:12px; }
+.catalog-search input { display:block; width:min(520px,100%); margin-top:8px; padding:12px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--ink); font:inherit; }
+.related { margin:26px 0; padding:20px; border:1px solid var(--border); border-radius:10px; background:var(--surface); }
+.related a { display:inline-block; margin:12px 22px 0 0; }
+#map-viewport { height:min(65vh,650px); min-height:320px; overflow:auto; }
+#map-viewport svg { display:block; max-width:none; flex:none; }
+.evidence { margin-top:30px; }
+.record-detail { margin-top:10px; padding:14px 18px; border:1px solid var(--border); border-radius:8px; background:var(--surface); }
+.record-detail summary { color:var(--ink); font-size:13px; }
+.record-detail summary .record-id { margin-left:12px; font-size:10px; }
+.record-body { padding-top:14px; }
+dl,dd { margin:0; } dd ul { padding-left:20px; } dd li { margin:6px 0; }
+.detail-field .detail-field { padding-left:10px; border-left:1px solid var(--border); }
+.detail-value { white-space:normal; } .detail-value > span { white-space:pre-wrap; }
+#navigation-error { position:fixed; bottom:20px; left:20px; right:20px; padding:18px; background:var(--surface); border:2px solid var(--warning); border-radius:8px; z-index:20; }
+.document-workspace { margin-top:26px; }
+.masthead { height:auto; min-height:72px; padding-top:12px; padding-bottom:12px; flex-wrap:wrap; }.header-actions { flex-wrap:wrap; }
+@media(max-width:700px) { .document-workspace { grid-template-columns:1fr; gap:16px; } #document-nav { position:static; max-height:none; } .map-toolbar { flex-wrap:wrap; gap:12px; } }

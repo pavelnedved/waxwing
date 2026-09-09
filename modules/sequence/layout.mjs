@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { schemaDiagnostics, prefixDiagnostics } from '../shared/diagnostics.mjs';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { validateSequenceModel, drawableDiagnostics } from './model.mjs';
 import { canonical, digest, fail, wrap, units } from '../shared/model.mjs';
@@ -7,7 +8,7 @@ import { blockLines, regionLines, bandHeight, frameDiagnostics } from './frames.
 import { assertedEntry, entryCue } from './entry.mjs';
 
 const read = (name) => JSON.parse(fs.readFileSync(new URL(`../../schemas/${name}`, import.meta.url), 'utf8'));
-const ajv = new Ajv2020({ strict: true, allErrors: true, allowUnionTypes: true });
+const ajv = new Ajv2020({ strict: true, allErrors: true, verbose: true, allowUnionTypes: true });
 for (const name of ['system-model.schema.json', 'sequence-entry.schema.json', 'sequence-model.schema.json', 'sequence-behavior.schema.json']) ajv.addSchema(read(name), name);
 const shape = ajv.compile(read('sequence-layout.schema.json'));
 const behaviorShape = ajv.compile(read('sequence-behavior-layout.schema.json'));
@@ -77,9 +78,9 @@ export function layoutSequence(model, options = {}) {
 
 export function validateSequenceLayout(drawing, { expectedModel } = {}) {
   const validate = drawing?.schemaVersion === '0.2-sequence-layout-draft' ? behaviorShape : shape;
-  if (!validate(drawing)) return { ok: false, diagnostics: validate.errors.map((e) => ({ code: 'sequence/layout-schema', path: e.instancePath, message: e.message })) };
+  if (!validate(drawing)) return { ok: false, diagnostics: schemaDiagnostics(validate.errors, drawing, 'sequence/layout-schema', {root:validate.schema, ajv}) };
   const model = drawing.model, result = validateSequenceModel(model);
-  if (!result.ok) return result;
+  if (!result.ok) return {...result, diagnostics:prefixDiagnostics(result.diagnostics, '/model')};
   const diagnostics = [...drawableDiagnostics(model)];
   const add = (path, message) => diagnostics.push({ code: 'sequence/layout-invalid', path, message });
   if (digest(model) !== drawing.modelDigest) add('/modelDigest', 'Embedded source does not match its digest.');

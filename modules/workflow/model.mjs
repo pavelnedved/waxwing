@@ -1,4 +1,5 @@
 import { validateSequenceModel, drawableDiagnostics } from '../sequence/model.mjs';
+import { prefixDiagnostics } from '../shared/diagnostics.mjs';
 import { graphNodes } from '../graphs/index.mjs';
 
 // Reuse scenario semantics; this projection never replaces canonical JSON 1.
@@ -32,7 +33,7 @@ export function workflowDiagnostics(model) {
       }
     }
     const result = validateSequenceModel(workflowScenario(model, workflow));
-    diagnostics.push(...result.diagnostics.map((d) => ({ ...d, path: path + d.path })));
+    diagnostics.push(...prefixDiagnostics(result.diagnostics, path));
   }
   return diagnostics;
 }

@@ -303,3 +303,56 @@ validate, build, check-layout, selected SVG export and recovery after removing
 source inputs. The guide's JSON snippets and local file/heading links were checked.
 These tests guard executable examples against drift; they do not establish
 real-system ingestion accuracy or exhaustively verify prose.
+
+## Actionable validation diagnostics
+
+The full suite passes **189 tests**, including 11 diagnostic regression tests.
+The CLI reproduction supplies `kind: "rpc"` and loop execution `"parallel"` in
+`examples/sequence-markets/model.json`. Previously it returned 22 schema errors,
+including irrelevant knowledge and if/else variants, without naming the allowed
+choices. It now returns two diagnostics: the exact fields, their record IDs,
+received values, and the permitted choices (`message`/`reply`/`event` and
+`sequential`/`concurrent`).
+
+Coverage includes missing/unsupported properties with escaped JSON pointers,
+types, constants, patterns, array limits and duplicates, known/unknown/invalid
+claim tags, independent claims sharing schema definitions, invalid references,
+JSON 2 numeric constraints and embedded source locations, bounded value previews,
+and CLI file context for parse and shape failures. Sequence evidence reference
+errors identify the failing array index. Existing sequence tests now assert the
+new wording or structured constraint fields. Validation rules are unchanged;
+the shared formatter changes how failures are explained.
+
+The single-file agent guide documents the error envelope, expected/received
+fields, reference candidates, stdout/stderr handling and the repair workflow.
+This is a CLI/library change; no visual behavior changed or browser verification
+was needed.
+
+## Fixed multi-page export
+
+The full suite passes **199 tests**, including 10 site export tests. Coverage:
+
+- Separate graph, workflow and Markdown pages; every internal file/record/heading
+  link resolves in the fixture exports, including subgraphs and both sequence
+  contracts. Group definitions and source evidence are retained for inspection.
+- Complete JSON 1 recovery from a moved directory, deterministic rendering,
+  stable paths after title changes, unchanged single-file recovery, and an
+  explicit recovery error for individual site pages.
+- Escaped source/Markdown content, compiled viewer JavaScript, no runtime source
+  fetch, and one SVG with no full JSON 2 payload per diagram page.
+- JSON 1 and JSON 2 CLI entry points; prior output surviving invalid inputs;
+  obsolete page removal; refusal to replace unrelated/modified/extra/symlinked
+  output, malicious manifest paths or input files inside the output directory.
+
+The fictional `examples/multi-page` demo includes a shared architecture graph,
+three scoped workflows and two linked Markdown documents. Browser checks over
+localhost verified the index, focused stock workflow, canonical Orchestrator
+inspection and evidence links, record-to-document navigation, document-to-reply
+navigation, deep-link reload, Back navigation and zoom. No console errors were
+captured in that check. The catalog was visually inspected.
+
+The direct-file browser test was rejected by browser URL policy; no workaround
+was attempted, and `file://` remains unverified. Browser downloads and external
+static deployment were not exercised. The initial site viewer has fewer highlight
+modes than the existing single-file viewer; it retains uncertainty highlighting
+and selected-record inspection. The entire directory is the recovery boundary.

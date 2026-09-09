@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { schemaDiagnostics, referenceDiagnostic } from '../shared/diagnostics.mjs';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { validateSequenceModel } from '../sequence/model.mjs';
 import { graphDiagnostics } from '../graphs/index.mjs';
@@ -6,7 +7,8 @@ import { documentDiagnostics } from '../documents/markdown.mjs';
 import { workflowDiagnostics } from '../workflow/model.mjs';
 
 const schema = JSON.parse(fs.readFileSync(new URL('../../schemas/system-model.schema.json', import.meta.url), 'utf8'));
-const validateShape = new Ajv2020({ strict: true, allErrors: true, allowUnionTypes: true }).compile(schema);
+const ajv = new Ajv2020({ strict: true, allErrors: true, verbose: true, allowUnionTypes: true });
+const validateShape = ajv.compile(schema);
 const collections = ['sources', 'perspectives', 'entities', 'groups', 'memberships', 'relationships', 'notes', 'documents', 'graphs', 'workflows'];
 const escapePointer = (value) => value.replaceAll('~', '~0').replaceAll('/', '~1');
 
@@ -31,12 +33,7 @@ export function validateModel(model) {
   if (!validateShape(model)) {
     return {
       ok: false,
-      diagnostics: validateShape.errors.map((error) => ({
-        code: 'schema/invalid',
-        path: error.instancePath || '/',
-        message: error.message,
-        details: error.params,
-      })),
+      diagnostics: schemaDiagnostics(validateShape.errors, model, 'schema/invalid', {root:validateShape.schema, ajv}),
     };
   }
 
@@ -59,7 +56,7 @@ export function validateModel(model) {
   function reference(id, allowed, path) {
     const entry = entries.get(id);
     if (!entry || !allowed.includes(entry.collection)) {
-      add('reference/invalid', path, `"${id}" must reference ${allowed.join(' or ')}.`);
+      diagnostics.push(referenceDiagnostic(model, id, allowed, path, entries, 'reference/invalid'));
       return null;
     }
     return entry;

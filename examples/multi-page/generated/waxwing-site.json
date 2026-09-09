@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "0.1-site-draft",
+  "modelDigest": "ba4eefff09c8ba47960a8efcb4b900b6745c93c8bcf68719f5a007066f8fb8b6",
+  "layoutDigest": "3110f0d6d94ef75187c1b9be57cdf9b1fd42602a9f6d1bc84432f6538d8164e9",
+  "pages": [
+    {
+      "kind": "graph",
+      "ref": "services",
+      "path": "graphs/services.html",
+      "title": "Checkout connectivity"
+    },
+    {
+      "kind": "workflow",
+      "ref": "checkout-run",
+      "path": "workflows/checkout-run.html",
+      "title": "Checkout through the orchestrator"
+    },
+    {
+      "kind": "workflow",
+      "ref": "stock-roundtrip",
+      "path": "workflows/stock-roundtrip.html",
+      "title": "Check stock"
+    },
+    {
+      "kind": "workflow",
+      "ref": "pricing-roundtrip",
+      "path": "workflows/pricing-roundtrip.html",
+      "title": "Calculate pricing"
+    },
+    {
+      "kind": "document",
+      "ref": "reading-workflow",
+      "path": "documents/reading-workflow.html",
+      "title": "Reading repeated participation"
+    },
+    {
+      "kind": "document",
+      "ref": "workflow-guide",
+      "path": "documents/workflow-guide.html",
+      "title": "Choose a workflow"
+    }
+  ],
+  "files": {
+    "source/model.json": "fbd32d92b40dcbf1717bf699fa5b61e194aebce89747a52eeaf3026ee2cc1670",
+    "source/layout.json": "be70991a921c99e6a59d85d69048fd5fbc112e615c0788caf8d412e9eecfd3a2",
+    "assets/site.css": "19ea7835e4c2b6e82922c6b3c040ebb9660d6ef191daf20a995f6f175e49be83",
+    "assets/site.js": "0d804e724248c44a915181b24c12b6f8ec1118ec93944182fba595bd43faddf4",
+    "index.html": "ede5e5be375af797cc77f37e15d7e5d0e93c79ae75a8b00defca836896e4b027",
+    "graphs/services.html": "40909a140d78fb40764a41ebd0f14eb421635d0bab7a92d16ed2f764c6f86dc5",
+    "workflows/checkout-run.html": "da788b200683f964615f30b1037abbf51d1842db110761929e1ded82dd30982e",
+    "workflows/stock-roundtrip.html": "8c9d1d7ed29b8beb8cf020547b4d03de57b205516140c0563ff00f613f8754de",
+    "workflows/pricing-roundtrip.html": "327e70bf30a8153d215678996259067e9cf5aba9b5ecdebe207be0ee3495abc3",
+    "documents/reading-workflow.html": "8a8b0cefc0942fecee4757c16cf6dba7e331e3cd973509e5d55d66a95b7a6b38",
+    "documents/workflow-guide.html": "989d0e89359888e93c63e60bf96b2d4fb7b8d6a93d15baaaea331cab88b1cc00"
+  }
+}

@@ -230,8 +230,9 @@ selects the same document. Invalid URL targets show an explicit error.
 
 Internal navigation uses fragments in the current HTML file. Renaming/moving
 that file does not break its internal links. A separately shared full URL still
-depends on the published file's location. Cross-export discovery and multi-file
-website generation are not implemented. Static hosting needs no Waxwing server
+depends on the published file's location. Cross-model discovery is not implemented. The optional [site exporter](site-export.md)
+generates separate linked pages from the same typed references; its whole directory
+must move together. Static hosting needs no Waxwing server
 or server-side route rewriting. External host policies may constrain JavaScript.
 
 SVG exports retain complete documents and assets in their source payload; a

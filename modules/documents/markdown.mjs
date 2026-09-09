@@ -159,7 +159,7 @@ export function documentDiagnostics(model) {
   return diagnostics;
 }
 
-export function renderDocument(doc, graphId) {
+export function renderDocument(doc, graphId, { resolveTarget = (target) => targetURL(target, graphId) } = {}) {
   const { tokens, headings, resources } = parseMarkdown(doc.markdown);
   for (const heading of headings) heading.token.attrSet('id', headingId(doc.id, heading.slug));
   const links = new Map(doc.links.map((link) => [link.href, link.target]));
@@ -168,7 +168,7 @@ export function renderDocument(doc, graphId) {
     if (resource.type === 'link') {
       if (external(resource.href)) {
         resource.token.attrSet('target', '_blank'); resource.token.attrSet('rel', 'noopener noreferrer');
-      } else resource.token.attrSet('href', targetURL(links.get(resource.href), graphId));
+      } else resource.token.attrSet('href', resolveTarget(links.get(resource.href)));
     } else if (external(resource.href)) {
       // Remote media is an explicit link, never an automatic network request.
       resource.token.type = 'ww_external_image';

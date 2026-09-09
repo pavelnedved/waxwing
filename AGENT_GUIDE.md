@@ -1469,6 +1469,61 @@ exit 1 with a message and diagnostics where available. Validation checks structu
 references and consistency, not evidence truth, freshness or completeness. Model
 validation success and layout success are separate outcomes.
 
+### Reading validation failures
+
+Read the JSON result and its `diagnostics`, not just the summary message. CLI
+failures identify the `command` and absolute `input` path when a file argument
+is available. Validation results are written to stdout; thrown errors (including
+loader and JSON parsing failures) are written to stderr. Both exit 1. Library
+validators return `{ok, diagnostics}`; pipeline helpers may throw with
+`error.diagnostics`.
+
+Schema errors identify the exact JSON Pointer `path`, including the missing or
+unsupported property itself, and the nearest record's ID when available. For
+example, setting a sequence step's `kind` to `rpc` produces a message like:
+
+```text
+At /steps/0/kind (record "load-markets"): Expected one of ["message","reply","event"]. Received "rpc".
+```
+
+Machine-readable fields accompany schema messages:
+
+- `code`: diagnostic family, such as `sequence/schema` or `layout/schema`.
+- `keyword`: failing constraint, such as `enum`, `required`, or `type`.
+- `expected`: allowed values, required property, expected type, numeric bound,
+  allowed property names, or another applicable constraint.
+- `received`: the supplied scalar, or a bounded preview for large strings,
+  arrays and objects. An absent field is `{ "type": "missing" }`.
+- `record`: nearest record's `id` and `path`, plus label/title when available.
+- `details`: underlying schema constraint parameters. `schemaPath` is for
+  schema debugging; use `path` to locate the field in your input.
+
+Paths use JSON Pointer escaping (`~1` for `/`, `~0` for `~` in property names).
+JSON 2 errors in its embedded source model start with `/model`. Some checks use
+internal projections: use the record ID and surrounding context as well as the
+path when diagnosing a workflow.
+
+For an invalid reference, diagnostics distinguish an unregistered ID from an ID
+registered as the wrong kind of record. `expected.collections` names permitted
+record collections, `expected.availableRefs` lists up to 20 registered candidate
+IDs, and `expected.availableCount` gives the full count. These are valid reference
+targets, **not suggestions about what the system actually connects to**. Choose
+one only when the evidence supports it.
+
+Where `kind` or `status` selects a unique schema variant, errors focus on that
+variant. A loop should not prompt you to add an if/else condition; an unknown
+claim should not prompt you to invent an asserted value or basis. An unsupported
+discriminator lists its allowed values first. Fix it and rerun validation to
+check the chosen shape. Independent type and consistency constraints still apply.
+Other semantic diagnostics may provide only `code`, `path` and `message`; do not
+assume every diagnostic has every field above.
+
+Fix the underlying input and rerun the same command. Missing evidence or an
+uncertain relationship requires clarification or explicit unknown/disputed
+knowledge, not choosing an arbitrary value to satisfy the validator. Structural
+validation runs before semantic checks, so fixing one stage can reveal further
+errors. None of these diagnostics automatically rewrites your model.
+
 If documents use `file`, use a distinct authoring input and canonical output:
 
 ```sh
@@ -1481,6 +1536,129 @@ JSON 1. It does not infer system facts. `validate`, `layout`, and `build` also u
 this loader, so `prepare` is optional for a build but useful for handing off
 canonical JSON 1. The JavaScript validators expect already resolved JSON 1.
 Do not overwrite authoring inputs or any registered document/image with outputs.
+
+### Choose single-file or multi-page output
+
+Use `build` (below) for one self-contained HTML with all views/documents. Use
+`build-site` when readers should navigate between separate pages for many
+workflows. This is an export choice, not a new JSON 1 contract. Keep one canonical
+model so views share component IDs; the initial site exporter does not combine
+independently authored models or infer identity from matching IDs in other files.
+
+```sh
+node bin/waxwing.mjs build-site /absolute/path/to/model.json /absolute/path/to/export
+# Or enter directly at JSON 2:
+node bin/waxwing.mjs render-site /absolute/path/to/layout.json /absolute/path/to/export
+```
+
+`build-site` uses the document loader and accepts architecture `--group` and
+`--direction` exactly like `build`; sequence models reject those options.
+`render-site` accepts exactly input JSON 2 and the output directory. There is
+no CLI skin option. All included graphs, workflows and documents are published;
+all views must be drawable. No view-selection, custom-path or navigation
+configuration is implemented in this first version.
+
+The output structure is fixed; authoring files do not need to move:
+
+```text
+export/
+  index.html
+  graphs/<graph-id>.html
+  workflows/<workflow-id>.html
+  documents/<document-id>.html
+  assets/site.css
+  assets/site.js
+  source/model.json
+  source/layout.json
+  waxwing-site.json
+```
+
+A standalone sequence uses `graphs/<model-id>.html`; `workflows/` represents
+architecture workflow records. Empty categories need no directory. Page filenames
+use stable IDs, so changing a title retains its URL; changing an ID does not.
+The index groups by record kind and uses source collection order, with a
+search/filter over titles/questions. This navigation never asserts execution
+order or architectural containment. Components shared between views keep their
+canonical identities.
+
+Keep authoring typed references/Markdown links as defined in this guide. The
+exporter resolves them into relative HTML paths automatically. For example, from
+a document page `#workflow=checkout-run&node=orchestrator` becomes
+`../workflows/checkout-run.html#record-orchestrator`. A document-to-document link
+with a heading becomes `<document-id>.html#ww-doc-<document-id>--<heading-slug>`.
+Do not author output HTML paths in place of semantic references. Ambiguous graph
+targets still require explicit graph context. Document attachments to a component
+in multiple architecture graphs list those graph destinations; records in no
+view are labeled as not shown. Parent/child links use the existing explicit
+subgraph relationship, never the location of a source file.
+
+The index links all pages; every page links back to Contents. Graph pages link
+to their workflows and parent/child graphs; workflow pages link to their graph.
+Diagram records link to attached documents. Documents retain their rendered
+Markdown, original text, headings, images and resolved record links. Record
+inspection retains claims, qualification and referenced source records for the
+view. Pages reuse the existing SVG rendering, with zoom, selection,
+unknown/disputed/qualified highlighting, and style/theme selectors. The original
+single-file viewer additionally retains its operation and boundary highlighting
+controls; those controls are not implemented in the initial site viewer.
+
+Publish/move the **entire directory** with its relative structure intact. It needs
+no Waxwing backend, CDN, runtime source fetch or route rewrite. Shared CSS and
+JavaScript are local files. Moving a single HTML page cannot preserve sibling
+navigation or its shared assets. Direct-file opening is intended but not verified
+in this session because browser policy rejected `file://`; localhost navigation
+was verified. Use an allowed static/local preview instead of bypassing policy.
+Previously shared URLs are not automatically redirected when IDs change.
+
+The **whole directory** is the recoverable artifact. Full JSON 2 (including full
+JSON 1) is in `source/layout.json`; `source/model.json` is a separate convenient
+handoff. Page HTML does not embed the full source or every sibling SVG. Full
+source includes information beyond what any one page visibly draws. The manifest
+records the page map, source digests and file checksums, not system meaning.
+
+```sh
+node bin/waxwing.mjs recover /absolute/path/to/export /absolute/path/to/recovered-model.json
+```
+
+Directory recovery validates the manifest, checksums and source consistency.
+Recover outside the managed directory. Recovering just a site HTML page returns
+an error directing you to the directory or `source/layout.json`. Normal JSON 2
+and single-file SVG/HTML recovery remain supported.
+
+For updates, edit original JSON/Markdown and rerun `build-site`. Output must be
+new, empty or an unchanged generated Waxwing site. The writer computes and stages
+the complete output before replacing the managed directory; obsolete generated
+pages disappear on a successful rebuild. Validation/rendering failures leave
+prior output intact. This is a local directory replacement with rollback, not a
+zero-downtime deployment service. Publish the complete build as one snapshot.
+
+Do not manually edit/move generated pages or put source inputs or hand-maintained
+files in the output. Modified, missing, extra, unrelated or symlinked files are
+rejected before replacement. Use a new output directory or restore the generated
+files when this happens. Input files may not be inside the output directory.
+Checksums detect changes; they neither establish evidence truth nor authenticate
+a publisher. There is no watch/hot-reload or semantic diff feature yet.
+
+Module entry point, for an installed/resolvable checkout package:
+
+```js
+import { loadModel } from 'waxwing/documents';
+import { layoutModel } from 'waxwing/layout';
+import { renderSite, writeSite, recoverSite } from 'waxwing/site';
+
+const { model, inputFiles } = loadModel('/absolute/path/to/model.json');
+const json2 = await layoutModel(model);
+const files = renderSite(json2, { skin: 'engineering' }); // Map<relative path, text>
+writeSite(files, '/absolute/path/to/export', { inputFiles });
+const original = recoverSite('/absolute/path/to/export');
+```
+
+`renderSite` validates and returns output text without writing. `writeSite` checks
+ownership/inputs and writes the managed directory; do not alter the map because
+it must match the generated manifest. `recoverSite` verifies and recovers JSON 1.
+The only render option is `skin`: `standard`, `engineering`, or `editorial`.
+`npm run demo:site` builds the fictional three-workflow example to
+`examples/multi-page/generated/index.html`.
 
 ### Build HTML and SVG
 
@@ -1519,7 +1697,8 @@ node bin/waxwing.mjs render /absolute/path/to/output/diagram/layout.json /absolu
 
 These example IDs come from the architecture example above; use IDs in your
 actual model. Choose one selector, not both. They select standalone SVG only;
-HTML always contains all included views. For a sequence, `--graph` may name only
+The single-file `render` HTML always contains all included views; `render-site`
+uses separate pages. For a sequence, `--graph` may name only
 that sequence model ID; `--workflow` does not apply.
 
 Open the generated HTML. It is designed to run self-contained without a framework,

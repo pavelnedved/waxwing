@@ -119,7 +119,7 @@ test('cycles, multiple parents, orphans, undeclared children and changing branch
   invalid((m) => { condition(m).then.value.push('imagined'); }, /Unknown step or block/);
   invalid((m) => { condition(m).then = { status: 'disputed', reason: 'Membership differs.', alternatives: [known(['request-live','reply-live']), known(['save-quote'])] }; }, /same direct children/);
   invalid((m) => { m.blocks[1].id = 'collector'; }, /Duplicate ID/);
-  invalid((m) => { delete condition(m).else; }, /required property 'else'/);
+  invalid((m) => { delete condition(m).else; }, /"requiredProperty":"else"/);
 });
 
 test('reply validation rejects opposite-arm requests even when endpoints match', () => {
@@ -165,7 +165,7 @@ test('block documents and notes are checked, including explicit fragment rebindi
   assert.match(renderHTML(layout), /href="#graph=market-collection&amp;block=market-loop"/);
   invalid((m) => { m.documents[0].attachments[1].ref = 'missing'; }, /Unknown block target/);
   invalid((m) => { m.documents[0].links.find((l) => l.target.kind === 'block').target.ref = 'quote-route'; }, /changes the explicit target/);
-  invalid((m) => { condition(m).condition.basis.sourceRefs = ['invented']; }, /must reference sources/);
+  invalid((m) => { condition(m).condition.basis.sourceRefs = ['invented']; }, /expected sources/);
   const m = copy(); m.notes[0].subjectRefs = ['quote-route']; assert.equal(validateModel(m).ok, true);
 });
 
@@ -174,8 +174,8 @@ test('version gates preserve old occurrence semantics and reject mixed schemas',
   const before = structuredClone(old); const d = layoutSequence(old);
   assert.equal(d.schemaVersion, '0.1-sequence-layout-draft'); assert.deepEqual(recoverArtifact(renderHTML(d)), before);
   invalid((m) => { m.schemaVersion = '0.1-sequence-draft'; }, /schema/);
-  invalid((m) => { m.steps[0].occurrence = known(true); }, /additional properties/);
-  invalid((m) => { m.describes = 'execution'; }, /constant/);
+  invalid((m) => { m.steps[0].occurrence = known(true); }, /"keyword":"additionalProperties"/);
+  invalid((m) => { m.describes = 'execution'; }, /"keyword":"const"/);
   const mixed = structuredClone(layout); mixed.schemaVersion = '0.1-sequence-layout-draft'; assert.equal(validateLayout(mixed).ok, false);
   const oldWithBlock = structuredClone(old); oldWithBlock.documents[0].attachments.push({ kind: 'block', ref: old.id }); assert.equal(validateModel(oldWithBlock).ok, false);
 });

@@ -53,9 +53,9 @@ test('unknown and disputed orders remain valid JSON 1 but cannot silently choose
 
 test('order requires complete unique step coverage, valid sources, and distinct disputed alternatives', () => {
   invalid((m) => m.order.value.pop(), /every step exactly once/);
-  invalid((m) => { m.order.value[0] = 'retry'; }, /duplicate items/);
+  invalid((m) => { m.order.value[0] = 'retry'; }, /duplicates; values must be unique/);
   invalid((m) => { m.order.value[0] = 'not-recorded'; }, /every step exactly once/);
-  invalid((m) => { m.order.basis.sourceRefs = ['imagined']; }, /must reference sources/);
+  invalid((m) => { m.order.basis.sourceRefs = ['imagined']; }, /expected sources/);
   invalid((m) => { m.order = { status: 'disputed', reason: 'Two sources.', alternatives: [known(m.order.value), known(m.order.value)] }; }, /distinct values/);
 });
 
@@ -70,12 +70,12 @@ test('replies require a prior message with reversed participants, local events s
 
 test('identities, participant references, claim evidence, and supported vocabulary are checked', () => {
   invalid((m) => { m.steps[1].id = m.participants[0].id; }, /Duplicate ID/);
-  invalid((m) => { m.steps[0].from = 'missing'; }, /must reference participants/);
-  invalid((m) => { m.steps[0].occurrence.basis.sourceRefs = []; }, /fewer than 1/);
-  invalid((m) => { m.notes[0].subjectRefs = ['missing']; }, /must reference participants or steps/);
-  invalid((m) => { m.steps[0].branches = []; }, /additional properties/);
-  invalid((m) => { m.schemaVersion = '0.4-draft'; }, /constant/);
-  invalid((m) => { m.participants[0].pos = [0, 0]; }, /additional properties/);
+  invalid((m) => { m.steps[0].from = 'missing'; }, /expected participants/);
+  invalid((m) => { m.steps[0].occurrence.basis.sourceRefs = []; }, /"minItems":1/);
+  invalid((m) => { m.notes[0].subjectRefs = ['missing']; }, /expected participants or steps/);
+  invalid((m) => { m.steps[0].branches = []; }, /"keyword":"additionalProperties"/);
+  invalid((m) => { m.schemaVersion = '0.4-draft'; }, /"keyword":"const"/);
+  invalid((m) => { m.participants[0].pos = [0, 0]; }, /"keyword":"additionalProperties"/);
 });
 
 test('qualified orders and occurrences are drawn with explicit text, unresolved or absent occurrences are not invented', () => {

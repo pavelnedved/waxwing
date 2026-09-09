@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="waxwing-artifact" content="site-page"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reading repeated participation · Waxwing</title><link rel="stylesheet" href="../assets/site.css"><script src="../assets/site.js" defer></script></head>
+<body data-skin="standard"><header class="masthead"><a class="brand" href="../index.html"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions"><a href="../index.html" class="header-link">Contents</a><a href="../source/model.json" class="header-link" download>JSON 1</a><a href="../source/layout.json" class="header-link" download>JSON 2</a><label class="skin-control">Style <select id="skin" aria-label="Visual style"><option selected>standard</option><option>engineering</option><option>editorial</option></select></label><button id="theme">Dark theme</button></div></header>
+<main><nav class="document-breadcrumb" aria-label="Breadcrumb"><a href="../index.html" >Checkout: three focused workflows</a><span>/</span><span>document</span></nav><div class="eyebrow">CURRENT IMPLEMENTATION · PARTIAL MODEL</div><h1>Reading repeated participation</h1><div class="document-attachments"><a href="../graphs/services.html">graph: services</a><a href="../workflows/checkout-run.html">workflow: checkout-run</a><a href="../graphs/services.html#record-orchestrator">node: orchestrator · services</a><a href="../workflows/checkout-run.html#record-stock-result">step: stock-result</a></div><div class="document-workspace"><nav id="document-nav" aria-label="Document headings"><a class="document-nav-link" href="#ww-doc-reading-workflow--reading-repeated-participation">Reading repeated participation</a><a class="document-nav-link" href="#ww-doc-reading-workflow--limits-of-this-recording">Limits of this recording</a></nav><article class="markdown-body"><h1 id="ww-doc-reading-workflow--reading-repeated-participation">Reading repeated participation</h1>
+<p>The <a href="../graphs/services.html">connectivity view</a> has one box per service. It answers which services invoke which operations. It does not record the order of those operations.</p>
+<p>The <a href="../workflows/checkout-run.html">checkout workflow</a> answers a different question: where does this one recorded interaction path go next?</p>
+<p><a href="../workflows/checkout-run.html#record-orchestrator">Orchestrator</a> appears three times. Each appearance refers to the <strong>same service</strong>, not a replica, separate deployment, or new owner. Select one to inspect its participation and the shared source record.</p>
+<p>The <a href="../workflows/checkout-run.html#record-stock-result">stock result</a> is a reply to the stock request. It creates no new Stock → Orchestrator architecture dependency.</p>
+<h2 id="ww-doc-reading-workflow--limits-of-this-recording">Limits of this recording</h2>
+<p>The upstream trigger is explicitly unknown. The run stops after the payment request; no payment success or final response is implied. Neither the spacing nor a message arrow establishes elapsed time or blocking.</p>
+<details><summary>Original Markdown</summary><pre># Reading repeated participation
+
+The [connectivity view](#graph=services) has one box per service. It answers which services invoke which operations. It does not record the order of those operations.
+
+The [checkout workflow](#workflow=checkout-run) answers a different question: where does this one recorded interaction path go next?
+
+[Orchestrator](#workflow=checkout-run&amp;node=orchestrator) appears three times. Each appearance refers to the **same service**, not a replica, separate deployment, or new owner. Select one to inspect its participation and the shared source record.
+
+The [stock result](#workflow=checkout-run&amp;step=stock-result) is a reply to the stock request. It creates no new Stock → Orchestrator architecture dependency.
+
+## Limits of this recording
+
+The upstream trigger is explicitly unknown. The run stops after the payment request; no payment success or final response is implied. Neither the spacing nor a message arrow establishes elapsed time or blocking.
+</pre></details></article></div><footer><span>Keep this exported directory together. Complete source is in source/.</span><span>Waxwing · experimental MVP</span></footer></main>
+<aside id="inspector" hidden aria-label="Record details"><div class="inspector-header"><span>IN DETAIL</span><button id="close-inspector" aria-label="Close details">×</button></div><div id="inspector-content"></div></aside><p id="navigation-error" role="alert" hidden></p></body></html>
