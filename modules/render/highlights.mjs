@@ -73,8 +73,21 @@ export function selectHighlights(model, graph, { mode = 'selection', ref, bounda
 export function cleanViewerSVG(svg) {
   const clean = svg.cloneNode(true);
   clean.removeAttribute('style');
-  clean.querySelectorAll('.selected, .highlight-match').forEach((item) => {
-    item.classList.remove('selected', 'highlight-match');
+  clean.querySelectorAll('.selected, .highlight-match, .context-muted').forEach((item) => {
+    item.classList.remove('selected', 'highlight-match', 'context-muted');
   });
   return clean;
+}
+
+// Context remains legible and operable. Group frames and explicitly highlighted
+// qualifications keep their emphasis even when they are outside the selection.
+export function setDiagramFocus(svg, refs) {
+  const focus = new Set(refs);
+  const records = [...svg.querySelectorAll('.record')];
+  const active = records.some((item) => focus.has(item.dataset.ref));
+  for (const item of records) {
+    item.classList.toggle('context-muted', active && !focus.has(item.dataset.ref)
+      && !item.classList.contains('selected') && !item.classList.contains('highlight-match')
+      && !item.querySelector('.frame'));
+  }
 }

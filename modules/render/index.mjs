@@ -2,10 +2,11 @@ import fs from 'node:fs';
 import { workflowSVG } from '../workflow/render.mjs';
 import { renderSequenceSVG, renderSequenceHTML } from '../sequence/render.mjs';
 import { inspectReadability } from '../layout/readability.mjs';
-import { selectHighlights, cleanViewerSVG } from './highlights.mjs';
+import { selectHighlights, cleanViewerSVG, setDiagramFocus } from './highlights.mjs';
+import { componentPresentation, previewText } from './presentation.mjs';
 import { graphsOf, rootGraph } from '../graphs/index.mjs';
 import { assertLayout } from './artifacts.mjs';
-import { exists, knowledgeText, existenceText, alerts, wrap, edgeLines, canonical } from '../shared/model.mjs';
+import { exists, existenceText, alerts, wrap, edgeLines, canonical } from '../shared/model.mjs';
 import { renderDocument } from '../documents/markdown.mjs';
 
 export { selectHighlights } from './highlights.mjs';
@@ -13,7 +14,7 @@ export { extractLayout, recoverModel, recoverArtifact } from './artifacts.mjs';
 const asset = (name) => fs.readFileSync(new URL(name, import.meta.url), 'utf8');
 const svgCSS = asset('diagram.css');
 const pageCSS = asset('viewer.css');
-const pageJS = `const inspectReadability = ${inspectReadability.toString()};\nconst selectHighlights = ${selectHighlights.toString()};\nconst cleanViewerSVG = ${cleanViewerSVG.toString()};\n${asset('viewer.js')}`;
+const pageJS = `const inspectReadability = ${inspectReadability.toString()};\nconst selectHighlights = ${selectHighlights.toString()};\nconst setDiagramFocus = ${setDiagramFocus.toString()};\nconst cleanViewerSVG = ${cleanViewerSVG.toString()};\n${asset('viewer.js')}`;
 export const escapeXML = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&apos;');
 const n = (value) => Number(value.toFixed(3));
 const attrs = (ref, label) => `class="record" data-ref="${escapeXML(ref)}" tabindex="0" role="button" aria-label="Inspect ${escapeXML(label)}"`;
@@ -39,16 +40,16 @@ export function svgMarkup(source, graphRef = rootGraph(source.model), embed = tr
     const entity = entities.get(ref);
     const anchored = layout.layout.readingAnchorRef === ref;
     const titleLines = wrap(entity.label, 26);
-    const category = knowledgeText(entity.category);
-    const categoryClass = entity.category.status === 'established' ? entity.category.value : 'unspecified';
-    const categoryLabel = (graph.contextRefs.includes(ref) ? 'Context · ' : '') + (entity.category.status === 'established' ? category : `Category ${entity.category.status}`);
+    const presentation = componentPresentation(entity);
+    const context = graph.contextRefs.includes(ref);
     const flags = alerts({ ...model, memberships: model.memberships.filter((item) => graph.membershipRefs.includes(item.id)) }, entity);
-    return `<g ${attrs(ref, entity.label)}${anchored ? ' data-reading-anchor="true"' : ''}><g class="category-${categoryClass}">
+    return `<g ${attrs(ref, entity.label)}${anchored ? ' data-reading-anchor="true"' : ''}><title>${escapeXML(`${entity.label}. ${presentation.roleLabel}. ${presentation.summary}. ${existenceText(entity.existence)}${context ? '. External context' : ''}`)}</title><g class="category-${presentation.role}">
       <rect class="node-box" x="${n(box.x)}" y="${n(box.y)}" width="${n(box.width)}" height="${n(box.height)}" rx="12"/>
-      <rect class="accent" x="${n(box.x + 18)}" y="${n(box.y + 19)}" width="6" height="6" rx="2"/>
-      <text class="node-category" x="${n(box.x + 32)}" y="${n(box.y + 25)}">${escapeXML(categoryLabel)}</text>
+      <rect class="node-rail" x="${n(box.x)}" y="${n(box.y + 14)}" width="4" height="${n(box.height - 28)}" rx="2"/>
+      <text class="node-category" x="${n(box.x + 18)}" y="${n(box.y + 25)}">${escapeXML(presentation.roleLabel)}</text>
+      ${context ? `<text class="node-context" text-anchor="end" x="${n(box.x + box.width - 12)}" y="${n(box.y + 25)}"><title>External context</title>EXT</text>` : ''}
       ${titleLines.map((line, index) => `<text class="node-title" x="${n(box.x + 18)}" y="${n(box.y + 52 + index * 20)}">${escapeXML(line)}</text>`).join('')}
-      <text class="node-status" x="${n(box.x + 18)}" y="${n(box.y + 75 + (titleLines.length - 1) * 20)}">${escapeXML(existenceText(entity.existence))}</text>
+      <text class="node-status node-summary${presentation.existence ? ' node-alert' : ''}" x="${n(box.x + 18)}" y="${n(box.y + 75 + (titleLines.length - 1) * 20)}">${escapeXML(previewText(presentation.existence || presentation.summary, Math.floor((box.width - 36) / 7.2)))}</text>
       <text class="${flags.length ? 'node-alert' : 'node-link'}" x="${n(box.x + 18)}" y="${n(box.y + box.height - 18 - (anchored ? 24 : 0))}">${escapeXML(flags.length ? flags.slice(0, 2).join(' · ') : (model.graphs?.some((item) => item.expands?.graphRef === graphRef && item.expands.nodeRef === ref) ? 'Detailed graph available ↗' : 'Inspect evidence ↗'))}</text>
 ${anchored ? `      <text class="reading-anchor-cue" x="${n(box.x + 18)}" y="${n(box.y + box.height - 18)}">Start reading here</text>` : ''}
     </g></g>`;
@@ -95,20 +96,20 @@ export function renderHTML(layout, options = {}) {
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeXML(model.title)} · Waxwing</title><style>${pageCSS}</style></head>
 <body data-skin="${skin}">
-  <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions">${documents.length ? `<a class="header-link" href="#documents">Documents <span>${documents.length}</span></a>` : ''}<label class="skin-control">Style <select id="skin" aria-label="Visual style">${['standard', 'engineering', 'editorial'].map((value) => `<option value="${value}"${value === skin ? ' selected' : ''}>${value[0].toUpperCase() + value.slice(1)}</option>`).join('')}</select></label><button id="theme" aria-label="Switch color theme">Dark theme</button><button id="source-download">JSON 1 ↓</button><button id="layout-download">JSON 2 ↓</button><button id="svg-download">SVG ↓</button></div></header>
+  <header class="masthead"><a class="brand" href="#" aria-label="Waxwing overview"><span class="brand-mark">w</span> WAXWING <span class="brand-note">SYSTEM EXPLORER</span></a><div class="header-actions">${documents.length ? `<a class="header-link" href="#documents">Documents <span>${documents.length}</span></a>` : ''}<label class="skin-control">Style <select id="skin" aria-label="Visual style">${['standard', 'engineering', 'editorial'].map((value) => `<option value="${value}"${value === skin ? ' selected' : ''}>${value[0].toUpperCase() + value.slice(1)}</option>`).join('')}</select></label><button id="theme" aria-label="Switch color theme">Dark theme</button><details class="export-menu"><summary>Export ↓</summary><div class="export-options"><button id="svg-download">Diagram · SVG</button><button id="source-download">Source model · JSON 1</button><button id="layout-download">Layout · JSON 2</button></div></details></div></header>
   <main id="diagram-main">
     <nav id="graph-breadcrumb" aria-label="Graph hierarchy"></nav>
     <div class="eyebrow"><span class="live-dot"></span> CURRENT IMPLEMENTATION <span class="sep">/</span> PARTIAL MODEL</div>
     <div class="title-row"><h1 id="graph-title">${escapeXML(graph.title)}</h1><button id="model-details">Model details ↗</button></div>
     <p class="purpose" id="graph-question">${escapeXML(graph.scope.question)}</p>
-    <p class="purpose" id="graph-abstraction">${escapeXML(graph.scope.abstraction)}</p>
-    <div class="scope-line" id="graph-scope"></div>
+    <details class="view-context"><summary>About this view</summary><p class="purpose" id="graph-abstraction">${escapeXML(graph.scope.abstraction)}</p><div class="scope-line" id="graph-scope"></div></details>
     <div id="reading-anchor" class="reading-anchor" hidden><div><span class="detail-key">Start reading here</span><strong id="reading-anchor-name"></strong><p>Reading preference for this view. Arrows retain their operation direction.</p></div><button id="reading-anchor-go">Go to starting node</button></div>
     <div id="workflow-controls" hidden><label>View <select id="diagram-view" aria-label="Diagram view"></select></label><button id="workflow-details" hidden>Workflow entry & order ↗</button></div>
     <section class="map-panel" aria-label="Architecture diagram">
-      <div class="map-toolbar"><div><span class="toolbar-label">MAP</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
+      <div class="map-controls">
+      <div class="map-toolbar"><div><span class="toolbar-label">EXPLORE</span><span id="perspective-label"></span></div><div class="zoom-controls"><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-fit">Fit</button><button id="zoom-read" aria-label="Read at full size">100%</button><button id="zoom-in" aria-label="Zoom in">+</button><span id="zoom-label" aria-live="polite"></span></div></div>
       <div class="highlight-toolbar"><label for="highlight-mode">Highlight</label><select id="highlight-mode"><option value="selection">Selection and direct relationships</option><option value="unknown">Unknown claims</option><option value="disputed">Disputed claims</option><option value="qualified">All qualified claims</option><option value="context">External context</option><option value="calls">Calls</option><option value="reads">Reads</option><option value="writes">Writes</option><option value="publishes">Publishes</option><option value="consumes">Consumes</option></select><button id="highlight-clear">Clear highlights</button><span id="highlight-summary" role="status"></span></div>
-      <div id="highlight-details" aria-live="polite"></div>
+      </div><div id="highlight-details" aria-live="polite"></div>
       <div id="map-viewport" tabindex="0" aria-label="Diagram canvas. Use zoom controls; scroll to pan.">${svgMarkup(layout, graph.id, true, skin)}</div>
       <div class="map-caption"><span>Arrows describe operations: actor → resource.</span><span>Position does not imply execution order. Select any element to inspect it.</span></div>
     </section>

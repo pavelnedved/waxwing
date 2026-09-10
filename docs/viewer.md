@@ -10,6 +10,26 @@ selected diagram record in view at the current manual zoom. Closing it restores
 the full canvas width. At widths of 900 pixels or less, details open in the page
 below the content, with their own bounded scroll area, rather than covering it.
 
+Architecture component cards lead with the name, a qualified role, and an excerpt
+of the authored `abstraction.represents` claim. An ellipsis marks shortened text;
+the full claim remains in the inspector and source. Unknown/disputed meaning is
+labeled rather than choosing an alternative. Qualified or absent existence takes
+the description line so it remains explicit. The default established presence is
+available in the inspector. `EXT` identifies a component selected as external
+context. Role colors do not upgrade inferred or reported categories.
+
+Selecting a component emphasizes its direct connections and lowers the emphasis
+of other records. Group frames and active claim highlights remain emphasized.
+The component inspector begins with what it represents and its direct connections,
+then provides documents, detailed graphs, and expandable claims and evidence.
+Selection from automatic Fit opens at at least 100% for reading; closing restores
+Fit unless the reader changes zoom. Manual zoom is preserved. Transient emphasis
+is removed from SVG downloads, including reduced-emphasis context.
+
+The opening view keeps the question prominent, collects scope information under
+**About this view**, and groups standalone downloads under **Export**. Architecture
+and site toolbars share one row when space allows, then wrap on narrow screens.
+
 ## Advisory readability checks
 
 Open **Readability** below the canvas, or run:
