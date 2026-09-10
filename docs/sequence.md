@@ -118,7 +118,7 @@ for tall scenarios; choose 100% when text is small on a narrow screen.
 import {
   validateSequenceModel, layoutSequence, validateSequenceLayout,
   renderSequenceSVG, renderSequenceHTML,
-} from 'waxwing/sequence';
+} from '@felixfelicis/waxwing/sequence';
 
 const result = validateSequenceModel(json1);
 const json2 = layoutSequence(json1);
@@ -137,7 +137,7 @@ node bin/waxwing.mjs recover examples/sequence/generated/diagram.html /tmp/seque
 
 Architecture `--group` and `--direction` options are rejected for sequences.
 Sequence layout has no options yet. `--graph` on SVG can name only this scenario.
-The architecture-specific `waxwing/graphs` helpers are not sequence helpers.
+The architecture-specific `@felixfelicis/waxwing/graphs` helpers are not sequence helpers.
 
 ## Documents and references
 

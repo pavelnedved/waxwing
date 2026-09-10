@@ -25,11 +25,11 @@ try {
   assert.ok(!paths.some(file => /(^|\/)(\.internal|\.git|\.github|node_modules|generated|experiments)(\/|$)/.test(file)), 'Archive contains development/private output');
   fs.writeFileSync(path.join(temporary, 'package.json'), '{"private":true,"type":"module"}\n');
   run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', path.join(temporary, pack.filename)]);
-  const installed = path.join(temporary, 'node_modules/waxwing');
+  const installed = path.join(temporary, 'node_modules', pack.name);
   const cli = path.join(temporary, 'node_modules/.bin/waxwing');
   assert.match(run(cli, ['--help']), /build-site/);
   const manifest = JSON.parse(fs.readFileSync(path.join(installed, 'package.json')));
-  run(process.execPath, ['--input-type=module', '-e', `for (const entry of ${JSON.stringify(Object.keys(manifest.exports))}) await import('waxwing/' + entry.slice(2));`]);
+  run(process.execPath, ['--input-type=module', '-e', `for (const entry of ${JSON.stringify(Object.keys(manifest.exports))}) await import(${JSON.stringify(manifest.name + '/')} + entry.slice(2));`]);
   for (const [name, example] of [['architecture', 'waxwing'], ['sequence', 'sequence'], ['behavior', 'sequence-markets']]) {
     const input = path.join(installed, 'examples', example, 'model.json');
     const output = path.join(temporary, name);

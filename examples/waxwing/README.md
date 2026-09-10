@@ -19,7 +19,7 @@ by Git and can be rebuilt from the checked-in model and reading guide.
 From an installed npm package:
 
 ```sh
-waxwing build-site "$(npm root -g)/waxwing/examples/waxwing/model.json" ./waxwing-demo --direction DOWN
+waxwing build-site "$(npm root -g)/@felixfelicis/waxwing/examples/waxwing/model.json" ./waxwing-demo --direction DOWN
 ```
 
 Open `waxwing-demo/index.html`. Start with the overview, select Layout engine,

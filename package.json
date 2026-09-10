@@ -1,5 +1,5 @@
 {
-  "name": "waxwing",
+  "name": "@felixfelicis/waxwing",
   "version": "0.1.0",
   "type": "module",
   "description": "Inspectable architecture diagrams for humans and coding agents.",

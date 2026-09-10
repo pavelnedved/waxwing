@@ -2,14 +2,14 @@
 
 Waxwing is one npm package with subpath exports. Modules are separate code
 entry points, not separate services or separately published packages. In a
-consuming Node.js project, run `npm install waxwing@0.1.0`; imports below then
+consuming Node.js project, run `npm install @felixfelicis/waxwing@0.1.0`; imports below then
 resolve locally. A global CLI installation alone does not expose library imports.
 Within a source checkout, run `npm ci` before using these examples.
 
 ## Model
 
 ```js
-import { validateModel } from 'waxwing/model';
+import { validateModel } from '@felixfelicis/waxwing/model';
 
 const result = validateModel(json1);
 // { ok, diagnostics, summary, unresolved, qualifications, limits }
@@ -25,7 +25,7 @@ For a local model with Markdown file references, first call the optional
 [document loader](documents.md):
 
 ```js
-import { loadModel } from 'waxwing/documents';
+import { loadModel } from '@felixfelicis/waxwing/documents';
 const { model, inputFiles } = loadModel('/path/to/model.json');
 ```
 
@@ -33,7 +33,7 @@ It returns complete canonical JSON 1 and a list of physical input paths. The
 following layout API does not read files; supply `model` as its JSON 1 input.
 
 ```js
-import { layoutModel, validateLayout } from 'waxwing/layout';
+import { layoutModel, validateLayout } from '@felixfelicis/waxwing/layout';
 
 const json2 = await layoutModel(json1, {
   groupingPerspectiveRef: 'system-structure',
@@ -56,7 +56,7 @@ It never invents a primary path or changes operation direction.
 ## Render
 
 ```js
-import { renderSVG, renderHTML } from 'waxwing/render';
+import { renderSVG, renderHTML } from '@felixfelicis/waxwing/render';
 
 const svg = renderSVG(json2);
 const html = renderHTML(json2);
@@ -73,14 +73,14 @@ is available there. Preserve that source payload and its qualifications if your
 exports claim Waxwing's recoverability guarantee.
 
 The [viewer reference](viewer.md) documents skins, `selectHighlights` from
-`waxwing/render`, and `inspectReadability` from `waxwing/layout`. These helpers
+`@felixfelicis/waxwing/render`, and `inspectReadability` from `@felixfelicis/waxwing/layout`. These helpers
 operate independently of the HTML controls; their results do not alter source
 facts or geometry.
 
 ## Artifacts
 
 ```js
-import { extractLayout, recoverModel, recoverArtifact } from 'waxwing/artifacts';
+import { extractLayout, recoverModel, recoverArtifact } from '@felixfelicis/waxwing/artifacts';
 
 const json2 = extractLayout(svgOrHtmlText);
 const json1 = recoverModel(json2);
@@ -93,7 +93,7 @@ functions use validators but neither the renderer templates nor ELK.
 
 ## Sequence diagrams
 
-`waxwing/sequence` exports `validateSequenceModel`, `layoutSequence`,
+`@felixfelicis/waxwing/sequence` exports `validateSequenceModel`, `layoutSequence`,
 `validateSequenceLayout`, `renderSequenceSVG`, and `renderSequenceHTML`.
 It does not load ELK. The general model/layout/render/artifact entry points also
 dispatch on `diagramType: "sequence"`, so existing CLI stage names work.
@@ -152,7 +152,7 @@ packages can follow later if needed.
 
 ## Graphs across abstraction levels
 
-`waxwing/graphs` exports `graphsOf(model)`, `rootGraph(model)`, and
+`@felixfelicis/waxwing/graphs` exports `graphsOf(model)`, `rootGraph(model)`, and
 `projectGraph(model, graphRef)`. Projection is an internal adapter input for
 layout, not a complete source export. Pass the full model to `layoutModel`;
 it produces one validated geometry record per graph and embeds the complete
@@ -166,7 +166,7 @@ See [subgraphs](subgraphs.md) for model selection, mappings, and version rules.
 
 ## Architecture workflows
 
-`waxwing/workflow` exposes `workflowsOf(model, graphRef?)`,
+`@felixfelicis/waxwing/workflow` exposes `workflowsOf(model, graphRef?)`,
 `workflowParticipants(workflow)`, `workflowDiagnostics(model)` and
 `workflowDrawingDiagnostics(model, workflow)`. These inspection helpers expect
 a structurally valid architecture model and do not load ELK. Use `validateModel`

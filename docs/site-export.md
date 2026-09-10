@@ -132,9 +132,9 @@ signatures or a claim that source facts are true.
 ## Module entry point
 
 ```js
-import { loadModel } from 'waxwing/documents';
-import { layoutModel } from 'waxwing/layout';
-import { renderSite, writeSite, recoverSite } from 'waxwing/site';
+import { loadModel } from '@felixfelicis/waxwing/documents';
+import { layoutModel } from '@felixfelicis/waxwing/layout';
+import { renderSite, writeSite, recoverSite } from '@felixfelicis/waxwing/site';
 
 const { model, inputFiles } = loadModel('/path/to/model.json');
 const json2 = await layoutModel(model);

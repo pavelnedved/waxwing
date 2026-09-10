@@ -207,15 +207,15 @@ Your own producer
 
 | Entry point | Responsibility |
 |---|---|
-| `waxwing/model` | Validate JSON 1 without laying out or rendering. |
-| `waxwing/documents` | Load registered Markdown files and assets into complete JSON 1. |
-| `waxwing/graphs` | Inspect graph selections and adapt a graph for layout. |
-| `waxwing/layout` | Generate and validate JSON 2; ELK supplies automatic geometry. |
-| `waxwing/render` | Render a valid JSON 2 without running the layout engine. |
-| `waxwing/artifacts` | Extract embedded JSON 2 and recover JSON 1. |
-| `waxwing/site` | Render, write, and recover a fixed multi-page export with automatic navigation. |
-| `waxwing/workflow` | Inspect architecture workflow scope, participation, and drawing blockers without loading ELK. |
-| `waxwing/sequence` | Independently validate, lay out, and render a sequence scenario or structured behavior. |
+| `@felixfelicis/waxwing/model` | Validate JSON 1 without laying out or rendering. |
+| `@felixfelicis/waxwing/documents` | Load registered Markdown files and assets into complete JSON 1. |
+| `@felixfelicis/waxwing/graphs` | Inspect graph selections and adapt a graph for layout. |
+| `@felixfelicis/waxwing/layout` | Generate and validate JSON 2; ELK supplies automatic geometry. |
+| `@felixfelicis/waxwing/render` | Render a valid JSON 2 without running the layout engine. |
+| `@felixfelicis/waxwing/artifacts` | Extract embedded JSON 2 and recover JSON 1. |
+| `@felixfelicis/waxwing/site` | Render, write, and recover a fixed multi-page export with automatic navigation. |
+| `@felixfelicis/waxwing/workflow` | Inspect architecture workflow scope, participation, and drawing blockers without loading ELK. |
+| `@felixfelicis/waxwing/sequence` | Independently validate, lay out, and render a sequence scenario or structured behavior. |
 
 These are subpath exports of one npm package. They can be imported
 independently; separately published packages are not part of the initial release. See

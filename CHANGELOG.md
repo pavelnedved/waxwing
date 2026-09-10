@@ -4,7 +4,7 @@ Software versions and experimental schema versions are tracked separately.
 
 ## 0.1.0 — 2026-09-09
 
-First release. Install with `npm install -g waxwing@0.1.0`.
+First release. Install with `npm install -g @felixfelicis/waxwing@0.1.0`.
 
 ### Project and distribution
 

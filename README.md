@@ -22,8 +22,16 @@ Requires Node.js **20.19.0 or newer**. No server or account is needed to view th
 exported diagrams.
 
 ```sh
-npm install -g waxwing@0.1.0
-waxwing build-site "$(npm root -g)/waxwing/examples/waxwing/model.json" ./waxwing-demo --direction DOWN
+npm install -g @felixfelicis/waxwing@0.1.0
+```
+
+Copy the full command above. The package name includes its publisher namespace;
+once installed, the terminal command is simply **`waxwing`**.
+
+Build the included example:
+
+```sh
+waxwing build-site "$(npm root -g)/@felixfelicis/waxwing/examples/waxwing/model.json" ./waxwing-demo --direction DOWN
 ```
 
 Open `waxwing-demo/index.html` in your browser. The command above uses macOS/Linux
@@ -48,7 +56,7 @@ understand, and a concrete question:
 > linked to the source revision, and preserve unknowns. Validate the model and
 > build an HTML diagram in a separate output directory.
 
-The installed guide is at `$(npm root -g)/waxwing/AGENT_GUIDE.md` on macOS/Linux.
+The installed guide is at `$(npm root -g)/@felixfelicis/waxwing/AGENT_GUIDE.md` on macOS/Linux.
 Use the guide from your installed version. It contains complete authoring examples and commands. You choose the
 agent; Waxwing's layout and rendering do not call an LLM. There is no built-in
 repository crawler or `ingest` command.
