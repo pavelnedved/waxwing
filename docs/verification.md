@@ -379,3 +379,20 @@ advisory readability warnings; this does not certify arbitrary layout quality.
 
 Direct-file browser navigation and browser download events were not re-tested.
 Public npm installation remains pending publication and authentication.
+
+
+## Published 0.1.0, 2026-09-09
+
+`@felixfelicis/waxwing@0.1.0` is published with public access. The `v0.1.0`
+GitHub release points to `f8d504aa7f987d953436e6abaff8906c6be31d6f`, whose CI
+passed on Node 20.19.0, 22, and 24 (213 tests plus the package check per job).
+
+The public npm archive's integrity matches the exact locally tested archive.
+The downloaded archive passes all module imports and architecture, sequence,
+and structured-behavior build/recovery checks. A separate fresh global installation
+by package name successfully ran the README's copyable demo command and located
+the matching agent guide. The installation prefix and output were temporary;
+these checks did not replace a user's global installation.
+
+These checks establish packaging and the documented demo path. An unfamiliar
+user trial and broader real-codebase evaluation remain follow-up work.
