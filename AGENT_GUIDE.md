@@ -16,8 +16,7 @@ remains the executable check; it does not verify whether supplied evidence is tr
 
 ## Installed package or checkout
 
-The first npm release is being prepared. Until it is published, use a checkout.
-After publication, `npm install -g waxwing@0.1.0` provides the `waxwing` command.
+`npm install -g waxwing@0.1.0` provides the `waxwing` command.
 The matching guide is at `$(npm root -g)/waxwing/AGENT_GUIDE.md` on macOS/Linux;
 `npm root -g` prints the package directory on other platforms as well.
 

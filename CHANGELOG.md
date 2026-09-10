@@ -1,14 +1,12 @@
 # Release notes
 
-The first public release, **0.1.0**, is being prepared. It has not yet been
-published to npm or tagged. Software versions and experimental schema versions
-are tracked separately.
+Software versions and experimental schema versions are tracked separately.
 
-## Unreleased
+## 0.1.0 — 2026-09-09
 
-This section describes the initial release being prepared, not a published version.
+First release. Install with `npm install -g waxwing@0.1.0`.
 
-### Release preparation
+### Project and distribution
 
 - MIT license, contributor instructions, bug template, and public roadmap.
 - Clean-install CI and isolated npm package smoke checks.

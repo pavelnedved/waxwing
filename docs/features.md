@@ -279,10 +279,10 @@ has not edited an exported SVG's visible markup.
 
 ## Development and documents
 
-[Release notes](../CHANGELOG.md) describe the current Unreleased changes.
+[Release notes](../CHANGELOG.md) describe the 0.1.0 release.
 [Upgrade and migration instructions](migrations.md) explain when to
 re-render, rebuild, or recover an existing spec. Software releases and schema
-versions are tracked separately; the package is currently a development snapshot.
+versions are tracked separately; software 0.1.0 uses experimental draft formats.
 
 ```sh
 npm test

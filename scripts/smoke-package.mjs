@@ -14,7 +14,10 @@ function run(command, args, cwd = temporary) {
   return result.stdout;
 }
 try {
-  const [pack] = JSON.parse(run('npm', ['pack', '--json', '--ignore-scripts', '--pack-destination', temporary], root));
+  // An optional archive path or registry spec verifies the exact release artifact.
+  assert.ok(process.argv.length <= 3, 'Usage: node scripts/smoke-package.mjs [archive-or-package-spec]');
+  const spec = process.argv[2] ? [process.argv[2]] : [];
+  const [pack] = JSON.parse(run('npm', ['pack', ...spec, '--json', '--ignore-scripts', '--pack-destination', temporary], root));
   const paths = pack.files.map(file => file.path);
   for (const required of ['bin/waxwing.mjs', 'schemas/system-model.schema.json', 'modules/render/diagram.css', 'AGENT_GUIDE.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'examples/waxwing/model.json']) {
     assert.ok(paths.includes(required), `Missing package file: ${required}`);
@@ -44,7 +47,7 @@ try {
       assert.deepEqual(JSON.parse(fs.readFileSync(recovered)), JSON.parse(fs.readFileSync(prepared)), `Recovery differs for ${artifact}`);
     }
   }
-  console.log(`Package smoke check passed: ${manifest.name}@${manifest.version}, ${paths.length} files, ${pack.size} compressed bytes; all exports and architecture/sequence/behavior builds recovered successfully.`);
+  console.log(`Package smoke check passed: ${manifest.name}@${manifest.version}, ${paths.length} files, ${pack.size} compressed bytes; integrity ${pack.integrity}; all exports and architecture/sequence/behavior builds recovered successfully.`);
 } finally {
   fs.rmSync(temporary, { recursive: true, force: true });
 }

@@ -1,11 +1,10 @@
 # Independently usable modules
 
-Waxwing is one npm package with subpath exports. Its first public release is
-being prepared; use a checkout until publication. Modules are
-separate code entry points, not separate services or separately published npm
-packages. Install dependencies with `npm ci` before using them. The package
-name is `waxwing`; imports below work within this repository or when this local
-package is installed by a consuming Node.js project.
+Waxwing is one npm package with subpath exports. Modules are separate code
+entry points, not separate services or separately published packages. In a
+consuming Node.js project, run `npm install waxwing@0.1.0`; imports below then
+resolve locally. A global CLI installation alone does not expose library imports.
+Within a source checkout, run `npm ci` before using these examples.
 
 ## Model
 

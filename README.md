@@ -14,7 +14,7 @@ model included.
 
 Waxwing is an early, personally maintained project. The formats are experimental;
 validation checks structure and consistency, not whether your evidence is true.
-The first npm release is being prepared. The checkout quickstart below works now.
+Software version **0.1.0** is the first release; model formats retain their own draft versions.
 
 ## Try it
 
@@ -22,13 +22,13 @@ Requires Node.js **20.19.0 or newer**. No server or account is needed to view th
 exported diagrams.
 
 ```sh
-git clone https://github.com/pavelnedved/waxwing.git
-cd waxwing
-npm ci
-npm run demo:self
+npm install -g waxwing@0.1.0
+waxwing build-site "$(npm root -g)/waxwing/examples/waxwing/model.json" ./waxwing-demo --direction DOWN
 ```
 
-Open `examples/waxwing/generated/index.html` in your browser. This real example
+Open `waxwing-demo/index.html` in your browser. The command above uses macOS/Linux
+shell syntax; on Windows, run `npm root -g` and use its printed path in place of
+`$(npm root -g)`. This real example
 models [a pinned revision of Waxwing itself](examples/waxwing/README.md):
 
 1. Open **Waxwing: from model to artifact** and select **Layout engine** to inspect its claims.
@@ -48,14 +48,15 @@ understand, and a concrete question:
 > linked to the source revision, and preserve unknowns. Validate the model and
 > build an HTML diagram in a separate output directory.
 
-The guide contains complete authoring examples and commands. You choose the
+The installed guide is at `$(npm root -g)/waxwing/AGENT_GUIDE.md` on macOS/Linux.
+Use the guide from your installed version. It contains complete authoring examples and commands. You choose the
 agent; Waxwing's layout and rendering do not call an LLM. There is no built-in
 repository crawler or `ingest` command.
 
-From the checkout, build the model your agent produces:
+Build the model your agent produces:
 
 ```sh
-node bin/waxwing.mjs build /path/to/model.json /path/to/output
+waxwing build /path/to/model.json /path/to/output
 ```
 
 Open `output/diagram.html`. It contains the diagram, its inspector, registered
@@ -71,7 +72,7 @@ or use `build-site` to generate linked pages for static hosting.
 - **Recoverable source:** extract the complete embedded model from supported exports.
 
 ```sh
-node bin/waxwing.mjs recover /path/to/diagram.html /path/to/recovered-model.json
+waxwing recover /path/to/diagram.html /path/to/recovered-model.json
 ```
 
 Recovery preserves the parsed source model; it does not authenticate the original
@@ -86,7 +87,12 @@ claims or certify that an exported drawing has not been altered.
 - [Release notes](CHANGELOG.md) and [migration guidance](docs/migrations.md)
 - [Roadmap](ROADMAP.md) and [contribution guide](CONTRIBUTING.md)
 
+From a source checkout:
+
 ```sh
+git clone https://github.com/pavelnedved/waxwing.git
+cd waxwing
+npm ci
 npm test
 npm run test:package
 ```
