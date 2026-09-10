@@ -1,12 +1,19 @@
 # Release notes
 
-Named releases will be recorded here with a version, date, changes, and upgrade
-instructions. The package currently reports `0.0.0`; development snapshots are
-identified by their Git commit. No named release has been cut yet.
+The first public release, **0.1.0**, is being prepared. It has not yet been
+published to npm or tagged. Software versions and experimental schema versions
+are tracked separately.
 
 ## Unreleased
 
 This section describes the initial release being prepared, not a published version.
+
+### Release preparation
+
+- MIT license, contributor instructions, bug template, and public roadmap.
+- Clean-install CI and isolated npm package smoke checks.
+- A source-backed example of Waxwing itself, with a static demo deployment workflow.
+- Runtime assets, authoring guide, and example sources included in the npm package.
 
 ### Available functionality
 

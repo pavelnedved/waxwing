@@ -356,3 +356,26 @@ was attempted, and `file://` remains unverified. Browser downloads and external
 static deployment were not exercised. The initial site viewer has fewer highlight
 modes than the existing single-file viewer; it retains uncertainty highlighting
 and selected-record inspection. The entire directory is the recovery boundary.
+
+## First public release preparation, 2026-09-09
+
+The local suite passes **213 tests**. A separate `npm run test:package` packs
+Waxwing and installs the archive in a temporary project without checkout
+symlinks. It imports every documented subpath and exercises CLI help, validation,
+preparation, HTML/SVG builds, layout checking, re-rendering, site builds, and
+source recovery for architecture, sequence, and structured sequence examples.
+Recovered JSON is compared with the prepared model, including resolved Markdown.
+The archive check rejects internal plans and generated/development output.
+
+The real `examples/waxwing` model cites committed source at `00f3021`; it is a
+curated static explanation, not a runtime trace or large-repository benchmark.
+Browser checks over localhost verified overview inspection, navigation into the
+layout detail, attached reading-guide links, the build workflow, and a workflow
+reply deep link surviving reload. At a 390-pixel viewport, page scroll width
+remained 390 pixels; diagrams themselves retain scrolling at readable zoom.
+No browser console errors were captured. The README screenshot is taken from
+the actual overview at 76% zoom. Layout detail and the long workflow retain
+advisory readability warnings; this does not certify arbitrary layout quality.
+
+Direct-file browser navigation and browser download events were not re-tested.
+Public npm installation remains pending publication and authentication.

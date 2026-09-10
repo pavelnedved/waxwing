@@ -1,0 +1,924 @@
+{
+  "schemaVersion": "0.5-draft",
+  "id": "waxwing",
+  "title": "Waxwing, explained by Waxwing",
+  "scope": {
+    "timeframe": "current",
+    "environment": "Waxwing Node.js implementation; static source inspection",
+    "snapshot": "00f30217513433cbb1fb83318ed469e19f890621",
+    "coverage": "partial",
+    "question": "How does Waxwing turn a source model into an inspectable artifact?",
+    "includes": [
+      "Architecture-model path and selected direct function calls."
+    ],
+    "excludes": [
+      "Sequence dispatch, workflow layout internals, all validation branches, performance measurements, and filesystem failure recovery."
+    ],
+    "abstraction": "A curated model of real source code, not automatic discovery or a complete call graph."
+  },
+  "sources": [
+    {
+      "id": "src-cli",
+      "kind": "code",
+      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/bin/waxwing.mjs",
+      "description": "Committed source: bin/waxwing.mjs"
+    },
+    {
+      "id": "src-documents",
+      "kind": "code",
+      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/documents/index.mjs",
+      "description": "Committed source: modules/documents/index.mjs"
+    },
+    {
+      "id": "src-layout",
+      "kind": "code",
+      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/layout/index.mjs",
+      "description": "Committed source: modules/layout/index.mjs"
+    },
+    {
+      "id": "src-render",
+      "kind": "code",
+      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/render/index.mjs",
+      "description": "Committed source: modules/render/index.mjs"
+    },
+    {
+      "id": "src-recovery",
+      "kind": "code",
+      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/render/artifacts.mjs",
+      "description": "Committed source: modules/render/artifacts.mjs"
+    },
+    {
+      "id": "src-model",
+      "kind": "code",
+      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/model/index.mjs",
+      "description": "Committed source: modules/model/index.mjs"
+    },
+    {
+      "id": "src-geometry",
+      "kind": "code",
+      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/layout/validate.mjs",
+      "description": "Committed source: modules/layout/validate.mjs"
+    },
+    {
+      "id": "src-manifest",
+      "kind": "code",
+      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/package.json",
+      "description": "Committed source: package.json"
+    }
+  ],
+  "perspectives": [],
+  "entities": [
+    {
+      "id": "cli",
+      "label": "CLI",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-cli"
+          ],
+          "explanation": "Command dispatch and artifact writes."
+        }
+      },
+      "category": {
+        "status": "inferred",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "src-cli"
+          ],
+          "explanation": "The draft vocabulary has no module category. Service denotes a logical callable responsibility here, not a deployed network service."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Command dispatch and artifact writes.",
+          "basis": {
+            "sourceRefs": [
+              "src-cli"
+            ],
+            "explanation": "Command dispatch and artifact writes."
+          }
+        },
+        "omits": [
+          "Private functions and implementation classes."
+        ],
+        "reason": "Show callable responsibilities within one local Node.js process."
+      }
+    },
+    {
+      "id": "documents",
+      "label": "Document loader",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-documents"
+          ],
+          "explanation": "Resolve registered Markdown and local images into the model."
+        }
+      },
+      "category": {
+        "status": "inferred",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "src-documents"
+          ],
+          "explanation": "The draft vocabulary has no module category. Service denotes a logical callable responsibility here, not a deployed network service."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Resolve registered Markdown and local images into the model.",
+          "basis": {
+            "sourceRefs": [
+              "src-documents"
+            ],
+            "explanation": "Resolve registered Markdown and local images into the model."
+          }
+        },
+        "omits": [
+          "Private functions and implementation classes."
+        ],
+        "reason": "Show callable responsibilities within one local Node.js process."
+      }
+    },
+    {
+      "id": "layout",
+      "label": "Layout engine",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "Validate the model, obtain geometry, and preserve source in JSON 2."
+        }
+      },
+      "category": {
+        "status": "inferred",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "The draft vocabulary has no module category. Service denotes a logical callable responsibility here, not a deployed network service."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Validate the model, obtain geometry, and preserve source in JSON 2.",
+          "basis": {
+            "sourceRefs": [
+              "src-layout"
+            ],
+            "explanation": "Validate the model, obtain geometry, and preserve source in JSON 2."
+          }
+        },
+        "omits": [
+          "Private functions and implementation classes."
+        ],
+        "reason": "Show callable responsibilities within one local Node.js process."
+      }
+    },
+    {
+      "id": "render",
+      "label": "SVG / HTML renderer",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-render"
+          ],
+          "explanation": "Render validated layouts with embedded source and viewer assets."
+        }
+      },
+      "category": {
+        "status": "inferred",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "src-render"
+          ],
+          "explanation": "The draft vocabulary has no module category. Service denotes a logical callable responsibility here, not a deployed network service."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Render validated layouts with embedded source and viewer assets.",
+          "basis": {
+            "sourceRefs": [
+              "src-render"
+            ],
+            "explanation": "Render validated layouts with embedded source and viewer assets."
+          }
+        },
+        "omits": [
+          "Private functions and implementation classes."
+        ],
+        "reason": "Show callable responsibilities within one local Node.js process."
+      }
+    },
+    {
+      "id": "recovery",
+      "label": "Source recovery",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-recovery"
+          ],
+          "explanation": "Extract and validate embedded JSON 2, then clone its source model."
+        }
+      },
+      "category": {
+        "status": "inferred",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "src-recovery"
+          ],
+          "explanation": "The draft vocabulary has no module category. Service denotes a logical callable responsibility here, not a deployed network service."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Extract and validate embedded JSON 2, then clone its source model.",
+          "basis": {
+            "sourceRefs": [
+              "src-recovery"
+            ],
+            "explanation": "Extract and validate embedded JSON 2, then clone its source model."
+          }
+        },
+        "omits": [
+          "Private functions and implementation classes."
+        ],
+        "reason": "Show callable responsibilities within one local Node.js process."
+      }
+    },
+    {
+      "id": "model",
+      "label": "Model validator",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-model"
+          ],
+          "explanation": "Check model schema and semantic references."
+        }
+      },
+      "category": {
+        "status": "inferred",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "src-model"
+          ],
+          "explanation": "The draft vocabulary has no module category. Service denotes a logical callable responsibility here, not a deployed network service."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Check model schema and semantic references.",
+          "basis": {
+            "sourceRefs": [
+              "src-model"
+            ],
+            "explanation": "Check model schema and semantic references."
+          }
+        },
+        "omits": [
+          "Private functions and implementation classes."
+        ],
+        "reason": "Show callable responsibilities within one local Node.js process."
+      }
+    },
+    {
+      "id": "geometry",
+      "label": "Layout validator",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-geometry"
+          ],
+          "explanation": "Check layout geometry and source-model consistency."
+        }
+      },
+      "category": {
+        "status": "inferred",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "src-geometry"
+          ],
+          "explanation": "The draft vocabulary has no module category. Service denotes a logical callable responsibility here, not a deployed network service."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Check layout geometry and source-model consistency.",
+          "basis": {
+            "sourceRefs": [
+              "src-geometry"
+            ],
+            "explanation": "Check layout geometry and source-model consistency."
+          }
+        },
+        "omits": [
+          "Private functions and implementation classes."
+        ],
+        "reason": "Show callable responsibilities within one local Node.js process."
+      }
+    },
+    {
+      "id": "elk",
+      "label": "ELK",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "Third-party automatic geometry engine called by the layout module."
+        }
+      },
+      "category": {
+        "status": "inferred",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "The draft vocabulary has no module category. Service denotes a logical callable responsibility here, not a deployed network service."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "Third-party automatic geometry engine called by the layout module.",
+          "basis": {
+            "sourceRefs": [
+              "src-layout"
+            ],
+            "explanation": "Third-party automatic geometry engine called by the layout module."
+          }
+        },
+        "omits": [
+          "Private functions and implementation classes."
+        ],
+        "reason": "Show callable responsibilities within one local Node.js process."
+      }
+    },
+    {
+      "id": "layout-core",
+      "label": "Layout coordinator",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "Validate the model, obtain geometry, and preserve source in JSON 2."
+        }
+      },
+      "category": {
+        "status": "inferred",
+        "value": "service",
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "The draft vocabulary has no module category. Service denotes a logical callable responsibility here, not a deployed network service."
+        }
+      },
+      "abstraction": {
+        "represents": {
+          "status": "established",
+          "value": "The layoutModel function coordinates model checks, automatic placement and output checks.",
+          "basis": {
+            "sourceRefs": [
+              "src-layout"
+            ],
+            "explanation": "Directly implemented in layoutModel."
+          }
+        },
+        "omits": [
+          "Private functions and implementation classes."
+        ],
+        "reason": "Show callable responsibilities within one local Node.js process."
+      }
+    }
+  ],
+  "groups": [],
+  "memberships": [],
+  "relationships": [
+    {
+      "id": "load",
+      "from": "cli",
+      "to": "documents",
+      "label": "Load source",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-cli"
+          ],
+          "explanation": "loadModel is called before layout in the build branch."
+        }
+      }
+    },
+    {
+      "id": "place",
+      "from": "cli",
+      "to": "layout",
+      "label": "Build layout",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-cli"
+          ],
+          "explanation": "The build branch awaits layoutModel with the resolved source."
+        }
+      }
+    },
+    {
+      "id": "draw",
+      "from": "cli",
+      "to": "render",
+      "label": "Render exports",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-cli"
+          ],
+          "explanation": "The build branch calls renderSVG then renderHTML before writing outputs."
+        }
+      }
+    },
+    {
+      "id": "extract",
+      "from": "cli",
+      "to": "recovery",
+      "label": "Recover source",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-cli"
+          ],
+          "explanation": "The separate recover command calls recoverArtifact for a single-file artifact."
+        }
+      }
+    },
+    {
+      "id": "validate-source",
+      "from": "layout-core",
+      "to": "model",
+      "label": "Validate model",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "layoutModel calls validateModel before automatic layout."
+        }
+      }
+    },
+    {
+      "id": "auto-layout",
+      "from": "layout-core",
+      "to": "elk",
+      "label": "Place graph",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "The flat architecture path awaits new ELK().layout(graph)."
+        }
+      }
+    },
+    {
+      "id": "check-geometry",
+      "from": "layout-core",
+      "to": "geometry",
+      "label": "Validate result",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "Generated layouts are checked with validateLayout and expectedModel."
+        }
+      }
+    },
+    {
+      "id": "place-detail",
+      "from": "cli",
+      "to": "layout-core",
+      "label": "Build layout",
+      "kind": "calls",
+      "existence": {
+        "status": "established",
+        "value": true,
+        "basis": {
+          "sourceRefs": [
+            "src-layout"
+          ],
+          "explanation": "The CLI calls the exported layoutModel function. This is the detailed endpoint of the overview call."
+        }
+      }
+    }
+  ],
+  "notes": [
+    {
+      "id": "performance-unknown",
+      "subjectRefs": [
+        "layout"
+      ],
+      "topic": "behavior",
+      "statement": "What model size remains comfortably readable and fast?",
+      "answer": {
+        "status": "unknown",
+        "reason": "This source inspection includes no representative large-repository benchmark; implementation existence does not establish scale limits."
+      }
+    }
+  ],
+  "graphs": [
+    {
+      "id": "overview",
+      "title": "Waxwing: from model to artifact",
+      "scope": {
+        "timeframe": "current",
+        "environment": "Waxwing Node.js implementation; static source inspection",
+        "snapshot": "00f30217513433cbb1fb83318ed469e19f890621",
+        "coverage": "partial",
+        "question": "Which responsibilities turn source models into inspectable exports?",
+        "includes": [
+          "Architecture-model path and selected direct function calls."
+        ],
+        "excludes": [
+          "Sequence dispatch, workflow layout internals, all validation branches, performance measurements, and filesystem failure recovery."
+        ],
+        "abstraction": "Logical modules in one Node.js process; arrows are calls, not execution order."
+      },
+      "entityRefs": [
+        "cli",
+        "documents",
+        "layout",
+        "render",
+        "recovery"
+      ],
+      "contextRefs": [],
+      "relationshipRefs": [
+        "load",
+        "place",
+        "draw",
+        "extract"
+      ],
+      "membershipRefs": []
+    },
+    {
+      "id": "layout-details",
+      "title": "Inside architecture layout",
+      "scope": {
+        "timeframe": "current",
+        "environment": "Waxwing Node.js implementation; static source inspection",
+        "snapshot": "00f30217513433cbb1fb83318ed469e19f890621",
+        "coverage": "partial",
+        "question": "Where are model meaning and generated geometry checked?",
+        "includes": [
+          "Architecture-model path and selected direct function calls."
+        ],
+        "excludes": [
+          "Sequence dispatch, workflow layout internals, all validation branches, performance measurements, and filesystem failure recovery."
+        ],
+        "abstraction": "Selected module dependencies; ELK supplies placement, Waxwing validates source and output."
+      },
+      "entityRefs": [
+        "layout-core",
+        "model",
+        "geometry"
+      ],
+      "contextRefs": [
+        "cli",
+        "elk"
+      ],
+      "relationshipRefs": [
+        "place-detail",
+        "validate-source",
+        "auto-layout",
+        "check-geometry"
+      ],
+      "membershipRefs": [],
+      "expands": {
+        "graphRef": "overview",
+        "nodeRef": "layout",
+        "meaning": {
+          "status": "established",
+          "value": "Expand the layout module into its coordinator and validation responsibilities; CLI and ELK are external context.",
+          "basis": {
+            "sourceRefs": [
+              "src-layout"
+            ],
+            "explanation": "Responsibilities follow the imports and body of layoutModel."
+          }
+        },
+        "boundaries": [
+          {
+            "relationshipRef": "place",
+            "detail": {
+              "status": "established",
+              "value": [
+                "place-detail"
+              ],
+              "basis": {
+                "sourceRefs": [
+                  "src-layout"
+                ],
+                "explanation": "The overview layout call enters layoutModel."
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "workflows": [
+    {
+      "id": "build",
+      "title": "A successful architecture build",
+      "graphRef": "overview",
+      "scope": {
+        "timeframe": "current",
+        "environment": "Waxwing Node.js implementation; static source inspection",
+        "snapshot": "00f30217513433cbb1fb83318ed469e19f890621",
+        "coverage": "partial",
+        "question": "In what order does the CLI prepare the three export contents?",
+        "includes": [
+          "Architecture-model path and selected direct function calls."
+        ],
+        "excludes": [
+          "Sequence dispatch, workflow layout internals, all validation branches, performance measurements, and filesystem failure recovery."
+        ],
+        "abstraction": "Static successful call/return path; CLI appearances share one identity. File writes follow the last return and are outside this view."
+      },
+      "steps": [
+        {
+          "id": "load-model",
+          "label": "Load model",
+          "kind": "message",
+          "from": "cli",
+          "to": "documents",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "src-cli"
+              ],
+              "explanation": "Static reading of the successful architecture build branch, not an observed runtime trace. SVG and HTML are computed before the output files are written."
+            }
+          },
+          "relationshipRef": "load"
+        },
+        {
+          "id": "load-model-result",
+          "label": "Resolved model",
+          "kind": "reply",
+          "from": "documents",
+          "to": "cli",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "src-cli"
+              ],
+              "explanation": "Static reading of the successful architecture build branch, not an observed runtime trace. SVG and HTML are computed before the output files are written."
+            }
+          },
+          "replyTo": "load-model"
+        },
+        {
+          "id": "layout-model",
+          "label": "Lay out model",
+          "kind": "message",
+          "from": "cli",
+          "to": "layout",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "src-cli"
+              ],
+              "explanation": "Static reading of the successful architecture build branch, not an observed runtime trace. SVG and HTML are computed before the output files are written."
+            }
+          },
+          "relationshipRef": "place"
+        },
+        {
+          "id": "layout-model-result",
+          "label": "JSON 2",
+          "kind": "reply",
+          "from": "layout",
+          "to": "cli",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "src-cli"
+              ],
+              "explanation": "Static reading of the successful architecture build branch, not an observed runtime trace. SVG and HTML are computed before the output files are written."
+            }
+          },
+          "replyTo": "layout-model"
+        },
+        {
+          "id": "render-svg",
+          "label": "Render SVG",
+          "kind": "message",
+          "from": "cli",
+          "to": "render",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "src-cli"
+              ],
+              "explanation": "Static reading of the successful architecture build branch, not an observed runtime trace. SVG and HTML are computed before the output files are written."
+            }
+          },
+          "relationshipRef": "draw"
+        },
+        {
+          "id": "render-svg-result",
+          "label": "SVG content",
+          "kind": "reply",
+          "from": "render",
+          "to": "cli",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "src-cli"
+              ],
+              "explanation": "Static reading of the successful architecture build branch, not an observed runtime trace. SVG and HTML are computed before the output files are written."
+            }
+          },
+          "replyTo": "render-svg"
+        },
+        {
+          "id": "render-html",
+          "label": "Render HTML",
+          "kind": "message",
+          "from": "cli",
+          "to": "render",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "src-cli"
+              ],
+              "explanation": "Static reading of the successful architecture build branch, not an observed runtime trace. SVG and HTML are computed before the output files are written."
+            }
+          },
+          "relationshipRef": "draw"
+        },
+        {
+          "id": "render-html-result",
+          "label": "HTML content",
+          "kind": "reply",
+          "from": "render",
+          "to": "cli",
+          "occurrence": {
+            "status": "established",
+            "value": true,
+            "basis": {
+              "sourceRefs": [
+                "src-cli"
+              ],
+              "explanation": "Static reading of the successful architecture build branch, not an observed runtime trace. SVG and HTML are computed before the output files are written."
+            }
+          },
+          "replyTo": "render-html"
+        }
+      ],
+      "order": {
+        "status": "established",
+        "value": [
+          "load-model",
+          "load-model-result",
+          "layout-model",
+          "layout-model-result",
+          "render-svg",
+          "render-svg-result",
+          "render-html",
+          "render-html-result"
+        ],
+        "basis": {
+          "sourceRefs": [
+            "src-cli"
+          ],
+          "explanation": "Static reading of the successful architecture build branch, not an observed runtime trace. SVG and HTML are computed before the output files are written."
+        }
+      },
+      "entry": {
+        "point": {
+          "status": "established",
+          "value": {
+            "participantRef": "cli",
+            "itemRef": "load-model"
+          },
+          "basis": {
+            "sourceRefs": [
+              "src-cli"
+            ],
+            "explanation": "This scoped path starts when build loads the supplied model."
+          }
+        },
+        "trigger": {
+          "status": "established",
+          "value": "The user invokes waxwing build with valid input and output paths.",
+          "basis": {
+            "sourceRefs": [
+              "src-cli"
+            ],
+            "explanation": "CLI command dispatch selects the build branch."
+          }
+        }
+      }
+    }
+  ],
+  "documents": [
+    {
+      "id": "reading-guide",
+      "title": "Read this example",
+      "format": "markdown",
+      "file": "reading.md",
+      "attachments": [
+        {
+          "kind": "graph",
+          "ref": "overview"
+        },
+        {
+          "kind": "graph",
+          "ref": "layout-details"
+        },
+        {
+          "kind": "workflow",
+          "ref": "build"
+        },
+        {
+          "kind": "node",
+          "ref": "layout"
+        }
+      ]
+    }
+  ],
+  "rootGraphRef": "overview"
+}

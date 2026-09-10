@@ -1,6 +1,7 @@
 # Independently usable modules
 
-The MVP is one unpublished local npm package with subpath exports. Modules are
+Waxwing is one npm package with subpath exports. Its first public release is
+being prepared; use a checkout until publication. Modules are
 separate code entry points, not separate services or separately published npm
 packages. Install dependencies with `npm ci` before using them. The package
 name is `waxwing`; imports below work within this repository or when this local

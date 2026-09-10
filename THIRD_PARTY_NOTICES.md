@@ -1,6 +1,6 @@
 # Third-party dependencies
 
-This MVP uses the following direct dependencies, pinned in `package-lock.json`:
+Waxwing uses the following direct dependencies, pinned in `package-lock.json`:
 
 - **Ajv 8.17.1** — JSON Schema validation; MIT license.
   [Upstream](https://github.com/ajv-validator/ajv).
@@ -16,5 +16,4 @@ Ajv, and markdown-it run during generation/validation. The standalone viewer use
 JavaScript and CSS.
 
 Archify informed the design discussion. No Archify source has been copied or
-bundled. This notice does not select a license for Waxwing's own unpublished
-source code.
+bundled. Waxwing's own source is provided under the MIT license in LICENSE.

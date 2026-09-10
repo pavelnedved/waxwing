@@ -1,9 +1,8 @@
 {
   "name": "waxwing",
-  "version": "0.0.0",
-  "private": true,
+  "version": "0.1.0",
   "type": "module",
-  "description": "Composable system-model validation, automatic layout, and lossless SVG/HTML rendering.",
+  "description": "Inspectable architecture diagrams for humans and coding agents.",
   "engines": {
     "node": ">=20.19.0"
   },
@@ -17,7 +16,9 @@
     "demo:sequence": "node bin/waxwing.mjs build examples/sequence/model.json examples/sequence/generated",
     "demo:sequence:markets": "node bin/waxwing.mjs build examples/sequence-markets/model.json examples/sequence-markets/generated",
     "demo:workflow": "node bin/waxwing.mjs build examples/orchestration/model.json examples/orchestration/generated",
-    "demo:site": "node bin/waxwing.mjs build-site examples/multi-page/model.json examples/multi-page/generated"
+    "demo:site": "node bin/waxwing.mjs build-site examples/multi-page/model.json examples/multi-page/generated",
+    "demo:self": "node bin/waxwing.mjs build-site examples/waxwing/model.json examples/waxwing/generated --direction DOWN",
+    "test:package": "node scripts/smoke-package.mjs"
   },
   "dependencies": {
     "ajv": "8.17.1",
@@ -37,5 +38,34 @@
   },
   "bin": {
     "waxwing": "./bin/waxwing.mjs"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pavelnedved/waxwing.git"
+  },
+  "homepage": "https://github.com/pavelnedved/waxwing#readme",
+  "bugs": {
+    "url": "https://github.com/pavelnedved/waxwing/issues"
+  },
+  "keywords": [
+    "architecture",
+    "diagrams",
+    "documentation",
+    "agents",
+    "svg"
+  ],
+  "files": [
+    "bin/",
+    "modules/",
+    "schemas/",
+    "lib/",
+    "AGENT_GUIDE.md",
+    "CHANGELOG.md",
+    "THIRD_PARTY_NOTICES.md",
+    "docs/",
+    "examples/**/*.json",
+    "examples/**/*.md",
+    "!examples/**/generated/**"
+  ]
 }

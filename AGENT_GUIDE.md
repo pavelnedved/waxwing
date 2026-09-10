@@ -1,7 +1,7 @@
 # Waxwing agent guide: sources → JSON 1 → diagrams
 
 Give an agent **this one file**, the system sources it may inspect, and a Waxwing
-checkout if it should run commands. This is the complete user-facing guide for
+installation or checkout if it should run commands. This is the complete user-facing guide for
 constructing JSON 1 and running the existing pipeline. Required field shapes,
 semantics, examples, document rules, commands, and failure handling are included
 here. No other Markdown file or schema-reading exercise is a prerequisite. Start
@@ -10,9 +10,22 @@ pipeline commands; the other model sections remain available in this same file.
 
 Contract snapshot: architecture `0.5-draft`, sequence scenario
 `0.1-sequence-draft`, and sequence behavior `0.2-sequence-draft`. These are
-experimental formats. Use this file from the same checkout as the validator.
+experimental formats. Use this file from the same package version or checkout as the validator.
 Older formats are summarized under compatibility below. The installed validator
 remains the executable check; it does not verify whether supplied evidence is true.
+
+## Installed package or checkout
+
+The first npm release is being prepared. Until it is published, use a checkout.
+After publication, `npm install -g waxwing@0.1.0` provides the `waxwing` command.
+The matching guide is at `$(npm root -g)/waxwing/AGENT_GUIDE.md` on macOS/Linux;
+`npm root -g` prints the package directory on other platforms as well.
+
+With a global installation, replace `node bin/waxwing.mjs` in this guide with
+`waxwing`; do not change into the package directory or write outputs there.
+With a checkout, run the shown commands from its root after `npm ci`.
+For JavaScript imports from another project, install Waxwing locally in that
+project; a global CLI installation does not make `waxwing/*` imports available.
 
 ## Contents
 
@@ -42,7 +55,7 @@ is still needed: this guide describes Waxwing, not the user's system.
 ```text
 Use the supplied AGENT_GUIDE.md as your complete Waxwing authoring guide.
 
-Waxwing checkout: [absolute path, or unavailable]
+Waxwing: [global CLI and version / checkout path / unavailable]
 System sources: [authorized repository paths, documents, or supplied contents]
 Question to answer: [one concrete reading task]
 Model: [choose from the guide / architecture / architecture with workflow /
@@ -61,7 +74,7 @@ implementation. Preserve evidence, interpretation, unknowns and disputes. Keep
 existing canonical identities when updating a model. Follow the guide without
 asking me to approve each observation. Read the source projects without modifying
 them. Do not add facts merely to obtain a drawable graph. Validate with the actual
-Waxwing commands if a checkout is available; otherwise report validation not run.
+Waxwing commands if an installation is available; otherwise report validation not run.
 Deliver the requested artifacts and a brief ingestion-report.md describing scope,
 sources inspected, unresolved questions, omissions, validation and remaining limits.
 ```
@@ -1783,8 +1796,9 @@ preservation, not the truth of its claims or unedited visible markup.
 ### JavaScript entry points
 
 Within the checkout, these imports work without a globally installed package.
-From another project, reference the actual checkout paths or explicitly configure
-a local package dependency; `waxwing/*` exports are not magically available there.
+From another project, install the released package locally with `npm install waxwing`,
+or configure a local checkout dependency. A global CLI installation alone does
+not make `waxwing/*` imports available there.
 Use `.mjs` or a project configured for ES modules.
 
 ```js
