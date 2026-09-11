@@ -4,6 +4,17 @@ Software versions and experimental schema versions are tracked separately.
 
 ## Unreleased
 
+- `build-collection` packages independent models or existing sites under a shared
+  home page, with explicit record/view links and complete per-model recovery.
+- Local full-content search across records and document sections, including
+  collection-wide results, contextual excerpts, and precise destinations.
+- Site starting pages, complete record catalogs, hierarchy breadcrumbs, and
+  component-to-workflow links; browser history retains diagram view state.
+- Architecture views fit on arrival, with readable component navigation beside
+  small overviews and full-size detail on selection.
+- Bounded `query` CLI/module operations for search, inspection, neighbors, and
+  workflows with scope, revision, qualifications, and evidence.
+
 - A quieter opening view with grouped exports and compact diagram controls.
 - Architecture cards show qualified roles and authored description previews;
   qualified or absent existence stays explicit.

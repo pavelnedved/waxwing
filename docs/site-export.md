@@ -4,6 +4,10 @@ Use a site when one model has many views or documents. Keep the existing
 single-file export for an attachment containing everything. This is a publishing
 choice; JSON 1 and JSON 2 keep their existing contracts.
 
+For **multiple independent models or existing sites**, use
+[`build-collection`](collections.md) to add a parent page, shared search, and
+explicit links between their explanations.
+
 ## Commands and fixed structure
 
 ```sh
@@ -22,11 +26,14 @@ by scanning folders nor infers relationships from their locations.
 ```text
 export/
   index.html
+  search.html
+  records.html
   graphs/<graph-id>.html
   workflows/<workflow-id>.html
   documents/<document-id>.html
   assets/site.css
   assets/site.js
+  assets/search.js
   source/model.json
   source/layout.json
   waxwing-site.json
@@ -36,8 +43,14 @@ Empty page categories need no directory. A standalone sequence uses
 `graphs/<model-id>.html`; a workflow here means an architecture workflow record.
 Filenames use stable IDs, not titles. Titles can change without changing URLs;
 renaming an ID changes its URL. The generated index groups by record kind and
-lists records in their source collection order. This is navigation order, never
-an execution-order or containment claim. The index has a title/question filter.
+lists views in their source collection order. This is navigation order, never
+an execution-order or containment claim. The index adds a starting overview,
+component summaries, unresolved-record links, and a title/question filter.
+`search.html` searches model records and document sections with contextual
+excerpts and view/heading destinations. Repeated appearances share one result;
+records outside diagrams lead to `records.html`. A local generated search script
+contains the index; no fetch or service is needed. Search is case-insensitive
+text matching requiring all terms, not semantic question answering.
 
 Source files stay in their own locations. `build-site` uses the existing document
 loader: Markdown paths resolve relative to the authoring model, and Markdown
@@ -86,13 +99,20 @@ graph-scoped selection rules as the standalone viewer. Selection summaries are
 computed at export time; they require no runtime source fetch. Workflow and
 sequence pages retain their own recorded ordering and selection behavior.
 
-Pages initially show the diagram at 100% so labels remain readable. Architecture
+Architecture pages fit the complete diagram on arrival. Below 65%, a readable
+component navigator accompanies the overview; selecting a component opens its
+detail at full size. Sequence/workflow pages begin at 100%. Architecture
 **Fit** shows the full view; sequence and workflow **Fit width** retain vertical
 scrolling. Selecting an architecture record from Fit opens it at 100% or greater
 and restores Fit on closing, unless zoom was changed manually. Component details
 lead with the authored description, related views, and direct connections, with
 full claims and related knowledge under **Claims & evidence**. Source downloads
 are grouped under **Export**.
+
+Breadcrumbs name the graph ancestry, and component inspectors link to workflows
+involving that component. Browser history stores diagram zoom, pan and highlight
+state for return navigation. A component without an included internal view says
+so explicitly; it does not trigger automatic model generation.
 
 CSS and plain JavaScript are local shared files. No framework, CDN, runtime
 source fetch, Waxwing service, router rewrite or network discovery is needed.

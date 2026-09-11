@@ -34,7 +34,9 @@
     "./graphs": "./modules/graphs/index.mjs",
     "./sequence": "./modules/sequence/index.mjs",
     "./workflow": "./modules/workflow/index.mjs",
-    "./site": "./modules/site/index.mjs"
+    "./site": "./modules/site/index.mjs",
+    "./collection": "./modules/site/collection.mjs",
+    "./query": "./modules/query/index.mjs"
   },
   "bin": {
     "waxwing": "./bin/waxwing.mjs"

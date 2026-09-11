@@ -47,7 +47,12 @@ try {
       assert.deepEqual(JSON.parse(fs.readFileSync(recovered)), JSON.parse(fs.readFileSync(prepared)), `Recovery differs for ${artifact}`);
     }
   }
-  console.log(`Package smoke check passed: ${manifest.name}@${manifest.version}, ${paths.length} files, ${pack.size} compressed bytes; integrity ${pack.integrity}; all exports and architecture/sequence/behavior builds recovered successfully.`);
+  const collection=path.join(temporary,'library');
+  run(cli,['build-collection',path.join(installed,'examples/collection/collection.json'),collection]);
+  run(cli,['recover',path.join(collection,'sites/checkout'),path.join(temporary,'collection-recovered.json')]);
+  const query=JSON.parse(run(cli,['query',path.join(collection,'sites/checkout/source/model.json'),'search','stock','--kind','component']));
+  assert.ok(query.ok&&query.results.some(r=>r.id==='stock'));
+  console.log(`Package smoke check passed: ${manifest.name}@${manifest.version}, ${paths.length} files, ${pack.size} compressed bytes; integrity ${pack.integrity}; exports, architecture/sequence/behavior recovery, collection build/recovery and model queries passed.`);
 } finally {
   fs.rmSync(temporary, { recursive: true, force: true });
 }

@@ -71,6 +71,16 @@ Open `output/diagram.html`. It contains the diagram, its inspector, registered
 Markdown documents, and the source model. Share that HTML file as an attachment,
 or use `build-site` to generate linked pages for static hosting.
 
+Have one architecture model and several independent sequence models? Use
+[`build-collection`](docs/collections.md) to publish them under a shared home
+page, with search across all content and explicit links between explanations.
+Individual sites also include full-content search and a starting overview.
+
+```sh
+waxwing build-collection /path/to/collection.json /path/to/library
+waxwing query /path/to/model.json search "payment"
+```
+
 ## What you can inspect
 
 - **Architecture and subgraphs:** move between an overview and selected internals.
@@ -92,6 +102,8 @@ claims or certify that an exported drawing has not been altered.
 - [Agent authoring guide](AGENT_GUIDE.md)
 - [JavaScript module API](docs/modules.md)
 - [Publishing multi-page exports](docs/site-export.md)
+- [Linking multiple sites and models](docs/collections.md)
+- [Model queries for agents](docs/model-queries.md)
 - [Release notes](CHANGELOG.md) and [migration guidance](docs/migrations.md)
 - [Roadmap](ROADMAP.md) and [contribution guide](CONTRIBUTING.md)
 
