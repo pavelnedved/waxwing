@@ -139,4 +139,4 @@ include complete canonical source, including records outside visible graphs.
 This command does not implement audience-based export filtering.
 
 Module API: `buildCollection(inputFile, outputDirectory)` from
-`@felixfelicis/waxwing/collection`.
+`@isought/waxwing/collection`.

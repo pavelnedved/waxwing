@@ -193,9 +193,9 @@ targets exist; for relative paths it cannot authenticate their historical file
 mapping without the original authoring input.
 
 ```js
-import { loadModel } from '@felixfelicis/waxwing/documents';
-import { layoutModel } from '@felixfelicis/waxwing/layout';
-import { renderHTML } from '@felixfelicis/waxwing/render';
+import { loadModel } from '@isought/waxwing/documents';
+import { layoutModel } from '@isought/waxwing/layout';
+import { renderHTML } from '@isought/waxwing/render';
 
 const { model, inputFiles } = loadModel('/path/to/model.json');
 const json2 = await layoutModel(model);

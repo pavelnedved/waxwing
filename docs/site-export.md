@@ -164,9 +164,9 @@ signatures or a claim that source facts are true.
 ## Module entry point
 
 ```js
-import { loadModel } from '@felixfelicis/waxwing/documents';
-import { layoutModel } from '@felixfelicis/waxwing/layout';
-import { renderSite, writeSite, recoverSite } from '@felixfelicis/waxwing/site';
+import { loadModel } from '@isought/waxwing/documents';
+import { layoutModel } from '@isought/waxwing/layout';
+import { renderSite, writeSite, recoverSite } from '@isought/waxwing/site';
 
 const { model, inputFiles } = loadModel('/path/to/model.json');
 const json2 = await layoutModel(model);

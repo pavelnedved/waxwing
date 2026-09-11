@@ -1,8 +1,27 @@
 # Upgrading Waxwing specs and exports
 
 This guide uses commands that exist today. There is no automatic `migrate`
-command and no required source transformation for the current Unreleased changes.
+command and no required source transformation for the 0.2.0 changes.
 Read the target version's [release notes](../CHANGELOG.md) before upgrading.
+
+## npm scope change in 0.2.0
+
+Waxwing is now published as `@isought/waxwing`. To replace a global installation:
+
+```sh
+npm uninstall -g @felixfelicis/waxwing
+npm install -g @isought/waxwing@0.2.0
+```
+
+The CLI command remains `waxwing`. For a project dependency, uninstall the old
+package, install `@isought/waxwing@0.2.0`, and change module imports from
+`@felixfelicis/waxwing/...` to `@isought/waxwing/...`.
+
+Reinstall managed Waxwing skills with the new CLI's `skill install` command so
+that they bind to the new runtime. Preserve any custom skill edits; install to a
+new directory when the installer reports modifications. Existing model sources
+need no format migration. Previously published `@felixfelicis/waxwing@0.1.0`
+remains a separate package.
 
 ## Keep the previous result
 

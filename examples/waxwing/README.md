@@ -1,7 +1,7 @@
 # Waxwing, explained by Waxwing
 
 A real, curated model of Waxwing's source at
-[`00f3021`](https://github.com/pavelnedved/waxwing/tree/00f30217513433cbb1fb83318ed469e19f890621).
+[`00f3021`](https://github.com/isought/waxwing/tree/00f30217513433cbb1fb83318ed469e19f890621).
 It includes a package overview, an expansion of architecture layout, a successful
 build workflow, and a linked reading guide. This is static source analysis, not
 a runtime trace or a claim of complete repository coverage.
@@ -19,7 +19,7 @@ by Git and can be rebuilt from the checked-in model and reading guide.
 From an installed npm package:
 
 ```sh
-waxwing build-site "$(npm root -g)/@felixfelicis/waxwing/examples/waxwing/model.json" ./waxwing-demo --direction DOWN
+waxwing build-site "$(npm root -g)/@isought/waxwing/examples/waxwing/model.json" ./waxwing-demo --direction DOWN
 ```
 
 Open `waxwing-demo/index.html`. Start with the overview, select Layout engine,

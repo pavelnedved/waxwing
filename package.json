@@ -1,6 +1,6 @@
 {
-  "name": "@felixfelicis/waxwing",
-  "version": "0.1.0",
+  "name": "@isought/waxwing",
+  "version": "0.2.0",
   "type": "module",
   "description": "Inspectable architecture diagrams for humans and coding agents.",
   "engines": {
@@ -46,11 +46,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pavelnedved/waxwing.git"
+    "url": "git+https://github.com/isought/waxwing.git"
   },
-  "homepage": "https://github.com/pavelnedved/waxwing#readme",
+  "homepage": "https://github.com/isought/waxwing#readme",
   "bugs": {
-    "url": "https://github.com/pavelnedved/waxwing/issues"
+    "url": "https://github.com/isought/waxwing/issues"
   },
   "keywords": [
     "architecture",
@@ -72,5 +72,8 @@
     "examples/**/*.json",
     "examples/**/*.md",
     "!examples/**/generated/**"
-  ]
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

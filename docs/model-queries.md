@@ -55,6 +55,6 @@ whole model. Retrieve more evidence or investigate original sources when the
 current scope cannot answer the question.
 
 Module API: `queryModel(model, operation, value, options)` from
-`@felixfelicis/waxwing/query`, expecting resolved JSON 1. The CLI adds `ok` and
+`@isought/waxwing/query`, expecting resolved JSON 1. The CLI adds `ok` and
 structured errors. MCP, workspace-wide queries, and code indexing are not
 implemented by this command.

@@ -21,6 +21,6 @@ export function boundRuntime(skillDirectory) {
   const binding=JSON.parse(fs.readFileSync(path.join(skillDirectory,'runtime.json'),'utf8'));
   if(binding.schemaVersion!=='0.1-skill-runtime'||typeof binding.packageRoot!=='string'||!path.isAbsolute(binding.packageRoot))throw new Error('Invalid installed skill runtime binding.');
   const pkg=JSON.parse(fs.readFileSync(path.join(binding.packageRoot,'package.json'),'utf8'));
-  if(pkg.name!=='@felixfelicis/waxwing'||pkg.version!==binding.version||fingerprint(binding.packageRoot)!==binding.fingerprint)throw new Error('The bound Waxwing package changed.');
+  if(pkg.name!=='@isought/waxwing'||pkg.version!==binding.version||fingerprint(binding.packageRoot)!==binding.fingerprint)throw new Error('The bound Waxwing package changed.');
   return binding;
 }

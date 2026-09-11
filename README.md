@@ -6,7 +6,7 @@ Turn a structured system model into interactive diagrams with linked documentati
 source evidence, and explicit unknowns. Export portable HTML and SVG with the
 model included.
 
-[Explore the live demo](https://pavelnedved.github.io/waxwing/) ·
+[Explore the live demo](https://isought.github.io/waxwing/) ·
 [Agent guide](AGENT_GUIDE.md) · [Examples](docs/features.md) ·
 [Contributing](CONTRIBUTING.md)
 
@@ -14,7 +14,7 @@ model included.
 
 Waxwing is an early, personally maintained project. The formats are experimental;
 validation checks structure and consistency, not whether your evidence is true.
-Software version **0.1.0** is the first release; model formats retain their own draft versions.
+Software version **0.2.0** is published as `@isought/waxwing`; model formats retain their own draft versions.
 
 ## Try it
 
@@ -22,7 +22,7 @@ Requires Node.js **20.19.0 or newer**. No server or account is needed to view th
 exported diagrams.
 
 ```sh
-npm install -g @felixfelicis/waxwing@0.1.0
+npm install -g @isought/waxwing@0.2.0
 ```
 
 Copy the full command above. The package name includes its publisher namespace;
@@ -31,7 +31,7 @@ once installed, the terminal command is simply **`waxwing`**.
 Build the included example:
 
 ```sh
-waxwing build-site "$(npm root -g)/@felixfelicis/waxwing/examples/waxwing/model.json" ./waxwing-demo --direction DOWN
+waxwing build-site "$(npm root -g)/@isought/waxwing/examples/waxwing/model.json" ./waxwing-demo --direction DOWN
 ```
 
 Open `waxwing-demo/index.html` in your browser. The command above uses macOS/Linux
@@ -68,7 +68,7 @@ understand, and a concrete question:
 > linked to the source revision, and preserve unknowns. Validate the model and
 > build an HTML diagram in a separate output directory.
 
-The installed guide is at `$(npm root -g)/@felixfelicis/waxwing/AGENT_GUIDE.md` on macOS/Linux.
+The installed guide is at `$(npm root -g)/@isought/waxwing/AGENT_GUIDE.md` on macOS/Linux.
 Use the guide from your installed version. It contains complete authoring examples and commands. You choose the
 agent; Waxwing's layout and rendering do not call an LLM. There is no built-in
 repository crawler or `ingest` command.
@@ -136,7 +136,7 @@ claims or certify that an exported drawing has not been altered.
 From a source checkout:
 
 ```sh
-git clone https://github.com/pavelnedved/waxwing.git
+git clone https://github.com/isought/waxwing.git
 cd waxwing
 npm ci
 npm test

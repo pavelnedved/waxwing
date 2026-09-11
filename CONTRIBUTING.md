@@ -10,7 +10,7 @@ Response times depend on maintainer availability.
 Use Node.js 20.19.0 or newer (CI also checks Node 22 and 24).
 
 ```sh
-git clone https://github.com/pavelnedved/waxwing.git
+git clone https://github.com/isought/waxwing.git
 cd waxwing
 npm ci
 npm test

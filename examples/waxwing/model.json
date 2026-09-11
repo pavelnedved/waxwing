@@ -20,49 +20,49 @@
     {
       "id": "src-cli",
       "kind": "code",
-      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/bin/waxwing.mjs",
+      "locator": "https://github.com/isought/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/bin/waxwing.mjs",
       "description": "Committed source: bin/waxwing.mjs"
     },
     {
       "id": "src-documents",
       "kind": "code",
-      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/documents/index.mjs",
+      "locator": "https://github.com/isought/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/documents/index.mjs",
       "description": "Committed source: modules/documents/index.mjs"
     },
     {
       "id": "src-layout",
       "kind": "code",
-      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/layout/index.mjs",
+      "locator": "https://github.com/isought/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/layout/index.mjs",
       "description": "Committed source: modules/layout/index.mjs"
     },
     {
       "id": "src-render",
       "kind": "code",
-      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/render/index.mjs",
+      "locator": "https://github.com/isought/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/render/index.mjs",
       "description": "Committed source: modules/render/index.mjs"
     },
     {
       "id": "src-recovery",
       "kind": "code",
-      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/render/artifacts.mjs",
+      "locator": "https://github.com/isought/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/render/artifacts.mjs",
       "description": "Committed source: modules/render/artifacts.mjs"
     },
     {
       "id": "src-model",
       "kind": "code",
-      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/model/index.mjs",
+      "locator": "https://github.com/isought/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/model/index.mjs",
       "description": "Committed source: modules/model/index.mjs"
     },
     {
       "id": "src-geometry",
       "kind": "code",
-      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/layout/validate.mjs",
+      "locator": "https://github.com/isought/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/modules/layout/validate.mjs",
       "description": "Committed source: modules/layout/validate.mjs"
     },
     {
       "id": "src-manifest",
       "kind": "code",
-      "locator": "https://github.com/pavelnedved/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/package.json",
+      "locator": "https://github.com/isought/waxwing/blob/00f30217513433cbb1fb83318ed469e19f890621/package.json",
       "description": "Committed source: package.json"
     }
   ],
