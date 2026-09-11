@@ -79,8 +79,20 @@ style/theme selectors. Each page renders one diagram and the relevant records;
 it does not embed every sibling SVG or the complete JSON 2 payload. Shared
 components keep their canonical IDs. Graph/workflow readability warnings use a
 stated reference viewport. The single-file viewer retains its richer operation
-and boundary highlighting controls; the first site viewer highlights unknown,
-disputed and qualified claims, plus the selected record.
+and boundary highlighting controls. Architecture site pages also highlight a
+selected component's direct relationships and endpoints. Unknown, disputed, and
+qualified claim filters include related notes and memberships, using the same
+graph-scoped selection rules as the standalone viewer. Selection summaries are
+computed at export time; they require no runtime source fetch. Workflow and
+sequence pages retain their own recorded ordering and selection behavior.
+
+Pages initially show the diagram at 100% so labels remain readable. Architecture
+**Fit** shows the full view; sequence and workflow **Fit width** retain vertical
+scrolling. Selecting an architecture record from Fit opens it at 100% or greater
+and restores Fit on closing, unless zoom was changed manually. Component details
+lead with the authored description, related views, and direct connections, with
+full claims and related knowledge under **Claims & evidence**. Source downloads
+are grouped under **Export**.
 
 CSS and plain JavaScript are local shared files. No framework, CDN, runtime
 source fetch, Waxwing service, router rewrite or network discovery is needed.

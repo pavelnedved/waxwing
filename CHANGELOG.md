@@ -2,6 +2,17 @@
 
 Software versions and experimental schema versions are tracked separately.
 
+## Unreleased
+
+- A quieter opening view with grouped exports and compact diagram controls.
+- Architecture cards show qualified roles and authored description previews;
+  qualified or absent existence stays explicit.
+- Selecting architecture components emphasizes direct connections and opens
+  descriptions, detailed views, and expandable evidence in the inspector.
+- Site uncertainty filters include related notes and memberships. Selection
+  from Fit opens at readable zoom while preserving explicit manual zoom choices.
+- Existing source models, layout coordinates, and recovery contracts are unchanged.
+
 ## 0.1.0 — 2026-09-09
 
 First release. Install with `npm install -g @felixfelicis/waxwing@0.1.0`.

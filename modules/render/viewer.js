@@ -29,6 +29,7 @@
   const highlightMode = document.getElementById('highlight-mode');
   let zoom = 1;
   let fitted = true;
+  let restoreFit = false;
   const name = (ref) => {
     const record = index.get(ref)?.record;
     if (record?.memberRef) return `${index.get(record.memberRef)?.record.label ?? record.memberRef} · ${index.get(record.perspectiveRef)?.record.label ?? record.perspectiveRef}`;
@@ -92,10 +93,10 @@
     return container;
   }
 
-  function objectFields(record) {
+  function objectFields(record, omit = []) {
     const container = el('div');
     for (const [key, value] of Object.entries(record)) {
-      if (['id', 'label'].includes(key)) continue;
+      if (['id', 'label', ...omit].includes(key)) continue;
       container.append(field(key, value));
     }
     return container;
@@ -106,8 +107,30 @@
     content.replaceChildren();
     const record = ref === '__model' ? model : index.get(ref)?.record;
     if (!record) return;
+    if (inspector.hidden && fitted && [...svg.querySelectorAll('.record')].some(item=>item.dataset.ref===ref)) {
+      restoreFit = true; fitted = false; zoom = Math.max(1,zoom); applyZoom();
+    }
     content.append(el('h2', ref === '__model' ? 'Model & scope' : name(ref)));
     content.append(el('div', ref === '__model' ? `${model.schemaVersion} · ${model.id}` : ref, 'record-id'));
+    const component = index.get(ref)?.collection === 'entities';
+    if (component) {
+      const intro = el('section', undefined, 'component-intro');
+      const meaning = record.abstraction.represents;
+      intro.append(el('h3', 'Represents'), el('p', meaning.value ?? meaning.reason ?? `Meaning ${meaning.status}`), el('span', meaning.status, `status-pill ${meaning.status}`));
+      content.append(intro);
+      if (!activeWorkflow) {
+        const connections = model.relationships.filter((edge) => activeGraph.relationshipRefs.includes(edge.id) && [edge.from, edge.to].includes(ref));
+        const section = el('section', undefined, 'connection-list');
+        section.append(el('h3', `Direct connections · ${connections.length}`));
+        for (const edge of connections) {
+          const button = el('button', `${name(edge.from)} → ${name(edge.to)}`, 'connection-link');
+          button.append(el('span', `${edge.label}${edge.existence.status !== 'established' || !edge.existence.value ? ` · ${edge.existence.status}${edge.existence.value === false ? ' · absent' : ''}` : ''}`));
+          button.addEventListener('click', () => show(edge.id)); section.append(button);
+        }
+        if (!connections.length) section.append(el('p', 'No direct relationships recorded in this view.', 'purpose'));
+        content.append(section);
+      }
+    }
     const attached = documents.filter((doc) => doc.attachments.some((target) => ref === '__model' ? target.kind === 'graph' && target.ref === activeGraph.id : target.ref === ref && ['node', 'edge', 'workflow', 'step'].includes(target.kind) && (!target.graphRef || target.graphRef === activeGraph.id) && (!target.workflowRef || target.workflowRef === activeWorkflow?.id)));
     if (attached.length) {
       const section = el('section', undefined, 'attached-documents');
@@ -161,7 +184,11 @@
       }
       content.append(catalog);
     } else {
-      content.append(objectFields(record));
+      if (component) {
+        const evidence = el('details', undefined, 'component-evidence');
+        evidence.append(el('summary', 'Claims & evidence'), objectFields(record, ['abstraction']), field('abstraction', record.abstraction));
+        content.append(evidence);
+      } else content.append(objectFields(record));
       const memberships = model.memberships.filter((item) => activeGraph.membershipRefs.includes(item.id) && (item.memberRef === ref || item.group.value === ref || item.group.alternatives?.some((alternative) => alternative.value === ref)));
       const notes = model.notes.filter((item) => item.subjectRefs.includes(ref));
       for (const [heading, records] of [['Membership and perspective', memberships], ['Related knowledge', notes]]) {
@@ -197,6 +224,7 @@
 
   function hideInspector() {
     inspector.hidden = true;
+    if (restoreFit) { fitted=true; restoreFit=false; fit(); }
     selectedRef = null; refreshHighlights();
     document.querySelectorAll('[data-ref]').forEach((element) => element.classList.remove('selected'));
     if (previousFocus?.isConnected) previousFocus.focus();
@@ -502,16 +530,19 @@
     if (activeWorkflow) {
       document.getElementById('highlight-details').replaceChildren();
       svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('highlight-match', item.dataset.ref === selectedRef));
+      setDiagramFocus(svg, []);
       return;
     }
     const result = selectHighlights(model, activeGraph, { mode: highlightMode.value, ref: selectedRef, boundaryRef: currentBoundary });
     const refs = new Set(result.refs);
     svg.querySelectorAll('[data-ref]').forEach((item) => item.classList.toggle('highlight-match', refs.has(item.dataset.ref)));
+    const focus = selectedRef ? selectHighlights(model, activeGraph, { ref: selectedRef }).refs : [];
+    setDiagramFocus(svg, focus);
     const details = document.getElementById('highlight-details'); details.replaceChildren();
     const summary = document.getElementById('highlight-summary');
     const count = new Set([...svg.querySelectorAll('.highlight-match')].map((item) => item.dataset.ref)).size;
     summary.textContent = `${count} visible ${count === 1 ? 'record' : 'records'} highlighted. Other records remain visible.`;
-    if (highlightMode.value === 'selection' && !selectedRef && !currentBoundary) summary.textContent = 'Select a record to highlight its direct relationships. No execution order is implied.';
+    if (highlightMode.value === 'selection' && !currentBoundary) summary.textContent = '';
     if (result.boundary) {
       const detail = result.boundary.detail;
       details.append(el('strong', `Correspondence: ${name(currentBoundary)}`));
@@ -564,6 +595,7 @@
   }
   function fit() { fitted = true; zoom = Math.min(viewport.clientWidth / drawing.canvas.width, viewport.clientHeight / drawing.canvas.height, 1.3); applyZoom(); viewport.scrollTo(0, 0); }
   function changeZoom(factor) {
+    restoreFit = false;
     const centerX = (viewport.scrollLeft + viewport.clientWidth / 2 - parseFloat(svg.style.marginLeft || 0)) / zoom;
     const centerY = (viewport.scrollTop + viewport.clientHeight / 2 - parseFloat(svg.style.marginTop || 0)) / zoom;
     fitted = false;

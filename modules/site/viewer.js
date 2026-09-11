@@ -3,18 +3,40 @@
   const svg = document.querySelector('#map-viewport svg');
   const records = [...document.querySelectorAll('.record-detail')];
   const viewport = $('map-viewport');
-  let zoom = 1, lastFocus;
+  let zoom = 1, lastFocus, selectedRecord, restoreFit = false;
+  const architecture = svg && !svg.classList.contains('workflow-svg') && !svg.classList.contains('sequence-svg');
+  let fitted = false;
   const width = svg ? Number(svg.getAttribute('width')) : 0;
   const height = svg ? Number(svg.getAttribute('height')) : 0;
   function scale(value) {
-    const centerX = (viewport.scrollLeft + viewport.clientWidth / 2) / zoom;
-    const centerY = (viewport.scrollTop + viewport.clientHeight / 2) / zoom;
+    const centerX = (viewport.scrollLeft + viewport.clientWidth / 2 - parseFloat(svg.style.marginLeft || 0)) / zoom;
+    const centerY = (viewport.scrollTop + viewport.clientHeight / 2 - parseFloat(svg.style.marginTop || 0)) / zoom;
     zoom = Math.max(0.05,Math.min(3,value));
     svg.style.width = `${width*zoom}px`; svg.style.height = `${height*zoom}px`;
+    svg.style.marginLeft = `${Math.max(0,(viewport.clientWidth-width*zoom)/2)}px`;
+    svg.style.marginTop = `${Math.max(0,(viewport.clientHeight-height*zoom)/2)}px`;
     $('zoom-label').textContent = `${Math.round(zoom*100)}%`;
     $('zoom-out').disabled = zoom <= 0.05;
     $('zoom-in').disabled = zoom >= 3;
-    viewport.scrollTo(centerX * zoom - viewport.clientWidth / 2, centerY * zoom - viewport.clientHeight / 2);
+    viewport.scrollTo(centerX * zoom + parseFloat(svg.style.marginLeft) - viewport.clientWidth / 2, centerY * zoom + parseFloat(svg.style.marginTop) - viewport.clientHeight / 2);
+  }
+  function fit() {
+    scale(architecture ? Math.min((viewport.clientWidth-32)/width,(viewport.clientHeight-32)/height,1.15) : (viewport.clientWidth-24)/width);
+    viewport.scrollTo(0,0);
+  }
+  function highlights() {
+    if (!svg) return;
+    const mode = $('highlight').value;
+    const focus = JSON.parse(selectedRecord?.dataset.focusRefs || '[]');
+    const claims = JSON.parse(viewport.dataset.claimHighlights || '{}');
+    const matched = new Set(mode ? claims[mode] ? claims[mode].map(ref=>`record-${ref}`) : records.filter(r=>mode==='qualified' ? r.dataset.statuses : r.dataset.statuses.split(' ').includes(mode)).map(r=>r.id) : focus.map(ref=>`record-${ref}`));
+    const visible = new Set();
+    for(const item of svg.querySelectorAll('.record')) {
+      const hit = matched.has(`record-${item.dataset.ref}`);
+      item.classList.toggle('highlight-match',hit); if(hit)visible.add(item.dataset.ref);
+    }
+    setDiagramFocus(svg, focus);
+    $('highlight-count').textContent = mode ? `${visible.size} visible records with ${mode} claims. Inspect scope & evidence for view-level qualifications.` : '';
   }
   function preferences() {
     if (svg) { svg.dataset.theme = document.body.classList.contains('dark') ? 'dark' : 'light'; svg.dataset.skin = $('skin').value; }
@@ -33,8 +55,15 @@
     let id;
     try { id = decodeURIComponent(location.hash.slice(1)); } catch { id = ''; }
     const record = records.find((r) => r.id===id);
+    if (record && $('inspector').hidden && fitted && JSON.parse(record.dataset.focusRefs || '[]').length) {
+      restoreFit=true; fitted=false; scale(Math.max(1,zoom));
+    } else if (!record && restoreFit) {
+      restoreFit=false; fitted=true;
+    }
+    selectedRecord = record;
     $('inspector').hidden = !record;
     if (svg) for (const el of svg.querySelectorAll('.record')) el.classList.toggle('selected',record?.id===`record-${el.dataset.ref}`);
+    highlights();
     if (record) {
       // All content was escaped/rendered at export time; no model strings enter innerHTML here.
       $('inspector-content').replaceChildren(record.querySelector('.record-body').cloneNode(true));
@@ -57,23 +86,16 @@
   };
   document.addEventListener('keydown',(e) => {if(e.key==='Escape'&&!$('inspector').hidden)$('close-inspector').click();});
   if (svg) {
-    scale(1);
-    $('highlight').onchange = () => {
-      const mode = $('highlight').value, matched = new Set(records.filter(r=>mode==='qualified' ? r.dataset.statuses : r.dataset.statuses.split(' ').includes(mode)).map(r=>r.id));
-      const visible = new Set();
-      for(const el of svg.querySelectorAll('.record')) {
-        const hit = !!mode&&matched.has(`record-${el.dataset.ref}`);
-        el.classList.toggle('highlight-match',hit); if(hit)visible.add(el.dataset.ref);
-      }
-      $('highlight-count').textContent = mode ? `${visible.size} visible records with ${mode} claims. Inspect scope & evidence for view-level qualifications.` : '';
-    };
-    $('zoom-out').onclick = () => scale(zoom/1.25);
-    $('zoom-in').onclick = () => scale(zoom*1.25);
-    $('zoom-read').onclick = () => scale(1);
-    $('zoom-fit').onclick = () => { scale((viewport.clientWidth-24)/width); viewport.scrollTo(0, 0); };
+    fitted ? fit() : scale(1);
+    $('highlight').onchange = highlights;
+    $('zoom-out').onclick = () => { fitted=false; restoreFit=false; scale(zoom/1.25); };
+    $('zoom-in').onclick = () => { fitted=false; restoreFit=false; scale(zoom*1.25); };
+    $('zoom-read').onclick = () => { fitted=false; restoreFit=false; scale(1); };
+    $('zoom-fit').onclick = () => { fitted=true; restoreFit=false; fit(); };
+    new ResizeObserver(() => fitted ? fit() : scale(zoom)).observe(viewport);
     if ($('sequence-start')) $('sequence-start').onclick = () => {
       history.replaceState(null,'',location.pathname+location.search); route();
-      scale(1); viewport.scrollTo(0,0);
+      fitted=false; restoreFit=false; scale(1); viewport.scrollTo(0,0);
       svg.querySelector('[data-sequence-entry="participant"]')?.focus({preventScroll:true});
       viewport.scrollIntoView({block:'nearest'});
     };
@@ -89,7 +111,7 @@
   document.addEventListener('click',(e) => {
     const a = e.target.closest('a[href^="#record-"]'); if(!a)return;
     e.preventDefault(); lastFocus = a;
-    if (a.id === 'reading-anchor-go' && svg) scale(1);
+    if (a.id === 'reading-anchor-go' && svg) { fitted=false; restoreFit=false; scale(1); }
     history.pushState(null,'',a.getAttribute('href')); route();
   });
   addEventListener('hashchange',route); addEventListener('popstate',route); route();
