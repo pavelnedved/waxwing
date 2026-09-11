@@ -13,6 +13,7 @@ const usage = `Waxwing — experimental modular diagram tool
   waxwing render-site <layout.json> <output-directory>
   waxwing build-site <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
   waxwing build-collection <collection.json> <output-directory>
+  waxwing skill install <skill-directory>
   waxwing query <model.json> <search|inspect|neighbors|workflows|workflow> <text-or-id> [--limit 20] [--budget 12000] [--offset 0] [--kind kind] [--direction incoming|outgoing|both] [--relation kind]
   waxwing recover <layout.json|diagram.svg|diagram.html|site-directory> <model.json>
   waxwing build <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
@@ -24,6 +25,7 @@ An anchor is a reading preference, not a workflow entry or execution-order claim
 The layout stage is optional. Render accepts a compatible, independently authored JSON 2.
 build-site publishes a managed directory with an index and one page per view/document.
 build-collection packages separate models or existing sites under one home page, with shared search and explicit links.
+skill install writes a managed authoring/update skill bound to this package into an explicit destination.
 query reads recorded model knowledge; its budget bounds result characters, not tokens or the metadata envelope.
 render-site accepts JSON 2 directly; neither requires a Waxwing server.
 validate, prepare, layout, build, and build-site load explicitly registered Markdown files and local raster images.
@@ -81,6 +83,10 @@ try {
     const { validateLayout } = await import('../modules/layout/validate.mjs');
     const result = validateLayout(readJSON(args[0]));
     console.log(JSON.stringify(result.ok ? result : {...result, command, input: path.resolve(args[0])}, null, 2)); process.exitCode = result.ok ? 0 : 1;
+  } else if (command === 'skill') {
+    if(args.length!==2||args[0]!=='install')throw new Error('Usage: waxwing skill install <skill-directory>.');
+    const {installSkill}=await import('../modules/skill/index.mjs');
+    console.log(JSON.stringify({ok:true,...installSkill(args[1])},null,2));
   } else if (command === 'build-collection') {
     if(args.length!==2)throw new Error('build-collection requires collection JSON and output directory paths.');
     const {buildCollection}=await import('../modules/site/collection.mjs');

@@ -14,6 +14,10 @@ experimental formats. Use this file from the same package version or checkout as
 Older formats are summarized under compatibility below. The installed validator
 remains the executable check; it does not verify whether supplied evidence is true.
 
+For a concise installable entry point with selective contract loading and an
+update workflow, see [the Waxwing skill](docs/agent-skill.md). This complete guide
+remains the maintained contract source and can still be used on its own.
+
 ## Installed package or checkout
 
 `npm install -g @felixfelicis/waxwing@0.1.0` provides the `waxwing` command.
@@ -100,8 +104,8 @@ model credentials, ingestion server, or particular LLM provider is required.
 These answer different concerns. Do not infer chronology from dependencies or
 mechanically turn one source into every diagram type. A graph's prose question
 alone is not an executable ordering instruction. Flowcharts, ERDs, automatic
-architecture-to-sequence conversion, and packaged cross-model navigation are
-not implemented. Architecture and sequence are separate model documents; do not
+architecture-to-sequence conversion are not implemented. Collections provide
+navigation between independent models. Architecture and sequence are separate model documents; do not
 mix their top-level fields. Architecture workflows explicitly reuse architecture
 identities; a separate sequence does not automatically share those identities.
 

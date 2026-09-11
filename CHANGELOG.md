@@ -4,6 +4,12 @@ Software versions and experimental schema versions are tracked separately.
 
 ## Unreleased
 
+- `skill install` packages a concise authoring/update skill with explicit
+  destination ownership checks and a binding to the supplying Waxwing runtime.
+- The skill loads contract sections on demand, preserves a baseline during
+  updates, and reports added/removed/changed IDs before rebuilding. Its adapter
+  rejects changed or unavailable runtimes instead of silently switching versions.
+
 - `build-collection` packages independent models or existing sites under a shared
   home page, with explicit record/view links and complete per-model recovery.
 - Local full-content search across records and document sections, including

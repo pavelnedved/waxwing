@@ -48,6 +48,18 @@ execution path. Both retain the underlying component identities and evidence.
 
 ## Use it with your coding agent
 
+This checkout includes an [installable authoring/update skill](docs/agent-skill.md)
+with a short entry point and contract sections loaded as needed:
+
+```sh
+node bin/waxwing.mjs skill install /path/to/your/agent/skills/waxwing
+```
+
+Invoke it with a request such as “Use $waxwing to explain this system and build
+its diagrams” or “Use $waxwing to update this model while preserving its IDs.”
+The installer binds the skill to this package; it does not modify global agent
+configuration. The full guide remains available for agents without skill support.
+
 Give your agent [AGENT_GUIDE.md](AGENT_GUIDE.md), access to the code you want to
 understand, and a concrete question:
 
@@ -100,6 +112,7 @@ claims or certify that an exported drawing has not been altered.
 
 - [Feature walkthroughs and CLI examples](docs/features.md)
 - [Agent authoring guide](AGENT_GUIDE.md)
+- [Installable authoring/update skill](docs/agent-skill.md)
 - [JavaScript module API](docs/modules.md)
 - [Publishing multi-page exports](docs/site-export.md)
 - [Linking multiple sites and models](docs/collections.md)

@@ -36,7 +36,8 @@
     "./workflow": "./modules/workflow/index.mjs",
     "./site": "./modules/site/index.mjs",
     "./collection": "./modules/site/collection.mjs",
-    "./query": "./modules/query/index.mjs"
+    "./query": "./modules/query/index.mjs",
+    "./skill": "./modules/skill/index.mjs"
   },
   "bin": {
     "waxwing": "./bin/waxwing.mjs"
@@ -60,6 +61,7 @@
   "files": [
     "bin/",
     "modules/",
+    "skills/",
     "schemas/",
     "lib/",
     "AGENT_GUIDE.md",
