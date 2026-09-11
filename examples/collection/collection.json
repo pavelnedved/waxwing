@@ -1,0 +1,23 @@
+{
+  "schemaVersion": "0.1-collection-draft",
+  "title": "Architecture & scenario library",
+  "description": "Start with the checkout architecture, explore the timeout-and-retry scenario, or read a separate market-sequence example. These are fictional explanations with independent scopes.",
+  "start": { "site": "checkout", "kind": "graph", "ref": "services" },
+  "sites": [
+    { "id": "checkout", "title": "Checkout architecture", "model": "../multi-page/model.json", "layout": { "direction": "DOWN" } },
+    { "id": "retry", "title": "Timeout & retry", "model": "../sequence/model.json" },
+    { "id": "markets", "title": "Market sequence · separate example", "model": "../sequence-markets/model.json" }
+  ],
+  "links": [
+    {
+      "from": { "site": "checkout", "kind": "node", "ref": "checkout", "graphRef": "services" },
+      "to": { "site": "retry", "kind": "graph", "ref": "checkout-retry" },
+      "label": "Explore the timeout-and-retry example"
+    },
+    {
+      "from": { "site": "retry", "kind": "node", "ref": "checkout" },
+      "to": { "site": "checkout", "kind": "node", "ref": "checkout", "graphRef": "services" },
+      "label": "Return to the checkout architecture example"
+    }
+  ]
+}

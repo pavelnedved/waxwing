@@ -214,6 +214,8 @@ Your own producer
 | `@felixfelicis/waxwing/render` | Render a valid JSON 2 without running the layout engine. |
 | `@felixfelicis/waxwing/artifacts` | Extract embedded JSON 2 and recover JSON 1. |
 | `@felixfelicis/waxwing/site` | Render, write, and recover a fixed multi-page export with automatic navigation. |
+| `@felixfelicis/waxwing/collection` | Package separate models or existing sites with a parent page, shared search, and explicit reading links. |
+| `@felixfelicis/waxwing/query` | Search, inspect, and retrieve bounded model relationships/workflows with scope and evidence. |
 | `@felixfelicis/waxwing/workflow` | Inspect architecture workflow scope, participation, and drawing blockers without loading ELK. |
 | `@felixfelicis/waxwing/sequence` | Independently validate, lay out, and render a sequence scenario or structured behavior. |
 

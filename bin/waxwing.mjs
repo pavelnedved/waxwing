@@ -12,6 +12,8 @@ const usage = `Waxwing — experimental modular diagram tool
   waxwing render <layout.json> <output.svg|output.html> [--graph graph-id | --workflow workflow-id]
   waxwing render-site <layout.json> <output-directory>
   waxwing build-site <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
+  waxwing build-collection <collection.json> <output-directory>
+  waxwing query <model.json> <search|inspect|neighbors|workflows|workflow> <text-or-id> [--limit 20] [--budget 12000] [--offset 0] [--kind kind] [--direction incoming|outgoing|both] [--relation kind]
   waxwing recover <layout.json|diagram.svg|diagram.html|site-directory> <model.json>
   waxwing build <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
 
@@ -21,6 +23,8 @@ Architecture and basic sequence models use the same commands. Sequence models de
 An anchor is a reading preference, not a workflow entry or execution-order claim.
 The layout stage is optional. Render accepts a compatible, independently authored JSON 2.
 build-site publishes a managed directory with an index and one page per view/document.
+build-collection packages separate models or existing sites under one home page, with shared search and explicit links.
+query reads recorded model knowledge; its budget bounds result characters, not tokens or the metadata envelope.
 render-site accepts JSON 2 directly; neither requires a Waxwing server.
 validate, prepare, layout, build, and build-site load explicitly registered Markdown files and local raster images.
 No command scans repositories, fetches source locators, or calls an LLM.`;
@@ -77,6 +81,21 @@ try {
     const { validateLayout } = await import('../modules/layout/validate.mjs');
     const result = validateLayout(readJSON(args[0]));
     console.log(JSON.stringify(result.ok ? result : {...result, command, input: path.resolve(args[0])}, null, 2)); process.exitCode = result.ok ? 0 : 1;
+  } else if (command === 'build-collection') {
+    if(args.length!==2)throw new Error('build-collection requires collection JSON and output directory paths.');
+    const {buildCollection}=await import('../modules/site/collection.mjs');
+    console.log(JSON.stringify({ok:true,...await buildCollection(args[0],args[1])},null,2));
+  } else if (command === 'query') {
+    if(args.length<3||(args.length-3)%2)throw new Error('query requires a model, operation, value, and optional flag/value pairs.');
+    const options={};
+    for(let i=3;i<args.length;i+=2) {
+      const key=args[i].slice(2);
+      if(!['--limit','--offset','--budget','--kind','--direction','--relation'].includes(args[i])||Object.hasOwn(options,key))throw new Error(`Unknown or repeated query option ${args[i]}.`);
+      options[key]=['limit','offset','budget'].includes(key)?Number(args[i+1]):args[i+1];
+    }
+    const {loadModel}=await import('../modules/documents/index.mjs');
+    const {queryModel}=await import('../modules/query/index.mjs');
+    console.log(JSON.stringify({ok:true,...queryModel(loadModel(args[0]).model,args[1],args[2],options)},null,2));
   } else if (command === 'render-site' || command === 'build-site') {
     if (args.length < 2 || (command === 'render-site' && args.length !== 2)) throw new Error(`${command} requires input and output directory paths.`);
     const { renderSite, writeSite } = await import('../modules/site/index.mjs');
@@ -122,6 +141,6 @@ try {
     console.log(JSON.stringify({ ok: true, output: write(args[1], JSON.stringify(model, null, 2) + '\n', directory ? [path.join(args[0],'source/model.json'),path.join(args[0],'source/layout.json')] : [args[0]]) }));
   } else throw new Error(`Unknown command "${command}". Run with --help.`);
 } catch (error) {
-  console.error(JSON.stringify({ ok: false, command, ...(args[0] && ['validate','prepare','layout','check-layout','render','recover','build','render-site','build-site'].includes(command) ? {input: path.resolve(args[0])} : {}), message: error.message, diagnostics: error.diagnostics ?? [] }, null, 2));
+  console.error(JSON.stringify({ ok: false, command, ...(args[0] && ['validate','prepare','layout','check-layout','render','recover','build','render-site','build-site','build-collection','query'].includes(command) ? {input: path.resolve(args[0])} : {}), message: error.message, diagnostics: error.diagnostics ?? [] }, null, 2));
   process.exitCode = 1;
 }

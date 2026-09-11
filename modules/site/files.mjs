@@ -6,32 +6,36 @@ import { canonical, digest } from '../shared/model.mjs';
 
 const hash = (data) => createHash('sha256').update(data).digest('hex');
 const manifestName = 'waxwing-site.json';
-const validPath = (p) => typeof p==='string' && /^(?:index\.html|(?:graphs|workflows|documents)\/[a-z][a-z0-9_-]*\.html|source\/(?:model|layout)\.json|assets\/site\.(?:css|js))$/.test(p);
-function manifestOf(text) {
+const validPath = (p) => typeof p==='string' && /^(?:index\.html|search\.html|records\.html|(?:graphs|workflows|documents)\/[a-z][a-z0-9_-]*\.html|source\/(?:model|layout)\.json|assets\/(?:site\.(?:css|js)|search\.js))$/.test(p);
+const collectionName='waxwing-collection.json';
+const collectionPath=p=>['index.html','search.html','collection.json','assets/site.css','assets/search.js'].includes(p)||/^sites\/[a-z][a-z0-9_-]*\//.test(p)&&(p.split('/').slice(2).join('/')===manifestName||validPath(p.split('/').slice(2).join('/')));
+function manifestOf(text, collection=false) {
   const manifest = JSON.parse(text);
-  if (manifest?.schemaVersion !== '0.1-site-draft' || !manifest.files || Array.isArray(manifest.files) || typeof manifest.files !== 'object' || !['index.html','source/model.json','source/layout.json'].every(p=>Object.hasOwn(manifest.files,p)) || Object.entries(manifest.files).some(([p,h])=>!validPath(p)||typeof h!=='string'||!/^[a-f0-9]{64}$/.test(h))) throw new Error('Invalid Waxwing site manifest.');
+  const required=collection?['index.html','collection.json']:['index.html','source/model.json','source/layout.json'];
+  if (manifest?.schemaVersion !== (collection?'0.1-collection-draft':'0.1-site-draft') || !manifest.files || Array.isArray(manifest.files) || typeof manifest.files !== 'object' || !required.every(p=>Object.hasOwn(manifest.files,p)) || Object.entries(manifest.files).some(([p,h])=>!(collection?collectionPath(p):validPath(p))||typeof h!=='string'||!/^[a-f0-9]{64}$/.test(h))) throw new Error('Invalid Waxwing site manifest.');
   return manifest;
 }
-function inventory(dir) {
+function inventory(dir,collection=false) {
   const files = [];
   function walk(base, prefix='') {
     for(const item of fs.readdirSync(base,{withFileTypes:true})) {
       const name = prefix+item.name;
       if(item.isSymbolicLink() || (!item.isDirectory()&&!item.isFile())) throw new Error(`Site contains an unsupported file or symlink: ${name}`);
       if(item.isDirectory()) {
-        if(!['graphs','workflows','documents','source','assets'].includes(name)) throw new Error(`Site contains an unowned directory: ${name}`);
+        if(!(collection ? name==='assets'||name==='sites'||/^sites\/[a-z][a-z0-9_-]*(?:\/(?:graphs|workflows|documents|source|assets))?$/.test(name) : ['graphs','workflows','documents','source','assets'].includes(name))) throw new Error(`Site contains an unowned directory: ${name}`);
         walk(path.join(base,item.name),name+'/');
       } else files.push(name);
     }
   }
   walk(dir); return files;
 }
-function checkSite(dir) {
+function checkSite(dir,collection=false) {
   if(fs.lstatSync(dir).isSymbolicLink()) throw new Error('Site directory must not be a symlink.');
-  const actual = inventory(dir);
-  if(!actual.includes(manifestName)) throw new Error('Output directory is not a managed Waxwing site. Choose a new or empty directory.');
-  const manifest = manifestOf(fs.readFileSync(path.join(dir,manifestName),'utf8'));
-  const expected = new Set([...Object.keys(manifest.files),manifestName]);
+  const name=collection?collectionName:manifestName;
+  const actual = inventory(dir,collection);
+  if(!actual.includes(name)) throw new Error('Output directory is not a managed Waxwing site. Choose a new or empty directory.');
+  const manifest = manifestOf(fs.readFileSync(path.join(dir,name),'utf8'),collection);
+  const expected = new Set([...Object.keys(manifest.files),name]);
   if(actual.length!==expected.size || actual.some(p=>!expected.has(p))) throw new Error('Site has added or missing files. Rebuild to a new directory, or restore the generated files.');
   for(const [name,expectedHash] of Object.entries(manifest.files)) if(hash(fs.readFileSync(path.join(dir,name)))!==expectedHash) throw new Error(`Generated site file was modified: ${name}. Rebuild to a new directory, or restore it first.`);
   return manifest;
@@ -48,8 +52,9 @@ export function assertOutsideSite(directory, file) {
   if(rel===''||(!rel.startsWith('..'+path.sep)&&rel!=='..'&&!path.isAbsolute(rel))) throw new Error('Recover to a file outside the managed site directory.');
 }
 export function writeSite(files, directory, {inputFiles=[]}={}) {
-  const manifest = manifestOf(files.get(manifestName));
-  if(files.size!==Object.keys(manifest.files).length+1 || [...files].some(([name,content])=>name!==manifestName&&(!Object.hasOwn(manifest.files,name)||hash(content)!==manifest.files[name]))) throw new Error('Site files do not match their manifest.');
+  const collection=files.has(collectionName),name=collection?collectionName:manifestName;
+  const manifest = manifestOf(files.get(name),collection);
+  if(files.size!==Object.keys(manifest.files).length+1 || [...files].some(([p,content])=>p!==name&&(!Object.hasOwn(manifest.files,p)||hash(content)!==manifest.files[p]))) throw new Error('Site files do not match their manifest.');
   const target=path.resolve(directory),actualTarget=physical(target);
   if(target===path.parse(target).root) throw new Error('Cannot publish a site at the filesystem root.');
   for(const input of inputFiles) {
@@ -58,7 +63,7 @@ export function writeSite(files, directory, {inputFiles=[]}={}) {
   }
   if(fs.existsSync(target)) {
     if(fs.lstatSync(target).isSymbolicLink()||!fs.statSync(target).isDirectory()) throw new Error('Site output must be a real directory.');
-    if(fs.readdirSync(target).length) checkSite(target);
+    if(fs.readdirSync(target).length) checkSite(target,collection);
   }
   fs.mkdirSync(path.dirname(target),{recursive:true});
   const staging=fs.mkdtempSync(path.join(path.dirname(target),'.waxwing-site-'));
@@ -80,6 +85,7 @@ export function writeSite(files, directory, {inputFiles=[]}={}) {
   return {directory:target,index:path.join(target,'index.html'),files:files.size};
 }
 export function recoverSite(directory) {
+  if(fs.existsSync(path.join(directory,collectionName)))throw new Error('A collection contains separate models. Recover a member directory under sites/<id>, not the collection as one model.');
   const dir=path.resolve(directory),manifest=checkSite(dir);
   const layout=JSON.parse(fs.readFileSync(path.join(dir,'source/layout.json'),'utf8'));
   const model=recoverModel(layout);

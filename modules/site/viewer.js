@@ -8,6 +8,17 @@
   let fitted = false;
   const width = svg ? Number(svg.getAttribute('width')) : 0;
   const height = svg ? Number(svg.getAttribute('height')) : 0;
+  const saveView=()=>{
+    if(!svg)return;
+    try {history.replaceState({...history.state,wwView:{zoom,fitted,left:viewport.scrollLeft,top:viewport.scrollTop,highlight:$('highlight').value}},'');} catch { /* Optional view memory under restrictive local-file policies. */ }
+  };
+  const restoreView=()=>{
+    const state=history.state?.wwView;if(!svg||!state)return;
+    fitted=state.fitted;$('highlight').value=state.highlight;
+    fitted?fit():scale(state.zoom);viewport.scrollTo(state.left,state.top);highlights();
+  };
+  addEventListener('pagehide',saveView);
+  addEventListener('pageshow',()=>requestAnimationFrame(restoreView));
   function scale(value) {
     const centerX = (viewport.scrollLeft + viewport.clientWidth / 2 - parseFloat(svg.style.marginLeft || 0)) / zoom;
     const centerY = (viewport.scrollTop + viewport.clientHeight / 2 - parseFloat(svg.style.marginTop || 0)) / zoom;
@@ -16,6 +27,7 @@
     svg.style.marginLeft = `${Math.max(0,(viewport.clientWidth-width*zoom)/2)}px`;
     svg.style.marginTop = `${Math.max(0,(viewport.clientHeight-height*zoom)/2)}px`;
     $('zoom-label').textContent = `${Math.round(zoom*100)}%`;
+    if($('overview-guide'))$('overview-guide').hidden=!fitted||zoom>=0.65;
     $('zoom-out').disabled = zoom <= 0.05;
     $('zoom-in').disabled = zoom >= 3;
     viewport.scrollTo(centerX * zoom + parseFloat(svg.style.marginLeft) - viewport.clientWidth / 2, centerY * zoom + parseFloat(svg.style.marginTop) - viewport.clientHeight / 2);
@@ -59,6 +71,7 @@
       restoreFit=true; fitted=false; scale(Math.max(1,zoom));
     } else if (!record && restoreFit) {
       restoreFit=false; fitted=true;
+      requestAnimationFrame(fit);
     }
     selectedRecord = record;
     $('inspector').hidden = !record;
@@ -82,10 +95,13 @@
     }
   }
   $('close-inspector').onclick = () => {
-    history.replaceState(null,'',location.pathname+location.search); route(); lastFocus?.focus({preventScroll:true});
+    history.replaceState(history.state,'',location.pathname+location.search); route(); lastFocus?.focus({preventScroll:true});
   };
   document.addEventListener('keydown',(e) => {if(e.key==='Escape'&&!$('inspector').hidden)$('close-inspector').click();});
   if (svg) {
+    // An architecture opens as a complete overview. A readable component index
+    // accompanies small scales; selection opens at full size. Sequences scroll.
+    fitted=architecture;
     fitted ? fit() : scale(1);
     $('highlight').onchange = highlights;
     $('zoom-out').onclick = () => { fitted=false; restoreFit=false; scale(zoom/1.25); };
@@ -103,18 +119,19 @@
       const record = e.target.closest('.record'); if (!record) return;
       if(e.type==='keydown'&&!['Enter',' '].includes(e.key))return;
       e.preventDefault(); lastFocus = record;
-      history.pushState(null,'',`#${encodeURIComponent(`record-${record.dataset.ref}`)}`); route();
+      saveView();history.pushState(null,'',`#${encodeURIComponent(`record-${record.dataset.ref}`)}`); route();
     }
     svg.addEventListener('click',select); svg.addEventListener('keydown',select);
     for(const el of svg.querySelectorAll('.record')) el.setAttribute('aria-controls','inspector');
   }
   document.addEventListener('click',(e) => {
+    const anyLink=e.target.closest('a');if(anyLink)saveView();
     const a = e.target.closest('a[href^="#record-"]'); if(!a)return;
     e.preventDefault(); lastFocus = a;
     if (a.id === 'reading-anchor-go' && svg) { fitted=false; restoreFit=false; scale(1); }
     history.pushState(null,'',a.getAttribute('href')); route();
   });
-  addEventListener('hashchange',route); addEventListener('popstate',route); route();
+  addEventListener('hashchange',route); addEventListener('popstate',()=>{route();requestAnimationFrame(()=>requestAnimationFrame(restoreView));}); route();
   if($('catalog-search')) $('catalog-search').oninput = () => {
     const query = $('catalog-search').value.trim().toLowerCase();
     for(const card of document.querySelectorAll('#catalog .document-card')) card.hidden = !card.textContent.toLowerCase().includes(query);

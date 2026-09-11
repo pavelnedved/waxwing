@@ -1554,8 +1554,16 @@ Do not overwrite authoring inputs or any registered document/image with outputs.
 Use `build` (below) for one self-contained HTML with all views/documents. Use
 `build-site` when readers should navigate between separate pages for many
 workflows. This is an export choice, not a new JSON 1 contract. Keep one canonical
-model so views share component IDs; the initial site exporter does not combine
-independently authored models or infer identity from matching IDs in other files.
+model so views share component IDs. For independent architecture/sequence models
+or already built sites, use `build-collection`; its parent page, shared search,
+and explicit navigation links connect explanations without merging identities.
+See [collection configuration and targets](docs/collections.md). Matching IDs in
+different member models never establish shared identity.
+
+Consult an existing model before reconstructing its explanation: `query` supports
+`search`, `inspect`, `neighbors`, `workflows`, and `workflow`. Use the returned
+scope/revision and pagination information; a missing answer is not proof of
+absence. See [bounded model queries](docs/model-queries.md).
 
 ```sh
 node bin/waxwing.mjs build-site /absolute/path/to/model.json /absolute/path/to/export
@@ -1575,11 +1583,14 @@ The output structure is fixed; authoring files do not need to move:
 ```text
 export/
   index.html
+  search.html
+  records.html
   graphs/<graph-id>.html
   workflows/<workflow-id>.html
   documents/<document-id>.html
   assets/site.css
   assets/site.js
+  assets/search.js
   source/model.json
   source/layout.json
   waxwing-site.json
