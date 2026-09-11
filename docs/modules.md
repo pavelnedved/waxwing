@@ -118,7 +118,8 @@ artifacts without entry metadata remain supported without invented defaults.
 
 ## CLI boundary
 
-`bin/waxwing.mjs` dynamically loads the module required for each command. Run
+`bin/waxwing.mjs` delegates to `modules/interfaces/cli.mjs`, which dynamically
+loads the operations required for each command. Run
 `node bin/waxwing.mjs --help` for command syntax. The old
 `scripts/validate-model.mjs` and `lib/validate-model.mjs` remain compatibility
 entry points for the initial prototype.
@@ -127,8 +128,8 @@ entry points for the initial prototype.
 Markdown files. `prepare` saves canonical JSON 1 without laying it out. Existing
 canonical models need no preparation. Render/recover do not load source files.
 
-The CLI writes outputs via a temporary sibling file and rename. Render and
-layout failures leave a previous output unchanged; inputs cannot be overwritten
+Application file workflows write outputs via a temporary sibling file and rename.
+Render and layout failures leave a previous output unchanged; inputs cannot be overwritten
 by an output. `build` computes all content before writing, but its three file
 replacements are individually atomic, not a filesystem transaction across the
 whole bundle. Concurrent editing/writing is not coordinated by the MVP.
@@ -137,22 +138,94 @@ whole bundle. Concurrent editing/writing is not coordinated by the MVP.
 
 ```text
 modules/
-  model/       JSON 1 validation
-  documents/   Explicit file loading, Markdown resolution and rendering
-  layout/      ELK adapter and JSON 2 validation
-  render/      SVG/HTML generation, viewer assets, source recovery
-  sequence/    Scenario/behavior validation, deterministic layout, SVG/HTML viewer
-  shared/      canonical serialization, semantic helpers, text metrics
+  knowledge/
+    architecture/  JSON 1 validation, graph references and projections
+    sequence/      Scenario/behavior meaning, entry and order validation
+    workflow/      Architecture participation and interaction validation
+    documents/     Markdown parsing, resolved links and asset validation
+    query/         Bounded retrieval of recorded knowledge
+    records/       In-memory model update inventories
+    workspace/     Manifest validation and potential review scope
+    shared/        Qualified claims, canonical serialization and diagnostics
+  presentation/
+    layout/        ELK adapter, geometry validation and readability checks
+    render/        SVG/HTML output, viewer assets and artifact recovery
+    sequence/      Drawing constraints, geometry and sequence viewer
+    workflow/      Drawing constraints, geometry and workflow rendering
+    documents/     Document HTML and navigation URLs
+    site/          Page composition, assets and search presentation
+    workspace/     Markdown review reports
+    shared/        Display text and drawing metrics
+  application/     File loading, build/render/recover workflows, site writes,
+                   collection builds and update review coordination
+  interfaces/      CLI arguments/results and skill installation/guide access
+  analysis/        Reserved source-analysis boundary; design notes only
+  model/, ...      Existing module paths retained as compatibility entry points
 schemas/       JSON 1 and JSON 2 contracts
-bin/           CLI orchestration and filesystem output
+bin/           Stable executable entry point
 examples/      fictional evidence, JSON 1, generated artifacts
 test/          contract, preservation, rendering, and independent CLI tests
 ```
+
+### Dependency direction
+
+These boundaries separate responsibilities; they do not rank models by size or
+force repositories, services and views into one hierarchy.
+
+| Responsibility | May import other responsibility implementations |
+| --- | --- |
+| Knowledge | None |
+| Analysis (planned) | Knowledge |
+| Presentation | Knowledge |
+| Application | Analysis, knowledge, presentation |
+| Interfaces | Application, analysis, knowledge, presentation |
+
+Each responsibility may also import its own modules. Only interfaces may use
+the packaged skill adapter. New implementation code imports the owning module
+directly, never an old compatibility entry point. The public npm subpaths stay
+unchanged; their exports can combine several responsibilities for existing
+callers. These internal directory names are not new public package exports.
+
+Knowledge functions operate on supplied records. Validators read bundled JSON
+schemas at initialization, but do not open user models, fetch evidence, import
+viewers or load ELK. Markdown parsing uses markdown-it; HTML customization and
+document URLs belong to presentation. A valid model can still be undrawable;
+drawing blockers belong with the presentation that imposes them.
+
+Application functions own explicit input/output operations and coordination.
+For example, `application/pipeline.mjs` resolves documents, validates and lays
+out a model, renders artifacts, and writes outputs. It returns results or throws;
+CLI flags, console messages and exit codes belong to interfaces. Presentation
+can read its bundled schemas/templates/assets but does not write user outputs.
+
+`test/module-boundaries.test.mjs` checks literal imports/re-exports across these
+boundaries and runs all knowledge modules from an isolated copy with the other
+responsibilities absent. Existing API and CLI tests exercise the compatibility
+entry points. Viewer JS and CSS live beside their presentation implementations;
+their old unexported asset paths are no longer present.
 
 To replace layout, produce JSON 2 and pass it to the renderer. To replace
 rendering, consume JSON 2 directly. Neither requires adopting the future
 ingestion layer. Splitting dependency installation into separately published
 packages can follow later if needed.
+
+### Source analysis and future interfaces
+
+The [analysis notes](../modules/analysis/README.md) record the next implementation
+boundary and initial language targets, including Lean 4. No scanner or proof
+checker is implemented by this refactor. Source/code/proof models should remain
+specialized and connect to explanatory models through explicit evidence and
+identity mappings. Diagram IDs and exported URLs do not define code identity.
+
+A repository may contain several services; a service may span repositories.
+Likewise a reading tree or document sequence is one view over relationships,
+not a constraint on all stored knowledge. The existing workspace index remains
+a declared lineage index, not an extracted code graph.
+
+See [design principles](design-principles.md) for the machine/human interaction
+rule that applies across source analysis, authoring and future apps. Existing
+examples with pinned source revisions describe those revisions; their old module
+names are not a claim about the current internal directory layout.
 
 
 ## Graphs across abstraction levels

@@ -10,7 +10,11 @@ direction, not promised dates.
    then evaluate another public codebase. Record omissions and failure cases.
 3. **Improvements from use.** Address authoring friction, diagnostics, and
    diagram readability revealed by those trials before expanding the feature set.
+4. **Source analysis foundations.** Separate knowledge, presentation, application
+   workflows and interfaces; then define source/code/proof contracts and evaluate
+   language adapters. [Initial targets](modules/analysis/README.md) include Lean 4.
+   This work begins with local analysis and explicit evidence links to explanations.
 
-There is no planned ingestion service, visual editor, or automatic infrastructure
-discovery in the initial release. Current features and limitations are described
+The current release has no repository scanner, visual editor, or automatic
+infrastructure discovery. Current features and limitations are described
 in the [README](README.md) and [release notes](CHANGELOG.md).
