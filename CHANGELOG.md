@@ -4,6 +4,14 @@ Software versions and experimental schema versions are tracked separately.
 
 ## Unreleased
 
+- Explicit workspace lineage registers evidence and model elaboration across
+  local paths, separate repositories, and hosted locators. `workspace check`
+  validates declarations and local model targets; `workspace affected` produces
+  JSON or Markdown review queues with reasons and access/reference gaps.
+- The authoring/update skill can consult workspace lineage and record scoped
+  review outcomes across abstraction levels. No remote fetching, automatic
+  freshness certification, diagram schema change, or model edits are implied.
+
 - `skill install` packages a concise authoring/update skill with explicit
   destination ownership checks and a binding to the supplying Waxwing runtime.
 - The skill loads contract sections on demand, preserves a baseline during

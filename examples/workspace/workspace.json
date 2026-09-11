@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "0.1-workspace-draft",
+  "id": "checkout-library",
+  "title": "Checkout explanation review",
+  "sources": [
+    { "id": "checkout-design", "location": "../multi-page/README.md" },
+    { "id": "retry-design", "location": "../sequence/README.md" },
+    { "id": "platform-decision", "location": "https://docs.example.com/commerce/platform", "revision": "illustrative-version-12" },
+    { "id": "markets-design", "location": "../sequence-markets/README.md" }
+  ],
+  "models": [
+    {
+      "id": "organization", "modelId": "commerce-overview",
+      "title": "Organization overview (external example)",
+      "location": "https://docs.example.com/commerce/model.json",
+      "sourceRefs": ["platform-decision"]
+    },
+    {
+      "id": "checkout", "modelId": "checkout-system",
+      "location": "../multi-page/model.json",
+      "sourceRefs": ["checkout-design"],
+      "elaborates": [{ "model": "organization", "element": "commerce" }]
+    },
+    {
+      "id": "retry", "modelId": "checkout-retry",
+      "location": "../sequence/model.json",
+      "sourceRefs": ["retry-design"],
+      "elaborates": [{ "model": "checkout", "element": "checkout" }]
+    },
+    {
+      "id": "markets", "modelId": "market-collection",
+      "location": "../sequence-markets/model.json",
+      "sourceRefs": ["markets-design"]
+    }
+  ]
+}
