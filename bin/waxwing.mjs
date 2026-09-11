@@ -14,6 +14,8 @@ const usage = `Waxwing — experimental modular diagram tool
   waxwing build-site <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
   waxwing build-collection <collection.json> <output-directory>
   waxwing skill install <skill-directory>
+  waxwing workspace check <workspace.json> [--format json|markdown]
+  waxwing workspace affected <workspace.json> [--source source-id] [--model model-id] [--format json|markdown]
   waxwing query <model.json> <search|inspect|neighbors|workflows|workflow> <text-or-id> [--limit 20] [--budget 12000] [--offset 0] [--kind kind] [--direction incoming|outgoing|both] [--relation kind]
   waxwing recover <layout.json|diagram.svg|diagram.html|site-directory> <model.json>
   waxwing build <model.json> <output-directory> [--group perspective-id] [--direction RIGHT|DOWN]
@@ -26,6 +28,7 @@ The layout stage is optional. Render accepts a compatible, independently authore
 build-site publishes a managed directory with an index and one page per view/document.
 build-collection packages separate models or existing sites under one home page, with shared search and explicit links.
 skill install writes a managed authoring/update skill bound to this package into an explicit destination.
+workspace records evidence and elaboration across locations; affected produces a review queue, not automatic edits.
 query reads recorded model knowledge; its budget bounds result characters, not tokens or the metadata envelope.
 render-site accepts JSON 2 directly; neither requires a Waxwing server.
 validate, prepare, layout, build, and build-site load explicitly registered Markdown files and local raster images.
@@ -83,6 +86,19 @@ try {
     const { validateLayout } = await import('../modules/layout/validate.mjs');
     const result = validateLayout(readJSON(args[0]));
     console.log(JSON.stringify(result.ok ? result : {...result, command, input: path.resolve(args[0])}, null, 2)); process.exitCode = result.ok ? 0 : 1;
+  } else if (command === 'workspace') {
+    const [operation, input, ...flags] = args;
+    if (!['check','affected'].includes(operation) || !input || flags.length % 2) throw new Error('Usage: waxwing workspace <check|affected> <workspace.json> [--source id] [--model id] [--format json|markdown].');
+    const options = { sources: [], models: [] }; let format;
+    for (let i = 0; i < flags.length; i += 2) {
+      if (flags[i] === '--format' && format === undefined && ['json','markdown'].includes(flags[i+1])) format = flags[i+1];
+      else if (operation === 'affected' && ['--source','--model'].includes(flags[i]) && flags[i+1] && !flags[i+1].startsWith('--')) options[flags[i] === '--source' ? 'sources' : 'models'].push(flags[i+1]);
+      else throw new Error(`Unknown or invalid workspace option ${flags[i]}.`);
+    }
+    const { loadWorkspace, affectedModels, workspaceMarkdown } = await import('../modules/workspace/index.mjs');
+    const workspace = loadWorkspace(input), report = operation === 'check' ? workspace : affectedModels(workspace, options);
+    console.log(format === 'markdown' ? workspaceMarkdown(report).trimEnd() : JSON.stringify(report,null,2));
+    process.exitCode = report.ok ? 0 : 1;
   } else if (command === 'skill') {
     if(args.length!==2||args[0]!=='install')throw new Error('Usage: waxwing skill install <skill-directory>.');
     const {installSkill}=await import('../modules/skill/index.mjs');

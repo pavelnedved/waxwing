@@ -37,7 +37,8 @@
     "./site": "./modules/site/index.mjs",
     "./collection": "./modules/site/collection.mjs",
     "./query": "./modules/query/index.mjs",
-    "./skill": "./modules/skill/index.mjs"
+    "./skill": "./modules/skill/index.mjs",
+    "./workspace": "./modules/workspace/index.mjs"
   },
   "bin": {
     "waxwing": "./bin/waxwing.mjs"

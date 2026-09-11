@@ -8,6 +8,11 @@ Within a source checkout, run `npm ci` before using these examples.
 
 ## Model
 
+For a separate cross-model evidence/lineage index, see the
+[`@felixfelicis/waxwing/workspace` API](workspace.md#module-api). It validates
+declared references and produces potential review scope without merging models,
+fetching remote evidence, or scanning repositories.
+
 ```js
 import { validateModel } from '@felixfelicis/waxwing/model';
 

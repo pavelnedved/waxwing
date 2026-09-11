@@ -38,6 +38,7 @@ Load `basics`, then only the relevant topics:
 | Build options, recovery, or troubleshooting | `pipeline` |
 | Several independent models under one home page | `collections` |
 | Consult existing knowledge in bounded pieces | `queries` |
+| Locate evidence and related models across folders, repositories, or hosted documents | `workspace` |
 
 `guide list` shows the topics and their sizes. These excerpts come directly from
 the bound package's complete guide/docs, so schema details are not maintained

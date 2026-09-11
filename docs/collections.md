@@ -9,6 +9,10 @@ links back to the collection from every member page, and optional links between
 specific records/views. It preserves separate source models; matching names or
 IDs do not merge component identities.
 
+For evidence and maintenance relationships across these models and explanations
+published elsewhere, use a separate [workspace manifest](workspace.md). Link it
+from the collection's authoring README; publication links are not lineage claims.
+
 ## Define and build
 
 Save this beside your model directories as `collection.json`:

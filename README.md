@@ -93,6 +93,19 @@ waxwing build-collection /path/to/collection.json /path/to/library
 waxwing query /path/to/model.json search "payment"
 ```
 
+Keep high-level explanations and service models in different locations? An
+explicit [workspace manifest](docs/workspace.md) records their evidence sources
+and elaboration links without imposing a folder or repository structure:
+
+```sh
+waxwing workspace check /path/to/workspace.json
+waxwing workspace affected /path/to/workspace.json --source payments-repo --format markdown
+```
+
+The review queue follows declared links across abstraction levels and reports
+unavailable material. The agent or human reviews evidence and decides which
+models to update; the command does not scan repositories or fetch remote sources.
+
 ## What you can inspect
 
 - **Architecture and subgraphs:** move between an overview and selected internals.

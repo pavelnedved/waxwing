@@ -62,7 +62,14 @@ try {
   run(process.execPath,[adapter,'build-site',skillInput,path.join(temporary,'skill-output')]);
   const review=JSON.parse(run(process.execPath,[adapter,'review-update',skillInput,skillInput]));
   assert.deepEqual(review.counts,{added:0,removed:0,changed:0,unchanged:review.counts.unchanged});
-  console.log(`Package smoke check passed: ${manifest.name}@${manifest.version}, ${paths.length} files, ${pack.size} compressed bytes; integrity ${pack.integrity}; exports, recovery, collections, queries, installed skill binding/build/update passed.`);
+  const workspaceInput=path.join(installed,'examples/workspace/workspace.json');
+  const workspace=JSON.parse(run(cli,['workspace','check',workspaceInput]));
+  assert.equal(workspace.ok,true);assert.equal(workspace.referencesComplete,false);
+  const plan=JSON.parse(run(process.execPath,[adapter,'workspace','affected',workspaceInput,'--source','retry-design']));
+  assert.deepEqual(plan.reviews.map(m=>m.id),['organization','checkout','retry']);
+  assert.deepEqual(plan.unaffected,['markets']);
+  assert.match(run(process.execPath,[adapter,'guide','workspace']),/workspace affected/);
+  console.log(`Package smoke check passed: ${manifest.name}@${manifest.version}, ${paths.length} files, ${pack.size} compressed bytes; integrity ${pack.integrity}; exports, recovery, collections, queries, workspace lineage, installed skill binding/build/update passed.`);
 } finally {
   fs.rmSync(temporary, { recursive: true, force: true });
 }

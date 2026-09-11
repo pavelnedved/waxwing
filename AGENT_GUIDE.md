@@ -1941,3 +1941,14 @@ files. Their marked JSON blocks are exercised by `test/agent-guide.test.mjs`
 through validation, layout, rendering and recovery. That catches stale examples;
 it is not proof that every prose sentence matches the code or that ingestion
 works correctly on every real system.
+
+## Cross-model maintenance with workspace lineage
+
+For models and evidence in different repositories, folders, or hosted documents,
+use an explicit [workspace manifest](docs/workspace.md). It records evidence and
+elaboration links separately from collection navigation. Start with `workspace
+check`, then `workspace affected` using the registered IDs of changed sources or
+models. Treat results as potential review scope, preserve access gaps and user
+authorization, and record evidence revisions and outcomes in an update report.
+No command fetches remote sources, scans repositories, or decides which claims
+are still accurate. See the workspace guide for the complete workflow.

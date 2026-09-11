@@ -16,3 +16,8 @@ for `Deduplication` to jump to its document section.
 
 See [collection publishing](../../docs/collections.md) for existing-site inputs,
 navigation targets, updates, and per-model recovery.
+
+For maintenance across these explanations and an external organization overview,
+see [the workspace manifest](../workspace/workspace.json) and its
+[review walkthrough](../workspace/README.md). Its evidence and elaboration links
+are separate from this collection's publication navigation.

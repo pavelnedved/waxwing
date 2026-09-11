@@ -4,6 +4,35 @@ Start from the existing canonical model, not a fresh reconstruction. Consult its
 question, scope, components, workflows, and relevant records with `query`.
 Read the matching contract topics before editing its fields.
 
+## Establish the review scope
+
+If the user supplies a workspace manifest, or the project's instructions link to
+one, load `guide workspace` and run `workspace check`, then `workspace affected`
+with the declared IDs of changed sources/models. A PR is one possible change
+input; select its corresponding source explicitly. The CLI does not scan the PR.
+Follow the reasons in the review queue across abstraction levels. Elaboration
+means potentially related explanations, not guaranteed impact or permission to
+edit every reachable model. Keep the user's authorized scope; list other models
+as follow-up work when needed.
+
+When no manifest is known, use the selected model/collection as the explicit
+scope. If cross-model maintenance is requested, register known sources and
+relationships in a workspace manifest at a user-appropriate location. Use
+evidence actually consulted and relationships the user supplied or that are
+supported by explicit documentation. Ask only for missing architectural context;
+never infer a parent from a folder name or impose a repository layout. Explain
+that unregistered dependents cannot be found.
+
+Obtain external evidence through available authorized tools; a URL or an
+available local file does not mean it has been reviewed. Preserve unresolved
+access and target-reference gaps. Save the generated queue in the separate
+update working directory as a review report, retaining its workspace/model
+revisions. For each affected model, record `updated`, `still-accurate`, `blocked`,
+or `out-of-scope`, with the evidence revisions actually inspected and rationale.
+Use `still-accurate` only after assessment; a successful build or an unchanged
+model is insufficient. The report is an authored assessment, not an automated
+freshness certificate. These commands never write review outcomes into models.
+
 ## Preserve a baseline
 
 Create a separate working directory for this update. Resolve registered documents

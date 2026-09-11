@@ -116,3 +116,11 @@ No change to personal skills is made merely by installing the Waxwing npm
 package. The explicit `skill install` command performs the filesystem write.
 
 Module API: `installSkill(directory)` from `@felixfelicis/waxwing/skill`.
+
+## Cross-model maintenance
+
+The `workspace` guide topic explains how to locate sources and related models
+across repositories and hosted documents. Supply a workspace manifest or link
+one from project instructions. The skill uses `workspace affected` as a review
+queue, preserves access gaps and task scope, and records evidence-based outcomes
+in the update report. See [workspace lineage](workspace.md).

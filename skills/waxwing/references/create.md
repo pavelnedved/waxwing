@@ -12,6 +12,12 @@ For several abstraction levels, use scoped subgraphs. Use architecture workflows
 when interactions share that model's component registry. Use a collection for
 independent models; navigation links do not merge identities.
 
+When the request includes cross-model maintenance, load `guide workspace` and
+register the explanation's known evidence and elaboration links in the supplied
+or newly created workspace manifest. Preserve existing workspace IDs when paths
+move. Use documented or user-supplied relationships; source folders alone do not
+establish architectural hierarchy. A manifest can live outside every code repo.
+
 Record environment, inspected revision or working-tree state, boundaries, and
 omissions honestly. Investigate only the sources needed to answer the question.
 Follow references into accessible context; name inaccessible dependencies as gaps.
