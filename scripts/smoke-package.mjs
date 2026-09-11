@@ -52,7 +52,17 @@ try {
   run(cli,['recover',path.join(collection,'sites/checkout'),path.join(temporary,'collection-recovered.json')]);
   const query=JSON.parse(run(cli,['query',path.join(collection,'sites/checkout/source/model.json'),'search','stock','--kind','component']));
   assert.ok(query.ok&&query.results.some(r=>r.id==='stock'));
-  console.log(`Package smoke check passed: ${manifest.name}@${manifest.version}, ${paths.length} files, ${pack.size} compressed bytes; integrity ${pack.integrity}; exports, architecture/sequence/behavior recovery, collection build/recovery and model queries passed.`);
+  const skill=path.join(temporary,'skills/waxwing');
+  run(cli,['skill','install',skill]);
+  const adapter=path.join(skill,'scripts/waxwing.mjs');
+  const binding=JSON.parse(run(process.execPath,[adapter,'check']));
+  assert.equal(binding.packageRoot,fs.realpathSync(installed));
+  const topics=JSON.parse(run(process.execPath,[adapter,'guide','list']));assert.ok(topics.some(t=>t.topic==='architecture'));
+  const skillInput=path.join(collection,'sites/checkout/source/model.json');
+  run(process.execPath,[adapter,'build-site',skillInput,path.join(temporary,'skill-output')]);
+  const review=JSON.parse(run(process.execPath,[adapter,'review-update',skillInput,skillInput]));
+  assert.deepEqual(review.counts,{added:0,removed:0,changed:0,unchanged:review.counts.unchanged});
+  console.log(`Package smoke check passed: ${manifest.name}@${manifest.version}, ${paths.length} files, ${pack.size} compressed bytes; integrity ${pack.integrity}; exports, recovery, collections, queries, installed skill binding/build/update passed.`);
 } finally {
   fs.rmSync(temporary, { recursive: true, force: true });
 }

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Waxwing"
+  short_description: "Create and update inspectable system explanations"
+  default_prompt: "Use $waxwing to create or update an evidence-backed system explanation and build its diagrams."

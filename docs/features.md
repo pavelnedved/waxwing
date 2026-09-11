@@ -216,6 +216,7 @@ Your own producer
 | `@felixfelicis/waxwing/site` | Render, write, and recover a fixed multi-page export with automatic navigation. |
 | `@felixfelicis/waxwing/collection` | Package separate models or existing sites with a parent page, shared search, and explicit reading links. |
 | `@felixfelicis/waxwing/query` | Search, inspect, and retrieve bounded model relationships/workflows with scope and evidence. |
+| `@felixfelicis/waxwing/skill` | Install the authoring/update skill in an explicit destination, bound to this runtime and its contract. |
 | `@felixfelicis/waxwing/workflow` | Inspect architecture workflow scope, participation, and drawing blockers without loading ELK. |
 | `@felixfelicis/waxwing/sequence` | Independently validate, lay out, and render a sequence scenario or structured behavior. |
 
