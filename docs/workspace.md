@@ -152,7 +152,7 @@ is not imported as lineage, and workspace paths are not embedded into exports.
 ## Module API
 
 ```js
-import { loadWorkspace, affectedModels, workspaceMarkdown } from '@felixfelicis/waxwing/workspace';
+import { loadWorkspace, affectedModels, workspaceMarkdown } from '@isought/waxwing/workspace';
 
 const workspace = loadWorkspace('/path/to/workspace.json');
 const plan = affectedModels(workspace, { sources: ['payments-repo'] });

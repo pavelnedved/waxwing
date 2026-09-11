@@ -65,7 +65,7 @@ Warnings with affected records provide buttons for inspecting those records.
 The independent API accepts already validated drawing geometry:
 
 ```js
-import { inspectReadability } from '@felixfelicis/waxwing/layout';
+import { inspectReadability } from '@isought/waxwing/layout';
 const warnings = inspectReadability(json2.graphs[0], json2.graphs[0].ref, {
   width: 1000, height: 500,
 });
@@ -112,11 +112,11 @@ mode and closes the selected record.
 Other viewers can reuse the pure selection function:
 
 ```js
-import { selectHighlights } from '@felixfelicis/waxwing/render';
+import { selectHighlights } from '@isought/waxwing/render';
 const { refs, findings } = selectHighlights(json1, graph, { mode: 'unknown' });
 ```
 
-`graph` is a graph selection from `@felixfelicis/waxwing/graphs` or JSON 1's `graphs[]`.
+`graph` is a graph selection from `@isought/waxwing/graphs` or JSON 1's `graphs[]`.
 Returned semantic refs are candidates for emphasis: a renderer should intersect
 them with its drawn elements, since qualified groups need not have frames.
 Findings retain links to relevant records even when they have no visible shape.
@@ -132,7 +132,7 @@ qualification labels, and dashed styles. Style switches do not run layout.
 The selected style carries across graph switches within the open viewer.
 
 ```js
-import { renderSVG, renderHTML } from '@felixfelicis/waxwing/render';
+import { renderSVG, renderHTML } from '@isought/waxwing/render';
 const svg = renderSVG(json2, { graphRef: 'overview', skin: 'engineering' });
 const html = renderHTML(json2, { skin: 'editorial' });
 ```

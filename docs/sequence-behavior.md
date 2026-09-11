@@ -186,7 +186,7 @@ inside a frame. The SVG draws then above else as a reading convention, with
 explicit branch labels. Steps are not globally numbered as if both arms ran.
 Spacing does not encode duration; message arrows do not imply blocking.
 
-The existing `@felixfelicis/waxwing/sequence` and general model/layout/render/artifact APIs and
+The existing `@isought/waxwing/sequence` and general model/layout/render/artifact APIs and
 CLI commands dispatch both versions. HTML and SVG preserve complete recoverable
 source. HTML remains self-contained with evidence inspection, Markdown, zoom,
 three skins, and theme switching. Select a block header for its evidence.

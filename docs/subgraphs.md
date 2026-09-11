@@ -205,9 +205,9 @@ every graph. The layout adapter calls the same deterministic ELK implementation
 for each explicitly selected graph.
 
 ```js
-import { graphsOf, rootGraph, projectGraph } from '@felixfelicis/waxwing/graphs';
-import { layoutModel } from '@felixfelicis/waxwing/layout';
-import { renderHTML, renderSVG } from '@felixfelicis/waxwing/render';
+import { graphsOf, rootGraph, projectGraph } from '@isought/waxwing/graphs';
+import { layoutModel } from '@isought/waxwing/layout';
+import { renderHTML, renderSVG } from '@isought/waxwing/render';
 
 const json2 = await layoutModel(json1);
 const html = renderHTML(json2); // All graphs and documents.

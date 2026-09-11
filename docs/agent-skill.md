@@ -115,7 +115,7 @@ the runtime package or over a directory containing it.
 No change to personal skills is made merely by installing the Waxwing npm
 package. The explicit `skill install` command performs the filesystem write.
 
-Module API: `installSkill(directory)` from `@felixfelicis/waxwing/skill`.
+Module API: `installSkill(directory)` from `@isought/waxwing/skill`.
 
 ## Cross-model maintenance
 

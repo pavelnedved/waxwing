@@ -20,15 +20,15 @@ remains the maintained contract source and can still be used on its own.
 
 ## Installed package or checkout
 
-`npm install -g @felixfelicis/waxwing@0.1.0` provides the `waxwing` command.
-The matching guide is at `$(npm root -g)/@felixfelicis/waxwing/AGENT_GUIDE.md` on macOS/Linux;
+`npm install -g @isought/waxwing@0.2.0` provides the `waxwing` command.
+The matching guide is at `$(npm root -g)/@isought/waxwing/AGENT_GUIDE.md` on macOS/Linux;
 `npm root -g` prints the package directory on other platforms as well.
 
 With a global installation, replace `node bin/waxwing.mjs` in this guide with
 `waxwing`; do not change into the package directory or write outputs there.
 With a checkout, run the shown commands from its root after `npm ci`.
 For JavaScript imports from another project, install Waxwing locally in that
-project; a global CLI installation does not make `@felixfelicis/waxwing/*` imports available.
+project; a global CLI installation does not make `@isought/waxwing/*` imports available.
 
 ## Contents
 
@@ -1465,8 +1465,8 @@ This complete canonical model describes invented current behavior. The two arms 
 
 Use Node.js **20.19.0 or newer**. The package is currently a local checkout, not
 an assumed globally installed tool. If you need a checkout and repository access
-is authorized, clone `git@github.com:pavelnedved/waxwing.git` or
-`https://github.com/pavelnedved/waxwing.git`, then enter its directory. Within an
+is authorized, clone `git@github.com:isought/waxwing.git` or
+`https://github.com/isought/waxwing.git`, then enter its directory. Within an
 existing checkout, respect local changes rather than resetting them. Record the
 Waxwing revision used for reproducibility.
 
@@ -1669,9 +1669,9 @@ a publisher. There is no watch/hot-reload or semantic diff feature yet.
 Module entry point, for an installed/resolvable checkout package:
 
 ```js
-import { loadModel } from '@felixfelicis/waxwing/documents';
-import { layoutModel } from '@felixfelicis/waxwing/layout';
-import { renderSite, writeSite, recoverSite } from '@felixfelicis/waxwing/site';
+import { loadModel } from '@isought/waxwing/documents';
+import { layoutModel } from '@isought/waxwing/layout';
+import { renderSite, writeSite, recoverSite } from '@isought/waxwing/site';
 
 const { model, inputFiles } = loadModel('/absolute/path/to/model.json');
 const json2 = await layoutModel(model);
@@ -1810,9 +1810,9 @@ preservation, not the truth of its claims or unedited visible markup.
 ### JavaScript entry points
 
 Within the checkout, these imports work without a globally installed package.
-From another project, install the released package locally with `npm install @felixfelicis/waxwing`,
+From another project, install the released package locally with `npm install @isought/waxwing`,
 or configure a local checkout dependency. A global CLI installation alone does
-not make `@felixfelicis/waxwing/*` imports available there.
+not make `@isought/waxwing/*` imports available there.
 Use `.mjs` or a project configured for ES modules.
 
 ```js
@@ -1850,14 +1850,14 @@ Package subpaths, for consumers that configure the local package, are:
 
 | Export | Responsibility |
 |---|---|
-| `@felixfelicis/waxwing/model` | `validateModel` for untrusted source JSON. |
-| `@felixfelicis/waxwing/documents` | `loadModel` for explicitly registered Markdown/assets. |
-| `@felixfelicis/waxwing/layout` | `layoutModel`, `validateLayout`, `inspectReadability`. |
-| `@felixfelicis/waxwing/render` | `renderHTML`, `renderSVG` and artifact recovery exports. |
-| `@felixfelicis/waxwing/artifacts` | `extractLayout`, `recoverModel`, `recoverArtifact`. Use `recoverArtifact` for serialized JSON 2/SVG/HTML. |
-| `@felixfelicis/waxwing/graphs` | `graphsOf`, `rootGraph`, `graphNodes`, `projectGraph` for architecture. `projectGraph` is a partial internal layout adapter, never a complete source/export substitute. |
-| `@felixfelicis/waxwing/workflow` | `workflowsOf`, `workflowParticipants`, `workflowDiagnostics`, `workflowDrawingDiagnostics` on structurally valid architecture input. |
-| `@felixfelicis/waxwing/sequence` | `validateSequenceModel`, `layoutSequence`, `validateSequenceLayout`, `renderSequenceSVG`, `renderSequenceHTML`; separate sequence API without ELK. |
+| `@isought/waxwing/model` | `validateModel` for untrusted source JSON. |
+| `@isought/waxwing/documents` | `loadModel` for explicitly registered Markdown/assets. |
+| `@isought/waxwing/layout` | `layoutModel`, `validateLayout`, `inspectReadability`. |
+| `@isought/waxwing/render` | `renderHTML`, `renderSVG` and artifact recovery exports. |
+| `@isought/waxwing/artifacts` | `extractLayout`, `recoverModel`, `recoverArtifact`. Use `recoverArtifact` for serialized JSON 2/SVG/HTML. |
+| `@isought/waxwing/graphs` | `graphsOf`, `rootGraph`, `graphNodes`, `projectGraph` for architecture. `projectGraph` is a partial internal layout adapter, never a complete source/export substitute. |
+| `@isought/waxwing/workflow` | `workflowsOf`, `workflowParticipants`, `workflowDiagnostics`, `workflowDrawingDiagnostics` on structurally valid architecture input. |
+| `@isought/waxwing/sequence` | `validateSequenceModel`, `layoutSequence`, `validateSequenceLayout`, `renderSequenceSVG`, `renderSequenceHTML`; separate sequence API without ELK. |
 
 ## Troubleshooting and completion
 

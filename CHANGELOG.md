@@ -4,6 +4,14 @@ Software versions and experimental schema versions are tracked separately.
 
 ## Unreleased
 
+## 0.2.0 — 2026-09-11
+
+- Publish under `@isought/waxwing`, with repository and documentation links pointing
+  to `isought/waxwing`. The terminal command remains `waxwing`.
+- Update the installed skill runtime check to recognize the new package scope.
+- Upgrade instructions: [move from the old npm scope](docs/migrations.md#npm-scope-change-in-020).
+  Existing diagram sources need no format migration for this release.
+
 - Explicit workspace lineage registers evidence and model elaboration across
   local paths, separate repositories, and hosted locators. `workspace check`
   validates declarations and local model targets; `workspace affected` produces

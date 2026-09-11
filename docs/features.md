@@ -207,18 +207,18 @@ Your own producer
 
 | Entry point | Responsibility |
 |---|---|
-| `@felixfelicis/waxwing/model` | Validate JSON 1 without laying out or rendering. |
-| `@felixfelicis/waxwing/documents` | Load registered Markdown files and assets into complete JSON 1. |
-| `@felixfelicis/waxwing/graphs` | Inspect graph selections and adapt a graph for layout. |
-| `@felixfelicis/waxwing/layout` | Generate and validate JSON 2; ELK supplies automatic geometry. |
-| `@felixfelicis/waxwing/render` | Render a valid JSON 2 without running the layout engine. |
-| `@felixfelicis/waxwing/artifacts` | Extract embedded JSON 2 and recover JSON 1. |
-| `@felixfelicis/waxwing/site` | Render, write, and recover a fixed multi-page export with automatic navigation. |
-| `@felixfelicis/waxwing/collection` | Package separate models or existing sites with a parent page, shared search, and explicit reading links. |
-| `@felixfelicis/waxwing/query` | Search, inspect, and retrieve bounded model relationships/workflows with scope and evidence. |
-| `@felixfelicis/waxwing/skill` | Install the authoring/update skill in an explicit destination, bound to this runtime and its contract. |
-| `@felixfelicis/waxwing/workflow` | Inspect architecture workflow scope, participation, and drawing blockers without loading ELK. |
-| `@felixfelicis/waxwing/sequence` | Independently validate, lay out, and render a sequence scenario or structured behavior. |
+| `@isought/waxwing/model` | Validate JSON 1 without laying out or rendering. |
+| `@isought/waxwing/documents` | Load registered Markdown files and assets into complete JSON 1. |
+| `@isought/waxwing/graphs` | Inspect graph selections and adapt a graph for layout. |
+| `@isought/waxwing/layout` | Generate and validate JSON 2; ELK supplies automatic geometry. |
+| `@isought/waxwing/render` | Render a valid JSON 2 without running the layout engine. |
+| `@isought/waxwing/artifacts` | Extract embedded JSON 2 and recover JSON 1. |
+| `@isought/waxwing/site` | Render, write, and recover a fixed multi-page export with automatic navigation. |
+| `@isought/waxwing/collection` | Package separate models or existing sites with a parent page, shared search, and explicit reading links. |
+| `@isought/waxwing/query` | Search, inspect, and retrieve bounded model relationships/workflows with scope and evidence. |
+| `@isought/waxwing/skill` | Install the authoring/update skill in an explicit destination, bound to this runtime and its contract. |
+| `@isought/waxwing/workflow` | Inspect architecture workflow scope, participation, and drawing blockers without loading ELK. |
+| `@isought/waxwing/sequence` | Independently validate, lay out, and render a sequence scenario or structured behavior. |
 
 These are subpath exports of one npm package. They can be imported
 independently; separately published packages are not part of the initial release. See
@@ -282,10 +282,10 @@ has not edited an exported SVG's visible markup.
 
 ## Development and documents
 
-[Release notes](../CHANGELOG.md) describe the 0.1.0 release.
+[Release notes](../CHANGELOG.md) describe the 0.2.0 release.
 [Upgrade and migration instructions](migrations.md) explain when to
 re-render, rebuild, or recover an existing spec. Software releases and schema
-versions are tracked separately; software 0.1.0 uses experimental draft formats.
+versions are tracked separately; software 0.2.0 uses experimental draft formats.
 
 ```sh
 npm test
