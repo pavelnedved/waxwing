@@ -19,9 +19,11 @@ try {
   const spec = process.argv[2] ? [process.argv[2]] : [];
   const [pack] = JSON.parse(run('npm', ['pack', ...spec, '--json', '--ignore-scripts', '--pack-destination', temporary], root));
   const paths = pack.files.map(file => file.path);
-  for (const required of ['bin/waxwing.mjs', 'schemas/system-model.schema.json', 'modules/render/diagram.css', 'AGENT_GUIDE.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'examples/waxwing/model.json']) {
+  for (const required of ['bin/waxwing.mjs', 'schemas/system-model.schema.json', 'AGENT_GUIDE.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'examples/waxwing/model.json']) {
     assert.ok(paths.includes(required), `Missing package file: ${required}`);
   }
+  // Explicit archive/registry specs may still use the earlier internal layout.
+  assert.ok(['modules/presentation/render/diagram.css', 'modules/render/diagram.css'].some(file => paths.includes(file)), 'Missing diagram stylesheet');
   assert.ok(!paths.some(file => /(^|\/)(\.internal|\.git|\.github|node_modules|generated|experiments)(\/|$)/.test(file)), 'Archive contains development/private output');
   fs.writeFileSync(path.join(temporary, 'package.json'), '{"private":true,"type":"module"}\n');
   run('npm', ['install', '--ignore-scripts', '--no-audit', '--no-fund', path.join(temporary, pack.filename)]);

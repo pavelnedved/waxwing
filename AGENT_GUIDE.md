@@ -124,6 +124,13 @@ embedded documents; it does not recreate details that ingestion never recorded.
 
 Follow these stages, revisiting earlier choices when evidence changes them:
 
+Complete the useful work available from the sources before asking the human to
+fill gaps. Present a usable partial result with its evidence and limits, and
+explain what each answer would improve. Human contributions are especially
+valuable for domain terms/verbs, intended boundaries, and goals, intentions or
+assumptions. Retrieve explicit explanations before asking people to repeat them;
+do not infer these meanings from implementation patterns alone.
+
 1. **Scope.** State the reading question, current environment, inspected revisions,
    abstraction, stopping boundary and omissions. Inventory accessible sources.
    Distinguish inspected code from proven production deployment and committed
@@ -134,17 +141,20 @@ Follow these stages, revisiting earlier choices when evidence changes them:
    folders, names and installed packages are leads, not proof of network edges,
    ownership or deployed components. Follow cross-repository references when
    authorized; record inaccessible dependencies without claiming to inspect them.
-3. **Clarify.** Ask a small batch of consequential questions about intent,
-   boundaries, rationale, conflicting reports or missing evidence after checking
-   available sources. Human input is especially useful for information absent
-   from code. Do not ask for confirmation of every observation. Continue
-   independent work while waiting; silence never establishes a claim. With
-   clarification disabled, retain the gap explicitly. An unresolved essential
-   scope/access choice may require pausing dependent investigation.
-4. **Assemble.** Use exact fields below and stable IDs. Each claim has its own
+3. **Assemble a useful draft.** Use exact fields below and stable IDs. Each claim has its own
    qualification and evidence explanation. Preserve previous human explanations
    and identities when updating an existing model; new evidence can qualify or
    dispute an earlier claim. Do not silently drop records to improve the picture.
+   Validate and deliver the usable portion through the requested output stage,
+   retaining explicit unknowns. If output is blocked, show the established
+   findings and the specific blocker.
+4. **Clarify consequential gaps.** Ask a small batch about terms, intended
+   boundaries, goals, assumptions, conflicting reports or missing evidence after
+   checking available sources and showing the useful result. Explain how each
+   answer will improve it. Do not ask people to narrate literal code behavior or
+   confirm every observation. Continue independent work while waiting; silence
+   never establishes a claim. With clarification disabled, retain gaps explicitly.
+   An essential scope/access choice may require earlier input for dependent work.
 5. **Review.** Run validation, review the evidence and omissions, and generate
    artifacts only through the requested stage. Compare the result to the reading
    task. An attractive SVG or valid JSON is not proof of a correct architecture.

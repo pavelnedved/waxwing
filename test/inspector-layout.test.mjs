@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import fs from 'node:fs';
 
-const css = fs.readFileSync(new URL('../modules/render/viewer.css', import.meta.url), 'utf8');
+const css = fs.readFileSync(new URL('../modules/presentation/render/viewer.css', import.meta.url), 'utf8');
 
 test('desktop inspector reserves exactly its width only while open', () => {
   const desktop = css.match(/@media\(min-width:901px\)\s*\{([\s\S]*?)\n\}/)?.[1];
